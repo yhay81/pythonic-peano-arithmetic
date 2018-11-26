@@ -1,12 +1,13 @@
 import unittest
 import time
-from numbers.integer import Integer, Z
-from numbers.natural_number import N
+from peano.integer import Integer, integer
+from peano.natural_number import natural_number
 import sys
+
 sys.setrecursionlimit(1 << 16)
 
 
-class TestNaturalNumber(unittest.TestCase):
+class TestInteger(unittest.TestCase):
     def setUp(self):
         self.startTime = time.time()
 
@@ -17,17 +18,17 @@ class TestNaturalNumber(unittest.TestCase):
     def test_eq(self):
         for i in range(-10, 10):
             for j in range(abs(i), 20):
-                self.assertEqual(Z(i), Integer(N(i + j), N(j)))
+                self.assertEqual(integer(i), Integer(natural_number(i + j), natural_number(j)))
 
     def test_add(self):
         for i in range(-10, 10):
             for j in range(-10, 10):
-                self.assertEqual(Z(i) + Z(j), Z(i + j))
+                self.assertEqual(integer(i) + integer(j), integer(i + j))
 
     def test_mul(self):
         for i in range(-5, 5):
             for j in range(-5, 5):
-                self.assertEqual(Z(i) * Z(j), Z(i * j))
+                self.assertEqual(integer(i) * integer(j), integer(i * j))
 
     # def test_bigmul(self):
     #     self.assertEqual(Z(100) * Z(100), Z(100 * 100))
@@ -35,17 +36,17 @@ class TestNaturalNumber(unittest.TestCase):
     def test_le(self):
         for i in range(-10, 10):
             for j in range(-10, 10):
-                self.assertEqual(Z(i) <= Z(j), i <= j)
+                self.assertEqual(integer(i) <= integer(j), i <= j)
 
     def test_lt(self):
         for i in range(-10, 10):
             for j in range(-10, 10):
-                self.assertEqual(Z(i) < Z(j), i < j)
+                self.assertEqual(integer(i) < integer(j), i < j)
 
     def test_sub(self):
         for i in range(-10, 10):
             for j in range(-10, 10):
-                self.assertEqual(Z(i) - Z(j), Z(i - j))
+                self.assertEqual(integer(i) - integer(j), integer(i - j))
 
     # def test_mod(self):
     #     for i in range(-10, 10):
@@ -63,19 +64,19 @@ class TestNaturalNumber(unittest.TestCase):
 
     def test_bool(self):
         for i in range(-100, 100):
-            self.assertEqual(bool(Z(i)), bool(i))
+            self.assertEqual(bool(integer(i)), bool(i))
 
     def test_int(self):
         for i in range(-100, 100):
-            self.assertEqual(int(Z(i)), int(i))
+            self.assertEqual(int(integer(i)), int(i))
 
     def test_hash(self):
         for i in range(-100, 100):
-            self.assertEqual(hash(Z(i)), hash(i))
+            self.assertEqual(hash(integer(i)), hash(i))
 
     def test_str(self):
         for i in range(-100, 100):
-            self.assertEqual(str(Z(i)), str(i))
+            self.assertEqual(str(integer(i)), str(i))
 
     # def test_divmod(self):
     #     for i in range(20):
@@ -86,15 +87,15 @@ class TestNaturalNumber(unittest.TestCase):
     def test_pow(self):
         for i in range(-5, 5):
             for j in range(5):
-                self.assertEqual(Z(i) ** N(j), Z(i**j))
+                self.assertEqual(integer(i) ** natural_number(j), integer(i ** j))
 
     def test_pos(self):
         for i in range(100):
-            self.assertEqual(+Z(i), Z(+i))
+            self.assertEqual(+integer(i), integer(+i))
 
     def test_abs(self):
         for i in range(100):
-            self.assertEqual(abs(Z(i)), N(abs(i)))
+            self.assertEqual(abs(integer(i)), natural_number(abs(i)))
 
 
 if __name__ == '__main__':
