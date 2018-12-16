@@ -1,10 +1,13 @@
 import unittest
 import time
-from peano.integer import Integer, integer
-from peano.natural_number import natural_number
 import sys
 
+from peano.integer import Integer, integer
+from peano.natural_number import natural_number
+from peano.logger import z_logger
+
 sys.setrecursionlimit(1 << 16)
+z_logger.setLevel(20)
 
 
 class TestInteger(unittest.TestCase):
@@ -17,12 +20,12 @@ class TestInteger(unittest.TestCase):
 
     def test_eq(self):
         for i in range(-10, 10):
-            for j in range(abs(i), 20):
+            for j in range(abs(i), 10):
                 self.assertEqual(integer(i), Integer(natural_number(i + j), natural_number(j)))
 
     def test_add(self):
-        for i in range(-10, 10):
-            for j in range(-10, 10):
+        for i in range(-5, 5):
+            for j in range(-5, 5):
                 self.assertEqual(integer(i) + integer(j), integer(i + j))
 
     def test_mul(self):
@@ -34,18 +37,18 @@ class TestInteger(unittest.TestCase):
     #     self.assertEqual(Z(100) * Z(100), Z(100 * 100))
 
     def test_le(self):
-        for i in range(-10, 10):
-            for j in range(-10, 10):
+        for i in range(-5, 5):
+            for j in range(-5, 5):
                 self.assertEqual(integer(i) <= integer(j), i <= j)
 
     def test_lt(self):
-        for i in range(-10, 10):
-            for j in range(-10, 10):
+        for i in range(-5, 5):
+            for j in range(-5, 5):
                 self.assertEqual(integer(i) < integer(j), i < j)
 
     def test_sub(self):
-        for i in range(-10, 10):
-            for j in range(-10, 10):
+        for i in range(-5, 5):
+            for j in range(-5, 5):
                 self.assertEqual(integer(i) - integer(j), integer(i - j))
 
     # def test_mod(self):
@@ -63,19 +66,19 @@ class TestInteger(unittest.TestCase):
     #             self.assertEqual(Z(i) // Z(j), Z(i // j))
 
     def test_bool(self):
-        for i in range(-100, 100):
+        for i in range(-30, 30):
             self.assertEqual(bool(integer(i)), bool(i))
 
     def test_int(self):
-        for i in range(-100, 100):
+        for i in range(-30, 30):
             self.assertEqual(int(integer(i)), int(i))
 
     def test_hash(self):
-        for i in range(-100, 100):
+        for i in range(-30, 30):
             self.assertEqual(hash(integer(i)), hash(i))
 
     def test_str(self):
-        for i in range(-100, 100):
+        for i in range(-30, 30):
             self.assertEqual(str(integer(i)), str(i))
 
     # def test_divmod(self):
@@ -85,16 +88,16 @@ class TestInteger(unittest.TestCase):
     #                              tuple(map(N, divmod(i, j))))
 
     def test_pow(self):
-        for i in range(-5, 5):
-            for j in range(5):
+        for i in range(-4, 4):
+            for j in range(4):
                 self.assertEqual(integer(i) ** natural_number(j), integer(i ** j))
 
     def test_pos(self):
-        for i in range(100):
+        for i in range(-30, 30):
             self.assertEqual(+integer(i), integer(+i))
 
     def test_abs(self):
-        for i in range(100):
+        for i in range(-30, 30):
             self.assertEqual(abs(integer(i)), natural_number(abs(i)))
 
 

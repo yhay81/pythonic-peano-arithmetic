@@ -1,7 +1,8 @@
 import unittest
 import time
-from peano.natural_number import NaturalNumber, natural_number
 import sys
+
+from peano.natural_number import NaturalNumber, natural_number
 
 sys.setrecursionlimit(1 << 16)
 
@@ -22,13 +23,13 @@ class TestNaturalNumber(unittest.TestCase):
             self.assertEqual(natural_number(i), n)
 
     def test_add(self):
-        for i in range(10):
-            for j in range(10):
+        for i in range(5):
+            for j in range(5):
                 self.assertEqual(natural_number(i) + natural_number(j), natural_number(i + j))
 
     def test_mul(self):
-        for i in range(10):
-            for j in range(10):
+        for i in range(5):
+            for j in range(5):
                 self.assertEqual(natural_number(i) * natural_number(j), natural_number(i * j))
 
     # def test_bigmul(self):
@@ -50,17 +51,17 @@ class TestNaturalNumber(unittest.TestCase):
                 self.assertEqual(natural_number(i) - natural_number(j), natural_number(i - j))
 
     def test_mod(self):
-        for i in range(20):
+        for i in range(10):
             for j in range(1, 10):
                 self.assertEqual(natural_number(i) % natural_number(j), natural_number(i % j))
 
     def test_floordiv(self):
-        for i in range(20):
+        for i in range(10):
             for j in range(1, 10):
                 self.assertEqual(natural_number(i) // natural_number(j), natural_number(i // j))
 
     def test_bool(self):
-        for i in range(100):
+        for i in range(20):
             self.assertEqual(bool(natural_number(i)), bool(i))
 
     def test_int(self):
@@ -78,37 +79,39 @@ class TestNaturalNumber(unittest.TestCase):
     def test_set_repr(self):
         self.assertEqual(natural_number(0).set_repr(), frozenset())
         self.assertEqual(natural_number(1).set_repr(), frozenset((frozenset(),)))
+        self.assertEqual(natural_number(2).set_repr(), frozenset((frozenset(),frozenset((frozenset(),)))))
 
     def test_set_str(self):
         self.assertEqual(natural_number(0).set_str(), "{}")
         self.assertEqual(natural_number(1).set_str(), "{{}}")
         self.assertEqual(natural_number(2).set_str(), "{{}, {{}}}")
+        self.assertEqual(natural_number(3).set_str(), "{{}, {{}, {{}}}, {{}}}")
 
     def test_iter(self):
-        for i, n in enumerate(natural_number(100)):
+        for i, n in enumerate(natural_number(30)):
             self.assertEqual(n, natural_number(i))
 
     def test_reversed(self):
-        for i, n in enumerate(reversed((natural_number(100)))):
-            self.assertEqual(n, natural_number(99 - i))
+        for i, n in enumerate(reversed((natural_number(30)))):
+            self.assertEqual(n, natural_number(29 - i))
 
     def test_divmod(self):
-        for i in range(20):
-            for j in range(1, 10):
+        for i in range(5):
+            for j in range(1, 5):
                 self.assertEqual(divmod(natural_number(i), natural_number(j)),
                                  tuple(map(natural_number, divmod(i, j))))
 
     def test_pow(self):
-        for i in range(8):
+        for i in range(4):
             for j in range(4):
                 self.assertEqual(natural_number(i) ** natural_number(j), natural_number(i ** j))
 
     def test_pos(self):
-        for i in range(100):
+        for i in range(30):
             self.assertEqual(+natural_number(i), natural_number(+i))
 
     def test_abs(self):
-        for i in range(100):
+        for i in range(30):
             self.assertEqual(abs(natural_number(i)), natural_number(abs(i)))
 
 
