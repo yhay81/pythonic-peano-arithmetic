@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "pythonic-peano-arithmetic"
+version = "0.1.0"
+description = ""
+authors = ["Yusuke Hayashi <yusuke8h@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+flake8 = "^4.0.1"
+isort = "^5.10.1"
+mypy = "^0.931"
+pre-commit = "^2.17.0"
+notebook = "^6.4.8"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+strict = true

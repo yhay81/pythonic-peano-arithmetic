@@ -1,114 +1,129 @@
-import unittest
+import sys
 import time
-from peano.rational import Rational, rational
+import unittest
+
 from peano.integer import integer
 from peano.natural_number import natural_number
-import sys
+from peano.rational import Rational, rational
 
 sys.setrecursionlimit(1 << 16)
 
 
 class TestRational(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.startTime = time.time()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         t = time.time() - self.startTime
         print("{}: {}ms".format(self.id(), int(t * 1000)))
 
-    def test_eq(self):
+    def test_eq(self) -> None:
         for i in range(-4, 4):
             for j in range(-4, 4):
                 self.assertEqual(rational(i, j), Rational(integer(i), integer(j)))
 
-    def test_add(self):
+    def test_add(self) -> None:
         for i in range(-2, 2):
             for j in range(-2, 2):
                 for k in range(-2, 2):
-                    for l in range(-2, 2):
-                        # if j * l == 0:
+                    for m in range(-2, 2):
+                        # if j * m == 0:
                         #     continue
-                        self.assertEqual(rational(i, j) + rational(k, l), rational(i * l + j * k, j * l))
+                        self.assertEqual(
+                            rational(i, j) + rational(k, m),
+                            rational(i * m + j * k, j * m),
+                        )
 
-    def test_mul(self):
+    def test_mul(self) -> None:
         for i in range(-2, 2):
             for j in range(-2, 2):
                 for k in range(-2, 2):
-                    for l in range(-2, 2):
-                        self.assertEqual(rational(i, j) * rational(k, l), rational(i * k, j * l))
+                    for m in range(-2, 2):
+                        self.assertEqual(
+                            rational(i, j) * rational(k, m), rational(i * k, j * m)
+                        )
 
-    # def test_bigmul(self):
-    #     self.assertEqual(rational(50) * rational(50), rational(50 * 50))
+    @unittest.skip("too slow")
+    def test_bigmul(self) -> None:
+        self.assertEqual(rational(9, 2) * rational(9, 2), rational(9 * 9, 2 * 2))
 
-    def test_le(self):
+    def test_le(self) -> None:
         for i in range(-2, 2):
             for j in range(-2, 2):
                 for k in range(-2, 2):
-                    for l in range(-2, 2):
-                        # if j * l == 0:
+                    for m in range(-2, 2):
+                        # if j * m == 0:
                         #     continue
-                        self.assertEqual(rational(i, j) < rational(k, l), (i * l) < (k * j))
+                        self.assertEqual(
+                            rational(i, j) < rational(k, m), (i * m) < (k * j)
+                        )
 
-    def test_lt(self):
+    def test_lt(self) -> None:
         for i in range(-2, 2):
             for j in range(-2, 2):
                 for k in range(-2, 2):
-                    for l in range(-2, 2):
-                        # if j * l == 0:
+                    for m in range(-2, 2):
+                        # if j * m == 0:
                         #     continue
-                        self.assertEqual(rational(i, j) <= rational(k, l), (i * l) <= (k * j))
+                        self.assertEqual(
+                            rational(i, j) <= rational(k, m), (i * m) <= (k * j)
+                        )
 
-    def test_sub(self):
+    def test_sub(self) -> None:
         for i in range(-2, 2):
             for j in range(-2, 2):
                 for k in range(-2, 2):
-                    for l in range(-2, 2):
-                        # if j * l == 0:
+                    for m in range(-2, 2):
+                        # if j * m == 0:
                         #     continue
-                        self.assertEqual(rational(i, j) - rational(k, l), rational(i * l - j * k, j * l))
+                        self.assertEqual(
+                            rational(i, j) - rational(k, m),
+                            rational(i * m - j * k, j * m),
+                        )
 
-    def test_truediv(self):
+    def test_truediv(self) -> None:
         for i in range(-2, 2):
             for j in range(-2, 2):
                 for k in range(-2, 2):
-                    for l in range(-2, 2):
-                        self.assertEqual(rational(i, j) / rational(k, l), rational(i * l, j * k))
+                    for m in range(-2, 2):
+                        self.assertEqual(
+                            rational(i, j) / rational(k, m), rational(i * m, j * k)
+                        )
 
-    def test_bool(self):
+    def test_bool(self) -> None:
         for i in range(-5, 5):
             for j in range(-5, 5):
                 self.assertEqual(bool(rational(i, j)), bool(i))
 
-    # def test_int(self):
-    #     for i in range(20):
-    #         self.assertEqual(int(rational(i, integer(1))), int(i))
+    def test_hash(self) -> None:
+        self.assertEqual(
+            len(set(hash(rational(i, j)) for j in range(-5, 5) for i in range(-5, 5))),
+            100,
+        )
 
-    def test_hash(self):
-        self.assertEqual(len(set(
-            hash(rational(i, j)) for j in range(-5, 5) for i in range(-5, 5)
-        )), 100)
-
-    def test_str(self):
+    def test_str(self) -> None:
         for i in range(-5, 5):
             for j in range(-5, 5):
                 self.assertEqual(str(rational(i, j)), f"{str(i)}/{str(j)}")
 
-    def test_pow(self):
+    def test_pow(self) -> None:
         for i in range(3):
             for j in range(3):
                 for k in range(3):
-                    self.assertEqual(rational(i, j) ** natural_number(k), rational(i ** k, j ** k))
+                    self.assertEqual(
+                        rational(i, j) ** natural_number(k), rational(i**k, j**k)
+                    )
 
-    def test_pos(self):
+    def test_pos(self) -> None:
         for i in range(5):
             for j in range(5):
                 self.assertEqual(+rational(i, j), rational(+i, +j))
 
-    def test_abs(self):
+    def test_abs(self) -> None:
         for i in range(5):
             for j in range(5):
                 self.assertEqual(abs(rational(i, j)), rational(abs(i), abs(j)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
