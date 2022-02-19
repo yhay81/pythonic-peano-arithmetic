@@ -90,7 +90,7 @@ class Rational:
     @log(log_level=26)
     def __pow__(self, x: object) -> tuple["Rational", str]:
         if not isinstance(x, NaturalNumber):
-            raise TypeError
+            raise TypeError(f"{repr(x)} is not NaturalNumber")
         formula = f"{repr(self)} ** {repr(x)}"
         if x == N_ZERO:
             return (

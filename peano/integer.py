@@ -144,7 +144,7 @@ class Integer:
     @log(log_level=16)
     def __pow__(self, x: object) -> tuple["Integer", str]:
         if not isinstance(x, NaturalNumber):
-            raise TypeError
+            raise TypeError(f"{repr(x)} is not a NaturalNumber")
         formula = f"{repr(self)} ** {repr(x)}"
         if x == N_ZERO:
             return Z_ONE, f"{formula} = {repr(Z_ONE)}"
