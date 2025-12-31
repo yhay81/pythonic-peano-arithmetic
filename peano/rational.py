@@ -4,6 +4,8 @@ from .utils import log
 
 
 class Rational:
+    """整数の商 p/q で有理数を表すクラス。"""
+
     def __init__(self, p: Integer, q: Integer) -> None:
         if q == Z_ZERO:
             raise ZeroDivisionError("分母は0にできません")
@@ -155,18 +157,26 @@ Q_MINUS_ONE = Rational(Z_MINUS_ONE, Z_ONE)
 
 
 def rational(p: int, q: int) -> Rational:
+    """Python の int から有理数を構成する。"""
+
     return Rational(integer(p), integer(q))
 
 
 def n2r(x: NaturalNumber) -> Rational:
+    """自然数を有理数に埋め込む。"""
+
     return Rational(n2z(x), Z_ONE)
 
 
 def z2r(x: Integer) -> Rational:
+    """整数を有理数に埋め込む。"""
+
     return Rational(x, Z_ONE)
 
 
 def cast2z(x: object) -> Rational:
+    """Rational への型変換を強制する。"""
+
     if isinstance(x, NaturalNumber):
         x = n2r(x)
     if isinstance(x, Integer):

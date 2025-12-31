@@ -1,24 +1,28 @@
 [tool.poetry]
 name = "pythonic-peano-arithmetic"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["Yusuke Hayashi <yusuke8h@gmail.com>"]
 license = "MIT"
+packages = [{ include = "peano" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 
-[tool.poetry.dev-dependencies]
-black = "^22.1.0"
-flake8 = "^4.0.1"
-isort = "^5.10.1"
-mypy = "^0.931"
-pre-commit = "^2.17.0"
-notebook = "^6.4.8"
+[tool.poetry.group.dev.dependencies]
+black = "^25.12.0"
+flake8 = "^7.3.0"
+isort = "^7.0.0"
+mypy = "^1.19.1"
+pre-commit = "^4.5.1"
+notebook = "^7.5.1"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.2.1"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 strict = true
+
+[tool.isort]
+profile = "black"

@@ -3,6 +3,11 @@ from .utils import log
 
 
 class Integer:
+    """自然数の差 (a, b) で整数を表すクラス。
+
+    意味としては a - b の同値類を扱う。
+    """
+
     def __init__(self, a: NaturalNumber, b: NaturalNumber) -> None:
         (self._a, self._b) = (a, b)
         self._repr = repr(self)
@@ -190,6 +195,8 @@ Z_MINUS_ONE = Integer(N_ZERO, N_ONE)
 
 
 def integer(x: int) -> Integer:
+    """Python の int から差の表現で整数を構成する。"""
+
     return (
         Integer(natural_number(x), N_ZERO)
         if x >= 0
@@ -198,10 +205,14 @@ def integer(x: int) -> Integer:
 
 
 def n2z(x: NaturalNumber) -> Integer:
+    """自然数を整数に埋め込む。"""
+
     return Integer(x, N_ZERO)
 
 
 def cast2z(x: object) -> Integer:
+    """Integer への型変換を強制する。"""
+
     if isinstance(x, NaturalNumber):
         x = n2z(x)
     if not isinstance(x, Integer):

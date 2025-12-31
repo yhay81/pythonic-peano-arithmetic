@@ -3,7 +3,7 @@
 このモジュールから主要な型と生成関数を参照できるようにする。
 """
 
-from .integer import Integer, Z_MINUS_ONE, Z_ONE, Z_ZERO, integer, n2z
+from .integer import Z_MINUS_ONE, Z_ONE, Z_ZERO, Integer, integer, n2z
 from .natural_number import N_ONE, N_ZERO, NaturalNumber, natural_number, successor
 from .polynomial import P_ONE, P_ZERO, Polynomial, n2p, polynomial, r2p, z2p
 from .rational import Q_MINUS_ONE, Q_ONE, Q_ZERO, Rational, n2r, rational, z2r

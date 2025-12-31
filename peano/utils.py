@@ -8,6 +8,8 @@ T = TypeVar("T")
 
 
 def log(log_level: int) -> Callable[..., Callable[..., Any]]:
+    """演算ログを出力するデコレータを生成する。"""
+
     def outer(func: Callable[..., tuple[T, str]]) -> Callable[..., T]:
         def inner(*args: Any, **kwargs: Any) -> T:
             result, message = func(*args, **kwargs)
@@ -25,6 +27,8 @@ def config_log(
     fmt: str = "Level %(levelno)s: %(message)s",
     clear_handlers: bool = True,
 ) -> None:
+    """演算ログの出力設定を行う。"""
+
     logger = getLogger(None if root else __name__)
     if clear_handlers:
         logger.handlers.clear()

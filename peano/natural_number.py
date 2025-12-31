@@ -4,6 +4,11 @@ from .utils import log
 
 
 class NaturalNumber:
+    """Peano 公理に基づく自然数。
+
+    `pre` は前者を表し、`None` が 0 に対応する。
+    """
+
     def __init__(self, pre: Optional["NaturalNumber"] = None) -> None:
         self._pre = pre
         self._repr = repr(self)  # for chaching
@@ -214,6 +219,8 @@ class NaturalNumber:
 
 
 class NaturalNumberIterator:
+    """0 から n-1 までを順に返すイテレータ。"""
+
     def __init__(self, n: NaturalNumber) -> None:
         self._i = N_ZERO
         self.n = n
@@ -231,6 +238,8 @@ class NaturalNumberIterator:
 
 
 class NaturalNumberReversedIterator:
+    """n-1 から 0 までを逆順に返すイテレータ。"""
+
     def __init__(self, n: NaturalNumber) -> None:
         self._i = n
         self.n = n
@@ -247,16 +256,22 @@ class NaturalNumberReversedIterator:
 
 
 def successor(n: NaturalNumber) -> NaturalNumber:
+    """後者関数 S(n) を返す。"""
+
     return NaturalNumber(n)
 
 
 def natural_number(k: int) -> NaturalNumber:
+    """Python の int から自然数を構成する。"""
+
     if k < 0:
         raise ValueError("負の値は自然数に変換できません")
     return N_ZERO if k == 0 else NaturalNumber(natural_number(k - 1))
 
 
 def cast2n(x: object) -> NaturalNumber:
+    """NaturalNumber への型変換を強制する。"""
+
     if not isinstance(x, NaturalNumber):
         raise TypeError(f"{repr(x)} is not an NaturalNumber, but {type(x)}")
     return x
