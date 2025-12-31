@@ -5,8 +5,12 @@ from .utils import log
 
 class NaturalNumber:
     def __init__(self, pre: Optional["NaturalNumber"] = None) -> None:
-        self.pre = pre
+        self._pre = pre
         self._repr = repr(self)  # for chaching
+
+    @property
+    def pre(self) -> Optional["NaturalNumber"]:
+        return self._pre
 
     def __repr__(self) -> str:
         if not hasattr(self, "_repr"):
@@ -24,6 +28,8 @@ class NaturalNumber:
 
     @log(log_level=1)
     def __eq__(self, x: object) -> tuple[bool, str]:
+        if not isinstance(x, NaturalNumber):
+            return NotImplemented, f"{repr(self)} == {repr(x)} = NotImplemented"
         x = cast2n(x)
         formula = f"{repr(self)} == {repr(x)} = {repr(self)}.pre == {repr(x)}.pre = {repr(self.pre)} == {repr(x.pre)}"
         if self.pre is None and x.pre is None:
@@ -43,6 +49,8 @@ class NaturalNumber:
 
     @log(log_level=2)
     def __le__(self, x: object) -> tuple[bool, str]:
+        if not isinstance(x, NaturalNumber):
+            return NotImplemented, f"{repr(self)} <= {repr(x)} = NotImplemented"
         x = cast2n(x)
         formula = f"{repr(self)} <= {repr(x)} = {repr(self)}.pre <= {repr(x)}.pre = {repr(self.pre)} <= {repr(x.pre)}"
         if self.pre is None:
@@ -54,6 +62,8 @@ class NaturalNumber:
 
     @log(log_level=3)
     def __lt__(self, x: object) -> tuple[bool, str]:
+        if not isinstance(x, NaturalNumber):
+            return NotImplemented, f"{repr(self)} < {repr(x)} = NotImplemented"
         x = cast2n(x)
         return (
             self <= x and self != x,
@@ -75,9 +85,9 @@ class NaturalNumber:
     @log(log_level=4)
     def __sub__(self, x: object) -> tuple["NaturalNumber", str]:
         x = cast2n(x)
-        formula = f"{repr(self)} - {repr(x)} = {repr(self)}.pre - {repr(x)}.pre"
+        formula = f"{repr(self)} - {repr(x)}"
         if x.pre is None:
-            return self, f"{formula} = {repr(self.pre)}"
+            return self, f"{formula} = {repr(self)}"
         elif self.pre is None:
             raise ValueError
         else:
@@ -124,18 +134,19 @@ class NaturalNumber:
         else:
             return (
                 N_ONE + ((self - x) // x),
-                f"{formula} = ({repr(N_ONE)} + (({repr(self)} - {repr(x)}) // {repr(x)})",
+                f"{formula} = {repr(N_ONE)} + (({repr(self)} - {repr(x)}) // {repr(x)})",
             )
 
     @log(log_level=5)
     def __mod__(self, x: object) -> tuple["NaturalNumber", str]:
         x = cast2n(x)
+        formula = f"{repr(self)} % {repr(x)}"
         if x.pre is None:
             raise ZeroDivisionError
         if self < x:
-            return self, f"({repr(self)} - {repr(x)} % {repr(x)}"
+            return self, f"{formula} = {repr(self)}"
         else:
-            return (self - x) % x, f"({repr(self)} - {repr(x)} % {repr(x)}"
+            return (self - x) % x, f"{formula} = ({repr(self)} - {repr(x)}) % {repr(x)}"
 
     @log(log_level=5)
     def __divmod__(
@@ -240,6 +251,8 @@ def successor(n: NaturalNumber) -> NaturalNumber:
 
 
 def natural_number(k: int) -> NaturalNumber:
+    if k < 0:
+        raise ValueError("負の値は自然数に変換できません")
     return N_ZERO if k == 0 else NaturalNumber(natural_number(k - 1))
 
 

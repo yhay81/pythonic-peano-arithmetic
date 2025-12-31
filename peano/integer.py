@@ -4,8 +4,16 @@ from .utils import log
 
 class Integer:
     def __init__(self, a: NaturalNumber, b: NaturalNumber) -> None:
-        (self.a, self.b) = (a, b)
+        (self._a, self._b) = (a, b)
         self._repr = repr(self)
+
+    @property
+    def a(self) -> NaturalNumber:
+        return self._a
+
+    @property
+    def b(self) -> NaturalNumber:
+        return self._b
 
     def __repr__(self) -> str:
         if not hasattr(self, "_repr"):
@@ -29,6 +37,8 @@ class Integer:
 
     @log(log_level=11)
     def __eq__(self, x: object) -> tuple[bool, str]:
+        if not isinstance(x, (NaturalNumber, Integer)):
+            return NotImplemented, f"{repr(self)} == {repr(x)} = NotImplemented"
         x = cast2z(x)
         formula = f"{repr(self)} == {repr(x)}"
         return (
@@ -38,6 +48,8 @@ class Integer:
 
     @log(log_level=12)
     def __le__(self, x: object) -> tuple[bool, str]:
+        if not isinstance(x, (NaturalNumber, Integer)):
+            return NotImplemented, f"{repr(self)} <= {repr(x)} = NotImplemented"
         x = cast2z(x)
         formula = f"{repr(self)} <= {repr(x)}"
         return (
@@ -47,6 +59,8 @@ class Integer:
 
     @log(log_level=13)
     def __lt__(self, x: object) -> tuple[bool, str]:
+        if not isinstance(x, (NaturalNumber, Integer)):
+            return NotImplemented, f"{repr(self)} < {repr(x)} = NotImplemented"
         x = cast2z(x)
         formula = f"{repr(self)} < {repr(x)}"
         return self <= x and self != x, f"{formula} = {self} <= {x} and {self} != {x}"

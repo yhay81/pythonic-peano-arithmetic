@@ -1,3 +1,5 @@
+from itertools import zip_longest
+
 from .integer import Integer
 from .natural_number import N_ONE, N_ZERO, NaturalNumber
 from .rational import Q_ONE, Q_ZERO, Rational, n2r, rational, z2r
@@ -5,25 +7,36 @@ from .rational import Q_ONE, Q_ZERO, Rational, n2r, rational, z2r
 
 class Polynomial:
     def __init__(self, *k: Rational) -> None:
-        self.k = k
+        if not k:
+            self._k = (Q_ZERO,)
+            return
+        coeffs = list(k)
+        while len(coeffs) > 1 and coeffs[-1] == Q_ZERO:
+            coeffs.pop()
+        self._k = tuple(coeffs)
+
+    @property
+    def k(self) -> tuple[Rational, ...]:
+        return self._k
 
     def __eq__(self, x: object) -> bool:
         x = cast2p(x)
-        return all(map(lambda a, b: a == b, self.k, x.k))
+        return self.k == x.k
 
     def __add__(self, x: object) -> "Polynomial":
         x = cast2p(x)
-        return Polynomial(*list(map(lambda a, b: a + b, self.k, x.k)))  # type: ignore
+        coeffs = [a + b for a, b in zip_longest(self.k, x.k, fillvalue=Q_ZERO)]
+        return Polynomial(*coeffs)
 
     def __iter__(self) -> "PolynomialIterator":
         return PolynomialIterator(*self.k)
 
     def __mul__(self, x: object) -> "Polynomial":
         x = cast2p(x)
-        result: list[Rational] = []
-        for i, sk in enumerate(self):
-            for j, xk in enumerate(x):
-                result[i + j] += sk * xk
+        result: list[Rational] = [Q_ZERO] * (len(self.k) + len(x.k) - 1)
+        for i, sk in enumerate(self.k):
+            for j, xk in enumerate(x.k):
+                result[i + j] = result[i + j] + (sk * xk)
         return Polynomial(*result)
 
     def __neg__(self) -> "Polynomial":
@@ -43,7 +56,7 @@ class Polynomial:
     # def __lt__(self, x):  # TODO
 
     def __bool__(self) -> bool:
-        return any(map(lambda x: x != Q_ZERO, self))
+        return any(k != Q_ZERO for k in self.k)
 
     # def __int__(self): # TODO
 
@@ -74,7 +87,7 @@ class PolynomialIterator(Polynomial):
     def __init__(self, *k: Rational) -> None:
         super().__init__(*k)
         self._i = 0
-        self.n = len(k)
+        self.n = len(self.k)
 
     def __iter__(self) -> "PolynomialIterator":
         return self

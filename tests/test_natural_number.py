@@ -59,6 +59,10 @@ class TestNaturalNumber(unittest.TestCase):
                     natural_number(i) - natural_number(j), natural_number(i - j)
                 )
 
+    def test_sub_negative_result(self) -> None:
+        with self.assertRaises(ValueError):
+            natural_number(1) - natural_number(2)
+
     def test_mod(self) -> None:
         for i in range(10):
             for j in range(1, 10):
@@ -133,6 +137,10 @@ class TestNaturalNumber(unittest.TestCase):
     def test_abs(self) -> None:
         for i in range(30):
             self.assertEqual(abs(natural_number(i)), natural_number(abs(i)))
+
+    def test_negative_input(self) -> None:
+        with self.assertRaises(ValueError):
+            natural_number(-1)
 
 
 if __name__ == "__main__":

@@ -5,9 +5,19 @@ from .utils import log
 
 class Rational:
     def __init__(self, p: Integer, q: Integer) -> None:
-        self.p = p
-        self.q = q
+        if q == Z_ZERO:
+            raise ZeroDivisionError("分母は0にできません")
+        self._p = p
+        self._q = q
         self._repr = repr(self)
+
+    @property
+    def p(self) -> Integer:
+        return self._p
+
+    @property
+    def q(self) -> Integer:
+        return self._q
 
     def __repr__(self) -> str:
         if not hasattr(self, "_repr"):
@@ -19,6 +29,8 @@ class Rational:
 
     @log(log_level=21)
     def __eq__(self, x: object) -> tuple[bool, str]:
+        if not isinstance(x, (NaturalNumber, Integer, Rational)):
+            return NotImplemented, f"{repr(self)} == {repr(x)} = NotImplemented"
         x = cast2z(x)
         formula = f"{repr(self)} == {repr(x)}"
         return (
@@ -28,15 +40,26 @@ class Rational:
 
     @log(log_level=22)
     def __le__(self, x: object) -> tuple[bool, str]:
+        if not isinstance(x, (NaturalNumber, Integer, Rational)):
+            return NotImplemented, f"{repr(self)} <= {repr(x)} = NotImplemented"
         x = cast2z(x)
         formula = f"{repr(self)} <= {repr(x)}"
+        left = self.p * x.q
+        right = self.q * x.p
+        if (self.q < Z_ZERO) != (x.q < Z_ZERO):
+            return (
+                left >= right,
+                f"{formula} = {repr(self)}.p * {repr(x)}.q >= {repr(self)}.q * {repr(x)}.p",
+            )
         return (
-            self.p * x.q <= self.q * x.p,
+            left <= right,
             f"{formula} = {repr(self)}.p * {repr(x)}.q <= {repr(self)}.q * {repr(x)}.p",
         )
 
     @log(log_level=23)
     def __lt__(self, x: object) -> tuple[bool, str]:
+        if not isinstance(x, (NaturalNumber, Integer, Rational)):
+            return NotImplemented, f"{repr(self)} < {repr(x)} = NotImplemented"
         x = cast2z(x)
         formula = f"{repr(self)} < {repr(x)}"
         return (
@@ -107,9 +130,8 @@ class Rational:
         return self != Q_ZERO
 
     def __hash__(self) -> int:
-        p, q = int(self.p), int(self.q)
-        ap, aq = abs(p), abs(q)
-        return (2 * (ap + aq) + int(p < 0)) ** 2 + 2 * aq + int(q < 0)
+        reduced = self.reduction()
+        return hash((reduced.p, reduced.q))
 
     def __pos__(self) -> "Rational":
         return self
@@ -118,10 +140,13 @@ class Rational:
         return Rational(Integer(abs(self.p), N_ZERO), Integer(abs(self.q), N_ZERO))
 
     def reduction(self) -> "Rational":
-        a, b = self.p.normalize(), self.q.normalize()
+        p, q = self.p.normalize(), self.q.normalize()
+        if q < Z_ZERO:
+            p, q = -p, -q
+        a, b = p, q
         while b:
             a, b = b, a % b
-        return Rational(self.p.normalize() // a, self.q.normalize() // a)
+        return Rational(p // a, q // a)
 
 
 Q_ZERO = Rational(Z_ZERO, Z_ONE)

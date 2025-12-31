@@ -66,6 +66,12 @@ class TestInteger(unittest.TestCase):
                     continue
                 self.assertEqual(integer(i) // integer(j), integer(i // j))
 
+    def test_zero_division(self) -> None:
+        with self.assertRaises(ZeroDivisionError):
+            integer(1) // integer(0)
+        with self.assertRaises(ZeroDivisionError):
+            integer(1) % integer(0)
+
     def test_bool(self) -> None:
         for i in range(-30, 30):
             self.assertEqual(bool(integer(i)), bool(i))
