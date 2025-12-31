@@ -6,6 +6,8 @@ from .utils import log
 class NaturalNumber:
     """Peano 公理に基づく自然数。
 
+    数学定義: 0 と後者 S(n) で生成される集合。
+    停止条件: 再帰は `pre is None` (0) に到達したときに止まる。
     `pre` は前者を表し、`None` が 0 に対応する。
     """
 

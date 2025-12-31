@@ -4,7 +4,11 @@ from .utils import log
 
 
 class Rational:
-    """整数の商 p/q で有理数を表すクラス。"""
+    """整数の商 p/q で有理数を表すクラス。
+
+    数学定義: p/q (q != 0) の同値類として有理数を構成する。
+    停止条件: 再帰は整数/自然数側の基底 (0) に到達した時点で止まる。
+    """
 
     def __init__(self, p: Integer, q: Integer) -> None:
         if q == Z_ZERO:

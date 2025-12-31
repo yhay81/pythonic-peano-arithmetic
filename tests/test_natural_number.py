@@ -2,7 +2,7 @@ import sys
 import time
 import unittest
 
-from peano.natural_number import NaturalNumber, natural_number
+from peano.natural_number import NaturalNumber, natural_number, successor
 
 sys.setrecursionlimit(1 << 16)
 
@@ -29,12 +29,32 @@ class TestNaturalNumber(unittest.TestCase):
                     natural_number(i) + natural_number(j), natural_number(i + j)
                 )
 
+    def test_add_axioms(self) -> None:
+        for i in range(5):
+            n = natural_number(i)
+            self.assertEqual(n + natural_number(0), n)
+        for i in range(4):
+            for j in range(4):
+                n = natural_number(i)
+                m = natural_number(j)
+                self.assertEqual(n + successor(m), successor(n + m))
+
     def test_mul(self) -> None:
         for i in range(5):
             for j in range(5):
                 self.assertEqual(
                     natural_number(i) * natural_number(j), natural_number(i * j)
                 )
+
+    def test_mul_axioms(self) -> None:
+        for i in range(5):
+            n = natural_number(i)
+            self.assertEqual(n * natural_number(0), natural_number(0))
+        for i in range(4):
+            for j in range(4):
+                n = natural_number(i)
+                m = natural_number(j)
+                self.assertEqual(n * successor(m), n + (n * m))
 
     @unittest.skip("too slow")
     def test_bigmul(self) -> None:

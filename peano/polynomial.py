@@ -6,7 +6,11 @@ from .rational import Q_ONE, Q_ZERO, Rational, n2r, rational, z2r
 
 
 class Polynomial:
-    """有理数係数の多項式を係数列で表すクラス。"""
+    """有理数係数の多項式を係数列で表すクラス。
+
+    数学定義: 有理数係数の有限列 (a0, ..., an) を多項式とみなす。
+    停止条件: 冪乗の再帰は指数が 0 のときに止まる。
+    """
 
     def __init__(self, *k: Rational) -> None:
         self._k: tuple[Rational, ...]

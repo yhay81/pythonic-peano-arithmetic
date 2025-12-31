@@ -5,7 +5,8 @@ from .utils import log
 class Integer:
     """自然数の差 (a, b) で整数を表すクラス。
 
-    意味としては a - b の同値類を扱う。
+    数学定義: (a, b) の同値類として a - b を表す。
+    停止条件: 演算の再帰は自然数側の基底 (0) に到達した時点で止まる。
     """
 
     def __init__(self, a: NaturalNumber, b: NaturalNumber) -> None:
