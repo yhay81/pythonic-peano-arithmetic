@@ -1,21 +1,10 @@
-import sys
-import time
 import unittest
 
 from peano.polynomial import Polynomial
 from peano.rational import rational
 
-sys.setrecursionlimit(1 << 16)
-
 
 class TestPolynomial(unittest.TestCase):
-    def setUp(self) -> None:
-        self.startTime = time.time()
-
-    def tearDown(self) -> None:
-        t = time.time() - self.startTime
-        print("{}: {}ms".format(self.id(), int(t * 1000)))
-
     def test_eq_missing_coefficients(self) -> None:
         self.assertEqual(
             Polynomial(rational(1, 1), rational(0, 1)),
@@ -84,6 +73,10 @@ class TestPolynomial(unittest.TestCase):
         self.assertEqual(
             hash(Polynomial(rational(1, 2))), hash(Polynomial(rational(2, 4)))
         )
+
+    def test_equality_with_unsupported_type(self) -> None:
+        self.assertNotEqual(Polynomial(rational(1, 1)), 1)
+        self.assertNotEqual(Polynomial(rational(1, 1)), "1")
 
 
 if __name__ == "__main__":

@@ -1,12 +1,8 @@
-import sys
-import time
 import unittest
 
 from peano.integer import integer
 from peano.natural_number import natural_number
 from peano.rational import Rational, rational
-
-sys.setrecursionlimit(1 << 16)
 
 
 def normalize_fraction(p: int, q: int) -> tuple[int, int]:
@@ -14,13 +10,6 @@ def normalize_fraction(p: int, q: int) -> tuple[int, int]:
 
 
 class TestRational(unittest.TestCase):
-    def setUp(self) -> None:
-        self.startTime = time.time()
-
-    def tearDown(self) -> None:
-        t = time.time() - self.startTime
-        print("{}: {}ms".format(self.id(), int(t * 1000)))
-
     def test_eq(self) -> None:
         for i in range(-4, 4):
             for j in range(-4, 4):
@@ -121,6 +110,12 @@ class TestRational(unittest.TestCase):
                 if j == 0:
                     continue
                 self.assertEqual(hash(rational(i, j)), hash(rational(i * 2, j * 2)))
+
+    def test_reduction_does_not_expand_integer_representation(self) -> None:
+        self.assertEqual(rational(16, 9).reduction(), rational(16, 9))
+        product = rational(-4, -3) * rational(-4, -3)
+        self.assertEqual(product.reduction(), rational(16, 9))
+        self.assertEqual(hash(product), hash(rational(16, 9)))
 
     def test_str(self) -> None:
         for i in range(-5, 5):

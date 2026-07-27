@@ -1,20 +1,9 @@
-import sys
-import time
 import unittest
 
 from peano.natural_number import NaturalNumber, natural_number, successor
 
-sys.setrecursionlimit(1 << 16)
-
 
 class TestNaturalNumber(unittest.TestCase):
-    def setUp(self) -> None:
-        self.startTime = time.time()
-
-    def tearDown(self) -> None:
-        t = time.time() - self.startTime
-        print("{}: {}ms".format(self.id(), int(t * 1000)))
-
     def test_eq(self) -> None:
         for i in range(20):
             n = NaturalNumber()

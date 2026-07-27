@@ -1,221 +1,271 @@
+"""自然数の差の同値類として整数を構成する。"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from functools import total_ordering
+from typing import Any
+
 from .natural_number import N_ONE, N_ZERO, NaturalNumber, natural_number
 from .utils import log
 
 
+@total_ordering
+@dataclass(frozen=True, slots=True, eq=False, repr=False)
 class Integer:
-    """自然数の差 (a, b) で整数を表すクラス。
+    """自然数の対 ``(a, b)`` で差 ``a - b`` を表す。
 
-    数学定義: (a, b) の同値類として a - b を表す。
-    停止条件: 演算の再帰は自然数側の基底 (0) に到達した時点で止まる。
+    ``(a, b) ~ (c, d)`` は ``a + d = b + c`` で定義する。表現をあえて
+    自動正規化しないため、同じ整数に複数の表現があることを観察できる。
     """
 
-    def __init__(self, a: NaturalNumber, b: NaturalNumber) -> None:
-        (self._a, self._b) = (a, b)
-        self._repr = repr(self)
+    a: NaturalNumber
+    b: NaturalNumber
 
-    @property
-    def a(self) -> NaturalNumber:
-        return self._a
-
-    @property
-    def b(self) -> NaturalNumber:
-        return self._b
+    def __post_init__(self) -> None:
+        if not isinstance(self.a, NaturalNumber) or not isinstance(
+            self.b, NaturalNumber
+        ):
+            raise TypeError("Integer の a と b は NaturalNumber でなければなりません")
 
     def __repr__(self) -> str:
-        if not hasattr(self, "_repr"):
-            self._repr = f"<Z({int(self.a)},{int(self.b)})>"
-        return self._repr
+        return f"<Z({int(self.a)},{int(self.b)})>"
 
     def __str__(self) -> str:
         return str(int(self))
 
     def __int__(self) -> int:
-        if self >= Z_ZERO:
-            return int(abs(self))
-        else:
-            return -int(abs(self))
+        return int(self.a) - int(self.b)
 
     def __abs__(self) -> NaturalNumber:
         if self.a >= self.b:
-            return self.a - self.b  # type: ignore
-        else:
-            return self.b - self.a  # type: ignore
+            return self.a - self.b
+        return self.b - self.a
 
     @log(log_level=11)
-    def __eq__(self, x: object) -> tuple[bool, str]:
-        if not isinstance(x, (NaturalNumber, Integer)):
-            return NotImplemented, f"{repr(self)} == {repr(x)} = NotImplemented"
-        x = cast2z(x)
-        formula = f"{repr(self)} == {repr(x)}"
+    def __eq__(self, other: object) -> tuple[bool | Any, str]:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented, f"{self!r} == {other!r} = NotImplemented"
+        result = self.a + converted.b == self.b + converted.a
         return (
-            self.a + x.b == self.b + x.a,
-            f"{formula} = {repr(self.a)} + {repr(x.b)} == {repr(self.b)} + {repr(x.a)}",
+            result,
+            f"{self!r} == {converted!r} iff "
+            f"{self.a!r} + {converted.b!r} == "
+            f"{self.b!r} + {converted.a!r}",
         )
 
     @log(log_level=12)
-    def __le__(self, x: object) -> tuple[bool, str]:
-        if not isinstance(x, (NaturalNumber, Integer)):
-            return NotImplemented, f"{repr(self)} <= {repr(x)} = NotImplemented"
-        x = cast2z(x)
-        formula = f"{repr(self)} <= {repr(x)}"
+    def __lt__(self, other: object) -> tuple[bool | Any, str]:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented, f"{self!r} < {other!r} = NotImplemented"
+        result = self.a + converted.b < self.b + converted.a
         return (
-            self.a + x.b <= self.b + x.a,
-            f"{formula} = {repr(self.a)} + {repr(x.b)} <= {repr(self.b)} + {repr(x.a)}",
+            result,
+            f"{self!r} < {converted!r} iff "
+            f"{self.a!r} + {converted.b!r} < "
+            f"{self.b!r} + {converted.a!r}",
         )
 
-    @log(log_level=13)
-    def __lt__(self, x: object) -> tuple[bool, str]:
-        if not isinstance(x, (NaturalNumber, Integer)):
-            return NotImplemented, f"{repr(self)} < {repr(x)} = NotImplemented"
-        x = cast2z(x)
-        formula = f"{repr(self)} < {repr(x)}"
-        return self <= x and self != x, f"{formula} = {self} <= {x} and {self} != {x}"
-
-    @log(log_level=14)
-    def __add__(self, x: object) -> tuple["Integer", str]:
-        x = cast2z(x)
-        formula = f"{repr(self)} + {repr(x)}"
+    @log(log_level=12)
+    def __le__(self, other: object) -> tuple[bool | Any, str]:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented, f"{self!r} <= {other!r} = NotImplemented"
+        result = self.a + converted.b <= self.b + converted.a
         return (
-            Integer(self.a + x.a, self.b + x.b),
-            f"{formula} = Integer({repr(self.a)} + {repr(x.a)}, {repr(self.b)} + {repr(x.b)})",
-        )
-
-    @log(log_level=14)
-    def __neg__(self) -> tuple["Integer", str]:
-        return (
-            Integer(self.b, self.a),
-            f"-{repr(self)} = Integer({repr(self.b)}, {repr(self.a)})",
+            result,
+            f"{self!r} <= {converted!r} iff "
+            f"{self.a!r} + {converted.b!r} <= "
+            f"{self.b!r} + {converted.a!r}",
         )
 
     @log(log_level=14)
-    def __sub__(self, x: object) -> tuple["Integer", str]:
-        x = cast2z(x)
-        formula = f"{repr(self)} - {repr(x)}"
-        return self + -x, f"{formula} = {repr(self)} + {repr(-x)}"
+    def __add__(self, other: object) -> tuple[Integer | Any, str]:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented, f"{self!r} + {other!r} = NotImplemented"
+        result = Integer(self.a + converted.a, self.b + converted.b)
+        return (
+            result,
+            f"{self!r} + {converted!r} = "
+            f"({self.a!r} + {converted.a!r}, "
+            f"{self.b!r} + {converted.b!r})",
+        )
+
+    def __radd__(self, other: object) -> Integer | Any:
+        return self + other
+
+    @log(log_level=14)
+    def __neg__(self) -> tuple[Integer, str]:
+        return Integer(self.b, self.a), f"-{self!r} = ({self.b!r}, {self.a!r})"
+
+    @log(log_level=14)
+    def __sub__(self, other: object) -> tuple[Integer | Any, str]:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented, f"{self!r} - {other!r} = NotImplemented"
+        return (
+            self + -converted,
+            f"{self!r} - {converted!r} = {self!r} + (-{converted!r})",
+        )
+
+    def __rsub__(self, other: object) -> Integer | Any:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented
+        return converted - self
 
     @log(log_level=15)
-    def __mul__(self, x: object) -> tuple["Integer", str]:
-        x = cast2z(x)
-        formula = f"{repr(self)} * {repr(x)}"
+    def __mul__(self, other: object) -> tuple[Integer | Any, str]:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented, f"{self!r} * {other!r} = NotImplemented"
+        result = Integer(
+            self.a * converted.a + self.b * converted.b,
+            self.a * converted.b + self.b * converted.a,
+        )
         return (
-            Integer(self.a * x.a + self.b * x.b, self.a * x.b + self.b * x.a),
-            f"{formula} = "
-            f"Integer({repr(self.a)} * {repr(x.a)} + {repr(self.b)} * {repr(x.b)}, "
-            f"{repr(self.a)} * {repr(x.b)} + {repr(self.b)} * {repr(x.a)})",
+            result,
+            f"{self!r} * {converted!r} = "
+            f"({self.a!r}{converted.a!r} + {self.b!r}{converted.b!r}, "
+            f"{self.a!r}{converted.b!r} + {self.b!r}{converted.a!r})",
         )
 
+    def __rmul__(self, other: object) -> Integer | Any:
+        return self * other
+
     @log(log_level=15)
-    def __truediv__(self, x: object):  # type: ignore
-        x = cast2z(x)
-        formula = f"{repr(self)} / {repr(x)}"
+    def __truediv__(self, other: object) -> tuple[Any, str]:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented, f"{self!r} / {other!r} = NotImplemented"
         from .rational import Rational
 
-        return Rational(self, x), f"{formula} = Rational({repr(self)}, {repr(x)})"
+        result = Rational(self, converted)
+        return result, f"{self!r} / {converted!r} = {result!r}"
 
-    @log(log_level=15)
-    def __floordiv__(self, x: object) -> tuple["Integer", str]:
-        x = cast2z(x)
-        if x == Z_ZERO:
-            raise ZeroDivisionError
-        formula = f"{repr(self)} // {repr(x)}"
-        if (self > Z_ZERO and x > Z_ZERO and self >= x) or (
-            self < Z_ZERO and x < Z_ZERO and self <= x
-        ):
-            return (
-                Z_ONE + ((self - x) // x),
-                f"{formula} = {repr(Z_ONE)} + (({repr(self)} - {repr(x)}) // {repr(x)})",
-            )
-        elif (self > Z_ZERO and x < Z_ZERO and self >= Z_ZERO) or (
-            self < Z_ZERO and x > Z_ZERO and self <= Z_ZERO
-        ):
-            return (
-                Z_MINUS_ONE + ((self + x) // x),
-                f"{formula} = {repr(Z_MINUS_ONE)} + (({repr(self)} + {repr(x)}) // {repr(x)})",
-            )
+    def __rtruediv__(self, other: object) -> Any:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented
+        return converted / self
+
+    def _divmod(self, divisor: Integer) -> tuple[Integer, Integer]:
+        if not divisor:
+            raise ZeroDivisionError("0 で割ることはできません")
+
+        quotient_magnitude, remainder_magnitude = divmod(abs(self), abs(divisor))
+        same_sign = (self < Z_ZERO) == (divisor < Z_ZERO)
+
+        if same_sign:
+            quotient = Integer(quotient_magnitude, N_ZERO)
+            remainder = Integer(remainder_magnitude, N_ZERO)
+        elif not remainder_magnitude:
+            quotient = Integer(N_ZERO, quotient_magnitude)
+            remainder = Z_ZERO
         else:
-            return Z_ZERO, f"{formula} = {repr(Z_ZERO)}"
+            quotient = Integer(N_ZERO, quotient_magnitude + N_ONE)
+            remainder = Integer(abs(divisor) - remainder_magnitude, N_ZERO)
+
+        if divisor < Z_ZERO:
+            remainder = -remainder
+        return quotient, remainder
 
     @log(log_level=15)
-    def __mod__(self, x: object) -> tuple["Integer", str]:
-        x = cast2z(x)
-        if x == Z_ZERO:
-            raise ZeroDivisionError
-        formula = f"{repr(self)} % {repr(x)}"
-        if (self > Z_ZERO and x > Z_ZERO and self >= x) or (
-            self < Z_ZERO and x < Z_ZERO and self <= x
-        ):
-            return (self - x) % x, f"{formula} = ({repr(self)} - {repr(x)}) % {repr(x)}"
-        elif (self > Z_ZERO and x < Z_ZERO and self >= Z_ZERO) or (
-            self < Z_ZERO and x > Z_ZERO and self <= Z_ZERO
-        ):
-            return (self + x) % x, f"{formula} = ({repr(self)} + {repr(x)}) % {repr(x)}"
-        else:
-            return self, f"{formula} = {repr(self)}"
-
-    @log(log_level=15)
-    def __divmod__(self, x: object) -> tuple[tuple["Integer", "Integer"], str]:
-        x = cast2z(x)
-        formula = f"divmod({repr(self)}, {repr(x)})"
+    def __floordiv__(self, other: object) -> tuple[Integer | Any, str]:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented, f"{self!r} // {other!r} = NotImplemented"
+        quotient, _ = self._divmod(converted)
         return (
-            (self // x, self % x),
-            f"{formula} = {repr(self)} // {repr(x)}, {repr(self)} % {repr(x)}",
+            quotient,
+            f"{self!r} = ({quotient!r}) * {converted!r} + ({self!r} % {converted!r})",
         )
 
+    @log(log_level=15)
+    def __mod__(self, other: object) -> tuple[Integer | Any, str]:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented, f"{self!r} % {other!r} = NotImplemented"
+        _, remainder = self._divmod(converted)
+        return (
+            remainder,
+            f"{self!r} % {converted!r} = {remainder!r}, "
+            f"sign(remainder) = sign({converted!r})",
+        )
+
+    def __divmod__(self, other: object) -> tuple[Integer, Integer] | Any:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented
+        return self._divmod(converted)
+
     @log(log_level=16)
-    def __pow__(self, x: object) -> tuple["Integer", str]:
-        if not isinstance(x, NaturalNumber):
-            raise TypeError(f"{repr(x)} is not a NaturalNumber")
-        formula = f"{repr(self)} ** {repr(x)}"
-        if x == N_ZERO:
-            return Z_ONE, f"{formula} = {repr(Z_ONE)}"
-        else:
-            return (
-                (self ** (x - N_ONE)) * self,
-                f"{formula} = ({repr(self)} ** ({repr(x)} - N_ONE)) * {repr(self)}",
-            )
+    def __pow__(self, exponent: object) -> tuple[Integer | Any, str]:
+        if not isinstance(exponent, NaturalNumber):
+            return NotImplemented, f"{self!r} ** {exponent!r} = NotImplemented"
+        if exponent == N_ZERO:
+            return Z_ONE, f"{self!r} ** {exponent!r} = {Z_ONE!r}"
+        return (
+            (self ** (exponent - N_ONE)) * self,
+            f"{self!r} ** {exponent!r} = "
+            f"({self!r} ** ({exponent!r} - {N_ONE!r})) * {self!r}",
+        )
 
     def __bool__(self) -> bool:
-        return self != Z_ZERO
+        return self.a != self.b
 
     def __hash__(self) -> int:
-        return int(self)
+        return hash(int(self))
 
-    def __pos__(self) -> "Integer":
+    def __pos__(self) -> Integer:
         return self
 
-    def normalize(self) -> "Integer":
-        if self.a <= self.b:
-            return Integer(N_ZERO, self.b - self.a)
-        else:
+    def normalize(self) -> Integer:
+        """同値類の代表を ``(n, 0)`` または ``(0, n)`` にする。"""
+
+        if self.a >= self.b:
             return Integer(self.a - self.b, N_ZERO)
+        return Integer(N_ZERO, self.b - self.a)
+
+
+def integer(value: int) -> Integer:
+    """Python の整数から標準的な差の表現を構成する。"""
+
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise TypeError("整数へ変換できるのは int だけです")
+    if value >= 0:
+        return Integer(natural_number(value), N_ZERO)
+    return Integer(N_ZERO, natural_number(-value))
+
+
+def n2z(value: NaturalNumber) -> Integer:
+    """自然数を整数へ埋め込む。"""
+
+    if not isinstance(value, NaturalNumber):
+        raise TypeError("n2z の引数は NaturalNumber でなければなりません")
+    return Integer(value, N_ZERO)
+
+
+def _coerce_integer(value: object) -> Integer | None:
+    if isinstance(value, NaturalNumber):
+        return n2z(value)
+    if isinstance(value, Integer):
+        return value
+    return None
+
+
+def cast2z(value: object) -> Integer:
+    """NaturalNumber または Integer を Integer に変換する。"""
+
+    converted = _coerce_integer(value)
+    if converted is None:
+        raise TypeError(f"{value!r} is not an Integer")
+    return converted
 
 
 Z_ZERO = Integer(N_ZERO, N_ZERO)
 Z_ONE = Integer(N_ONE, N_ZERO)
 Z_MINUS_ONE = Integer(N_ZERO, N_ONE)
-
-
-def integer(x: int) -> Integer:
-    """Python の int から差の表現で整数を構成する。"""
-
-    return (
-        Integer(natural_number(x), N_ZERO)
-        if x >= 0
-        else Integer(N_ZERO, natural_number(abs(x)))
-    )
-
-
-def n2z(x: NaturalNumber) -> Integer:
-    """自然数を整数に埋め込む。"""
-
-    return Integer(x, N_ZERO)
-
-
-def cast2z(x: object) -> Integer:
-    """Integer への型変換を強制する。"""
-
-    if isinstance(x, NaturalNumber):
-        x = n2z(x)
-    if not isinstance(x, Integer):
-        raise TypeError(f"{repr(x)} is not an Integer, but {type(x)}")
-    return x

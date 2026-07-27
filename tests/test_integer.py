@@ -1,21 +1,10 @@
-import sys
-import time
 import unittest
 
 from peano.integer import Integer, integer
 from peano.natural_number import natural_number
 
-sys.setrecursionlimit(1 << 16)
-
 
 class TestInteger(unittest.TestCase):
-    def setUp(self) -> None:
-        self.startTime = time.time()
-
-    def tearDown(self) -> None:
-        t = time.time() - self.startTime
-        print("{}: {}ms".format(self.id(), int(t * 1000)))
-
     def test_eq(self) -> None:
         for i in range(-10, 10):
             for j in range(abs(i), 10):
