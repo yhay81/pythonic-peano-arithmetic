@@ -29,6 +29,29 @@ class TestAlgebraicRoot(unittest.TestCase):
         )
         self.assertEqual(len(sturm_sequence(self.sqrt_two_polynomial)), 3)
 
+    def test_sturm_count_removes_repeated_factors_without_intermediate_blowup(
+        self,
+    ) -> None:
+        repeated_root_polynomial = Polynomial(
+            rational(-1, 1),
+            rational(-1, 1),
+            rational(1, 1),
+            rational(1, 1),
+        )
+
+        self.assertEqual(
+            repeated_root_polynomial.square_free(),
+            Polynomial(rational(-1, 1), Q_ZERO, Q_ONE),
+        )
+        self.assertEqual(
+            count_real_roots(
+                repeated_root_polynomial,
+                rational(-5, 2),
+                rational(5, 2),
+            ),
+            2,
+        )
+
     def test_polynomial_is_readable_and_differentiable(self) -> None:
         self.assertEqual(str(self.sqrt_two_polynomial), "-2 + x^2")
         self.assertEqual(

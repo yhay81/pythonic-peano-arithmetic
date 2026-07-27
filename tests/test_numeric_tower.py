@@ -3,12 +3,15 @@ import unittest
 from peano import (
     N_ONE,
     P_ONE,
+    P_ZERO,
     Q_ONE,
     Z_ONE,
     Integer,
     NaturalNumber,
     Polynomial,
     Rational,
+    integer,
+    natural_number,
 )
 
 NumericValue = NaturalNumber | Integer | Rational | Polynomial
@@ -65,6 +68,25 @@ class TestNumericTower(unittest.TestCase):
         polynomial = Polynomial(Q_ONE, Q_ONE)
         self.assertEqual(P_ONE // Q_ONE, P_ONE)
         self.assertFalse(polynomial.__rfloordiv__(Q_ONE))
+        self.assertEqual(divmod(Q_ONE, polynomial), (P_ZERO, P_ONE))
+
+    def test_mixed_integer_floor_division_is_symmetric(self) -> None:
+        for natural_value in range(4):
+            dividend = natural_number(natural_value)
+            for integer_value in range(-3, 4):
+                if integer_value == 0:
+                    continue
+                divisor = integer(integer_value)
+                quotient, remainder = divmod(natural_value, integer_value)
+
+                self.assertIsInstance(dividend // divisor, Integer)
+                self.assertEqual(dividend // divisor, integer(quotient))
+                self.assertIsInstance(dividend % divisor, Integer)
+                self.assertEqual(dividend % divisor, integer(remainder))
+                self.assertEqual(
+                    divmod(dividend, divisor),
+                    (integer(quotient), integer(remainder)),
+                )
 
 
 if __name__ == "__main__":

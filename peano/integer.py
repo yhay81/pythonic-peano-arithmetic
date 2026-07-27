@@ -184,6 +184,12 @@ class Integer:
             f"{self!r} = ({quotient!r}) * {converted!r} + ({self!r} % {converted!r})",
         )
 
+    def __rfloordiv__(self, other: object) -> Integer | Any:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented
+        return converted // self
+
     @log(log_level=15)
     def __mod__(self, other: object) -> tuple[Integer | Any, str]:
         converted = _coerce_integer(other)
@@ -196,11 +202,23 @@ class Integer:
             f"sign(remainder) = sign({converted!r})",
         )
 
+    def __rmod__(self, other: object) -> Integer | Any:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented
+        return converted % self
+
     def __divmod__(self, other: object) -> tuple[Integer, Integer] | Any:
         converted = _coerce_integer(other)
         if converted is None:
             return NotImplemented
         return self._divmod(converted)
+
+    def __rdivmod__(self, other: object) -> tuple[Integer, Integer] | Any:
+        converted = _coerce_integer(other)
+        if converted is None:
+            return NotImplemented
+        return converted._divmod(self)
 
     @log(log_level=16)
     def __pow__(self, exponent: object) -> tuple[Integer | Any, str]:

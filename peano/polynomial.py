@@ -128,7 +128,8 @@ class Polynomial:
         result = [Q_ZERO] * (len(self.coefficients) + len(converted.coefficients) - 1)
         for i, left in enumerate(self.coefficients):
             for j, right in enumerate(converted.coefficients):
-                result[i + j] = result[i + j] + left * right
+                product = (left * right).reduction()
+                result[i + j] = (result[i + j] + product).reduction()
         return Polynomial(*result)
 
     def __rmul__(self, other: object) -> Polynomial | Any:
@@ -154,6 +155,12 @@ class Polynomial:
             term = Polynomial(*([Q_ZERO] * degree_difference + [leading]))
             remainder = remainder - divisor * term
         return Polynomial(*quotient), remainder
+
+    def __rdivmod__(self, other: object) -> tuple[Polynomial, Polynomial] | Any:
+        dividend = _coerce_polynomial(other)
+        if dividend is None:
+            return NotImplemented
+        return divmod(dividend, self)
 
     def __floordiv__(self, other: object) -> Polynomial | Any:
         divisor = _coerce_polynomial(other)
