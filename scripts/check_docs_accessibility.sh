@@ -54,27 +54,46 @@ if ! curl --fail --silent "${A11Y_BASE_URL}/" >/dev/null; then
   exit 1
 fi
 
+if [[ -n "${A11Y_ROUTES:-}" ]]; then
+  read -r -a course_routes <<<"${A11Y_ROUTES}"
+else
+  course_routes=(
+    ""
+    "en"
+    "zh"
+    "zh-hant"
+    "es"
+    "pt-br"
+    "fr"
+    "de"
+    "ko"
+    "ru"
+    "ar"
+    "hi"
+  )
+fi
+readonly COURSE_PAGES=(
+  ""
+  "learn/python-basics"
+  "learn/natural-numbers"
+  "learn/integers"
+  "learn/rationals"
+  "learn/polynomials"
+  "learn/algebraic-roots"
+  "playground"
+  "about"
+  "reference/implementation"
+)
+a11y_urls=()
+for route in "${course_routes[@]}"; do
+  route_prefix="${route:+${route}/}"
+  for page in "${COURSE_PAGES[@]}"; do
+    a11y_urls+=("${A11Y_BASE_URL}/${route_prefix}${page:+${page}/}")
+  done
+done
+
 npx --yes "@axe-core/cli@${AXE_VERSION}" \
-  "${A11Y_BASE_URL}/" \
-  "${A11Y_BASE_URL}/learn/python-basics/" \
-  "${A11Y_BASE_URL}/learn/natural-numbers/" \
-  "${A11Y_BASE_URL}/learn/integers/" \
-  "${A11Y_BASE_URL}/learn/rationals/" \
-  "${A11Y_BASE_URL}/learn/polynomials/" \
-  "${A11Y_BASE_URL}/learn/algebraic-roots/" \
-  "${A11Y_BASE_URL}/playground/" \
-  "${A11Y_BASE_URL}/about/" \
-  "${A11Y_BASE_URL}/reference/implementation/" \
-  "${A11Y_BASE_URL}/en/" \
-  "${A11Y_BASE_URL}/en/learn/python-basics/" \
-  "${A11Y_BASE_URL}/en/learn/natural-numbers/" \
-  "${A11Y_BASE_URL}/en/learn/integers/" \
-  "${A11Y_BASE_URL}/en/learn/rationals/" \
-  "${A11Y_BASE_URL}/en/learn/polynomials/" \
-  "${A11Y_BASE_URL}/en/learn/algebraic-roots/" \
-  "${A11Y_BASE_URL}/en/playground/" \
-  "${A11Y_BASE_URL}/en/about/" \
-  "${A11Y_BASE_URL}/en/reference/implementation/" \
+  "${a11y_urls[@]}" \
   --tags wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa,best-practice \
   --exit \
   --load-delay 1500 \

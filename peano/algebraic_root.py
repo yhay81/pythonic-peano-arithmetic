@@ -8,7 +8,7 @@ from fractions import Fraction
 from .natural_number import NaturalNumber
 from .polynomial import Polynomial, count_real_roots
 from .rational import Rational, rational
-from .utils import LogMessage, localized, log
+from .utils import LogMessage, log, translate
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,9 +132,10 @@ def _bisect(
         result = RationalInterval(midpoint, midpoint)
         return (
             result,
-            lambda: localized(
-                f"{polynomial_value!r}: midpoint {midpoint!r} is a root",
-                f"{polynomial_value!r}: 中点 {midpoint!r} は根",
+            lambda: translate(
+                "midpoint_root",
+                polynomial=repr(polynomial_value),
+                midpoint=repr(midpoint),
             ),
         )
 

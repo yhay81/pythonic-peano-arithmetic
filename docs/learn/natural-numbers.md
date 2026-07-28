@@ -205,7 +205,7 @@ def __eq__(self, other: object) -> tuple[bool, LogMessage]:
         return (
             result,
             lambda: (
-                f"{localized('[equality: zero case]', '[等値・0の場合]')} "
+                f"{translate('equality.zero')} "
                 f"eq({self.structural_str()}, "
                 f"{other.structural_str()}) -> {result}"
             ),
@@ -213,7 +213,7 @@ def __eq__(self, other: object) -> tuple[bool, LogMessage]:
     return (
         left_predecessor == right_predecessor,
         lambda: (
-            f"{localized('[equality: successor case]', '[等値・後者の場合]')} "
+            f"{translate('equality.successor')} "
             f"eq({self.structural_str()}, "
             f"{other.structural_str()}) -> "
             f"eq({left_predecessor.structural_str()}, "
@@ -319,7 +319,7 @@ def __add__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
         return (
             self,
             lambda: (
-                f"{localized('[addition: base]', '[加法・基底]')} "
+                f"{translate('addition.base')} "
                 f"add({self.structural_str()}, 0) "
                 f"-> {self.structural_str()}"
             ),
@@ -327,7 +327,7 @@ def __add__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
     return (
         successor(self + predecessor),
         lambda: (
-            f"{localized('[addition: recursive]', '[加法・再帰]')} "
+            f"{translate('addition.recursive')} "
             f"add({self.structural_str()}, "
             f"{other.structural_str()}) -> "
             f"S(add({self.structural_str()}, {predecessor.structural_str()}))"

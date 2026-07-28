@@ -63,7 +63,11 @@ hooks = [
     id = "codespell",
     args = [
       "--exclude-file",
-      "uv.lock"
+      "uv.lock",
+      "--skip",
+      "docs/i18n/course.json",
+      "--ignore-words-list",
+      "als,environnement,erro,ist,multiplikation,sie,sucesor,sucessor"
     ]
   }
 ]

@@ -19,6 +19,19 @@
   --peano-success: #2a7258;
 }
 
+html[dir="rtl"] .md-typeset,
+html[dir="rtl"] .md-nav {
+  text-align: right;
+}
+
+html[dir="rtl"] code,
+html[dir="rtl"] pre,
+html[dir="rtl"] textarea,
+html[dir="rtl"] .peano-equation {
+  direction: ltr;
+  text-align: left;
+}
+
 [data-md-color-scheme="default"] {
   --md-default-bg-color: var(--peano-paper);
   --md-default-fg-color: var(--peano-ink);
@@ -140,6 +153,12 @@ body {
   font-weight: 650;
   letter-spacing: -0.035em;
   line-height: 1.12;
+}
+
+.md-nav__link--active,
+.md-nav__link--active > .md-ellipsis {
+  color: var(--peano-ink) !important;
+  font-weight: 700;
 }
 
 .md-content h2 {

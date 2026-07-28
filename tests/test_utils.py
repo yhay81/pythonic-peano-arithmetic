@@ -7,7 +7,7 @@ from typing import get_type_hints
 
 import peano.utils as peano_utils
 from peano import N_ONE, NaturalNumber, natural_number
-from peano.utils import LogMessage, config_log, log, logger
+from peano.utils import SUPPORTED_LOCALES, LogMessage, config_log, log, logger
 
 
 class TestLogging(unittest.TestCase):
@@ -172,13 +172,33 @@ class TestLogging(unittest.TestCase):
             ],
         )
 
+    def test_every_documented_locale_is_accepted(self) -> None:
+        for locale in SUPPORTED_LOCALES:
+            with self.subTest(locale=locale):
+                config_log(locale=locale)
+                self.assertEqual(peano_utils._locale, locale)
+
+    def test_simplified_chinese_runtime_labels(self) -> None:
+        stream = io.StringIO()
+        with redirect_stderr(stream):
+            config_log(log_level=4, max_lines=1, locale="zh-Hans")
+            natural_number(1) + natural_number(1)
+
+        self.assertEqual(
+            stream.getvalue().splitlines(),
+            [
+                "[加法：基础情形] add(S(0), 0) -> S(0)",
+                "…日志在1行后截断。请减小输入后重新运行。",
+            ],
+        )
+
     def test_log_line_limit_must_be_positive(self) -> None:
         with self.assertRaises(ValueError):
             config_log(max_lines=0)
 
     def test_locale_must_be_supported(self) -> None:
         with self.assertRaises(ValueError):
-            config_log(locale="fr")  # ty: ignore[invalid-argument-type]
+            config_log(locale="xx")  # ty: ignore[invalid-argument-type]
 
 
 if __name__ == "__main__":

@@ -8,10 +8,20 @@ The implementation is intentionally small and explicit. Its purpose is to make
 the correspondence between a mathematical definition and executable Python
 visible—not to compete with Python's built-in numeric types.
 
-The interactive course runs entirely in the browser with Zensical and Pyodide:
-
-- [English course](https://peano.yusuke-hayashi.com/en/)
-- [日本語の教材](https://peano.yusuke-hayashi.com/)
+The interactive course runs entirely in the browser with Zensical and Pyodide.
+It is available in
+[English](https://peano.yusuke-hayashi.com/en/),
+[日本語](https://peano.yusuke-hayashi.com/),
+[简体中文](https://peano.yusuke-hayashi.com/zh/),
+[繁體中文](https://peano.yusuke-hayashi.com/zh-hant/),
+[Español](https://peano.yusuke-hayashi.com/es/),
+[Português (Brasil)](https://peano.yusuke-hayashi.com/pt-br/),
+[Français](https://peano.yusuke-hayashi.com/fr/),
+[Deutsch](https://peano.yusuke-hayashi.com/de/),
+[한국어](https://peano.yusuke-hayashi.com/ko/),
+[Русский](https://peano.yusuke-hayashi.com/ru/),
+[العربية](https://peano.yusuke-hayashi.com/ar/), and
+[हिन्दी](https://peano.yusuke-hayashi.com/hi/).
 
 ## What you can observe
 
@@ -71,7 +81,9 @@ n + 0    = n
 n + S(m) = S(n + m)
 ```
 
-Pass `locale="ja"` to `config_log` to show Japanese rule labels.
+Pass a BCP 47 locale to `config_log` to localize rule labels. Supported values
+are `en`, `ja`, `zh-Hans`, `zh-Hant`, `es`, `pt-BR`, `fr`, `de`, `ko`, `ru`,
+`ar`, and `hi`.
 
 ### Integers: equality of representatives
 
@@ -193,10 +205,10 @@ intermediate Peano representations; returned endpoints are still `Rational`.
 ## Documentation development
 
 ```bash
-make docs          # build Japanese at / and English at /en/
+make docs          # build all 12 course languages
 make docs-serve    # preview Japanese
 make docs-serve-en # preview English
-make docs-a11y     # run WCAG checks on both languages
+make docs-a11y     # run WCAG checks on all 120 localized pages
 ```
 
 The site is deployed from `main` to Cloudflare Workers Static Assets. Deployment

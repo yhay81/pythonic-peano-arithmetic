@@ -39,6 +39,7 @@ docs-wheel:
 docs: docs-wheel
 	@uv run --locked zensical build --clean --config-file zensical.toml
 	@uv run --locked zensical build --clean --config-file zensical.en.toml
+	@uv run --locked python scripts/build_localized_docs.py
 	@uv run --locked python scripts/verify_docs_build.py
 
 .PHONY: docs-a11y

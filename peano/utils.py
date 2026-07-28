@@ -22,14 +22,199 @@ logger.disabled = True
 P = ParamSpec("P")
 T = TypeVar("T")
 LogMessage = str | Callable[[], str]
+Locale = Literal[
+    "en",
+    "ja",
+    "zh-Hans",
+    "zh-Hant",
+    "es",
+    "pt-BR",
+    "fr",
+    "de",
+    "ko",
+    "ru",
+    "ar",
+    "hi",
+]
+SUPPORTED_LOCALES: tuple[Locale, ...] = (
+    "en",
+    "ja",
+    "zh-Hans",
+    "zh-Hant",
+    "es",
+    "pt-BR",
+    "fr",
+    "de",
+    "ko",
+    "ru",
+    "ar",
+    "hi",
+)
 _PEANO_HANDLER_MARKER = "_peano_handler"
 _LOG_LIMIT_NOTICE = "_peano_log_limit_notice"
-_locale: Literal["en", "ja"] = "en"
+_locale: Locale = "en"
+
+_MESSAGES: dict[Locale, dict[str, str]] = {
+    "en": {
+        "equality.zero": "[equality: zero case]",
+        "equality.successor": "[equality: successor case]",
+        "addition.base": "[addition: base]",
+        "addition.recursive": "[addition: recursive]",
+        "multiplication.base": "[multiplication: base]",
+        "multiplication.recursive": "[multiplication: recursive]",
+        "truncated": (
+            "…Log output was truncated after {max_lines} lines. "
+            "Use smaller inputs and run the cell again."
+        ),
+        "midpoint_root": "{polynomial}: midpoint {midpoint} is a root",
+    },
+    "ja": {
+        "equality.zero": "[等値・0の場合]",
+        "equality.successor": "[等値・後者の場合]",
+        "addition.base": "[加法・基底]",
+        "addition.recursive": "[加法・再帰]",
+        "multiplication.base": "[乗法・基底]",
+        "multiplication.recursive": "[乗法・再帰]",
+        "truncated": (
+            "…ログは{max_lines}行で省略しました。入力を小さくして再実行してください。"
+        ),
+        "midpoint_root": "{polynomial}: 中点 {midpoint} は根",
+    },
+    "zh-Hans": {
+        "equality.zero": "[相等：零情形]",
+        "equality.successor": "[相等：后继情形]",
+        "addition.base": "[加法：基础情形]",
+        "addition.recursive": "[加法：递归情形]",
+        "multiplication.base": "[乘法：基础情形]",
+        "multiplication.recursive": "[乘法：递归情形]",
+        "truncated": "…日志在{max_lines}行后截断。请减小输入后重新运行。",
+        "midpoint_root": "{polynomial}：中点 {midpoint} 是根",
+    },
+    "zh-Hant": {
+        "equality.zero": "[相等：零情形]",
+        "equality.successor": "[相等：後繼情形]",
+        "addition.base": "[加法：基礎情形]",
+        "addition.recursive": "[加法：遞迴情形]",
+        "multiplication.base": "[乘法：基礎情形]",
+        "multiplication.recursive": "[乘法：遞迴情形]",
+        "truncated": "…記錄在{max_lines}行後截斷。請縮小輸入後重新執行。",
+        "midpoint_root": "{polynomial}：中點 {midpoint} 是根",
+    },
+    "es": {
+        "equality.zero": "[igualdad: caso cero]",
+        "equality.successor": "[igualdad: caso sucesor]",
+        "addition.base": "[suma: caso base]",
+        "addition.recursive": "[suma: caso recursivo]",
+        "multiplication.base": "[multiplicación: caso base]",
+        "multiplication.recursive": "[multiplicación: caso recursivo]",
+        "truncated": (
+            "…El registro se truncó tras {max_lines} líneas. "
+            "Reduce la entrada y vuelve a ejecutar."
+        ),
+        "midpoint_root": "{polynomial}: el punto medio {midpoint} es una raíz",
+    },
+    "pt-BR": {
+        "equality.zero": "[igualdade: caso zero]",
+        "equality.successor": "[igualdade: caso sucessor]",
+        "addition.base": "[adição: caso base]",
+        "addition.recursive": "[adição: caso recursivo]",
+        "multiplication.base": "[multiplicação: caso base]",
+        "multiplication.recursive": "[multiplicação: caso recursivo]",
+        "truncated": (
+            "…O log foi truncado após {max_lines} linhas. "
+            "Reduza a entrada e execute novamente."
+        ),
+        "midpoint_root": "{polynomial}: o ponto médio {midpoint} é uma raiz",
+    },
+    "fr": {
+        "equality.zero": "[égalité : cas zéro]",
+        "equality.successor": "[égalité : cas successeur]",
+        "addition.base": "[addition : cas de base]",
+        "addition.recursive": "[addition : cas récursif]",
+        "multiplication.base": "[multiplication : cas de base]",
+        "multiplication.recursive": "[multiplication : cas récursif]",
+        "truncated": (
+            "…Le journal a été tronqué après {max_lines} lignes. "
+            "Réduisez les entrées et relancez."
+        ),
+        "midpoint_root": "{polynomial} : le milieu {midpoint} est une racine",
+    },
+    "de": {
+        "equality.zero": "[Gleichheit: Nullfall]",
+        "equality.successor": "[Gleichheit: Nachfolgerfall]",
+        "addition.base": "[Addition: Basisfall]",
+        "addition.recursive": "[Addition: Rekursionsfall]",
+        "multiplication.base": "[Multiplikation: Basisfall]",
+        "multiplication.recursive": "[Multiplikation: Rekursionsfall]",
+        "truncated": (
+            "…Die Protokollausgabe wurde nach {max_lines} Zeilen gekürzt. "
+            "Verkleinern Sie die Eingaben und führen Sie die Zelle erneut aus."
+        ),
+        "midpoint_root": "{polynomial}: Der Mittelpunkt {midpoint} ist eine Nullstelle",
+    },
+    "ko": {
+        "equality.zero": "[같음: 0인 경우]",
+        "equality.successor": "[같음: 후속자 경우]",
+        "addition.base": "[덧셈: 기저 경우]",
+        "addition.recursive": "[덧셈: 재귀 경우]",
+        "multiplication.base": "[곱셈: 기저 경우]",
+        "multiplication.recursive": "[곱셈: 재귀 경우]",
+        "truncated": (
+            "…로그를 {max_lines}줄에서 줄였습니다. 입력을 작게 바꾸고 다시 실행하세요."
+        ),
+        "midpoint_root": "{polynomial}: 중점 {midpoint}은(는) 근입니다",
+    },
+    "ru": {
+        "equality.zero": "[равенство: случай нуля]",
+        "equality.successor": "[равенство: случай следующего]",
+        "addition.base": "[сложение: базовый случай]",
+        "addition.recursive": "[сложение: рекурсивный случай]",
+        "multiplication.base": "[умножение: базовый случай]",
+        "multiplication.recursive": "[умножение: рекурсивный случай]",
+        "truncated": (
+            "…Журнал обрезан после {max_lines} строк. "
+            "Уменьшите входные данные и запустите ячейку снова."
+        ),
+        "midpoint_root": "{polynomial}: середина {midpoint} является корнем",
+    },
+    "ar": {
+        "equality.zero": "[المساواة: حالة الصفر]",
+        "equality.successor": "[المساواة: حالة الخليفة]",
+        "addition.base": "[الجمع: الحالة الأساسية]",
+        "addition.recursive": "[الجمع: الحالة العودية]",
+        "multiplication.base": "[الضرب: الحالة الأساسية]",
+        "multiplication.recursive": "[الضرب: الحالة العودية]",
+        "truncated": (
+            "…اختُصر السجل بعد {max_lines} سطرًا. صغّر المدخلات ثم شغّل الخلية من جديد."
+        ),
+        "midpoint_root": "{polynomial}: نقطة المنتصف {midpoint} جذر",
+    },
+    "hi": {
+        "equality.zero": "[समानता: शून्य स्थिति]",
+        "equality.successor": "[समानता: उत्तराधिकारी स्थिति]",
+        "addition.base": "[जोड़: आधार स्थिति]",
+        "addition.recursive": "[जोड़: पुनरावर्ती स्थिति]",
+        "multiplication.base": "[गुणा: आधार स्थिति]",
+        "multiplication.recursive": "[गुणा: पुनरावर्ती स्थिति]",
+        "truncated": (
+            "…लॉग {max_lines} पंक्तियों के बाद छोटा कर दिया गया। इनपुट घटाकर सेल फिर चलाएँ।"
+        ),
+        "midpoint_root": "{polynomial}: मध्यबिंदु {midpoint} एक मूल है",
+    },
+}
+
+
+def translate(key: str, **values: object) -> str:
+    """Return a runtime message in the configured locale."""
+
+    return _MESSAGES[_locale][key].format(**values)
 
 
 def localized(english: str, japanese: str) -> str:
-    """Return a localized runtime message."""
+    """Return an English/Japanese compatibility message.
 
+    New runtime messages should use :func:`translate`.
+    """
     return japanese if _locale == "ja" else english
 
 
@@ -41,11 +226,7 @@ class _LineLimitFormatter(Formatter):
         if not isinstance(max_lines, int):
             return super().format(record)
         notice = copy(record)
-        notice.msg = localized(
-            f"…Log output was truncated after {max_lines} lines. "
-            "Use smaller inputs and run the cell again.",
-            f"…ログは{max_lines}行で省略しました。入力を小さくして再実行してください。",
-        )
+        notice.msg = translate("truncated", max_lines=max_lines)
         notice.args = ()
         return super().format(notice)
 
@@ -143,7 +324,7 @@ def config_log(
     fmt: str = "%(message)s",
     clear_handlers: bool = True,
     max_lines: int | None = None,
-    locale: Literal["en", "ja"] = "en",
+    locale: Locale = "en",
 ) -> None:
     """Write symbolic evaluation logs to standard error.
 
@@ -151,7 +332,8 @@ def config_log(
     existing root handlers and manages only the handler installed here.
     ``max_lines`` emits one truncation notice after the limit. Pass
     ``"Level %(levelno)s: %(message)s"`` as ``fmt`` to expose internal levels.
-    Runtime labels are English by default; ``locale="ja"`` selects Japanese.
+    Runtime labels are English by default. ``SUPPORTED_LOCALES`` lists the
+    available translations.
     """
 
     global _locale
@@ -159,8 +341,9 @@ def config_log(
         isinstance(max_lines, bool) or not isinstance(max_lines, int) or max_lines < 1
     ):
         raise ValueError("max_lines must be a positive integer or None")
-    if locale not in ("en", "ja"):
-        raise ValueError("locale must be 'en' or 'ja'")
+    if locale not in SUPPORTED_LOCALES:
+        supported = ", ".join(SUPPORTED_LOCALES)
+        raise ValueError(f"locale must be one of: {supported}")
     _locale = locale
 
     root_logger = getLogger()

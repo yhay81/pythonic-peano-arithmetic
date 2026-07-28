@@ -28,7 +28,7 @@ from .rational import (
     rational,
     z2r,
 )
-from .utils import config_log
+from .utils import SUPPORTED_LOCALES, config_log
 
 __all__ = [
     "NaturalNumber",
@@ -63,4 +63,5 @@ __all__ = [
     "AlgebraicRoot",
     "algebraic_root",
     "config_log",
+    "SUPPORTED_LOCALES",
 ]

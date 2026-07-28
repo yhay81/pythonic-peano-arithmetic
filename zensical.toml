@@ -28,6 +28,16 @@ nav = [
 alternate = [
   {name = "日本語", link = "/", lang = "ja"},
   {name = "English", link = "/en/", lang = "en"},
+  {name = "简体中文", link = "/zh/", lang = "zh-Hans"},
+  {name = "繁體中文", link = "/zh-hant/", lang = "zh-Hant"},
+  {name = "Español", link = "/es/", lang = "es"},
+  {name = "Português (Brasil)", link = "/pt-br/", lang = "pt-BR"},
+  {name = "Français", link = "/fr/", lang = "fr"},
+  {name = "Deutsch", link = "/de/", lang = "de"},
+  {name = "한국어", link = "/ko/", lang = "ko"},
+  {name = "Русский", link = "/ru/", lang = "ru"},
+  {name = "العربية", link = "/ar/", lang = "ar"},
+  {name = "हिन्दी", link = "/hi/", lang = "hi"},
 ]
 
 [project.theme]

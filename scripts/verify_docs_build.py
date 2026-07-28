@@ -1,4 +1,4 @@
-"""Verify the built bilingual course, runnable wheel, and source snapshots."""
+"""Verify the multilingual course, runnable wheel, and source snapshots."""
 
 from __future__ import annotations
 
@@ -20,6 +20,19 @@ LESSON_PATHS = tuple(sorted((PROJECT_ROOT / "docs" / "learn").glob("*.md")))
 ENGLISH_LESSON_PATHS = tuple(
     sorted((PROJECT_ROOT / "docs" / "en" / "learn").glob("*.md"))
 )
+GENERATED_DOCS_DIRECTORY = PROJECT_ROOT / "build" / "localized-course" / "docs"
+GENERATED_LOCALES = {
+    "zh": ("zh-Hans", "zh"),
+    "zh-hant": ("zh-Hant", "zh"),
+    "es": ("es", "es"),
+    "pt-br": ("pt-BR", "pt"),
+    "fr": ("fr", "fr"),
+    "de": ("de", "de"),
+    "ko": ("ko", "ko"),
+    "ru": ("ru", "ru"),
+    "ar": ("ar", "ar"),
+    "hi": ("hi", "hi"),
+}
 CORE_LESSON_PATHS = tuple(
     lesson_path
     for lesson_path in LESSON_PATHS
@@ -60,9 +73,9 @@ REQUIRED_IMPLEMENTATION_SYMBOLS = {
     "natural-numbers.md": (
         "def structural_str(",
         "def __eq__(",
-        "localized('[equality: zero case]', '[等値・0の場合]')",
+        "translate('equality.zero')",
         "def __add__(",
-        "localized('[addition: base]', '[加法・基底]')",
+        "translate('addition.base')",
         "@log(log_level=4)",
     ),
     "integers.md": ("def __eq__(", "def _coerce_integer("),
@@ -265,11 +278,85 @@ def verify_english_lesson_structure() -> None:
             )
 
 
+def verify_generated_locales() -> None:
+    """Verify every generated translation has the complete learning loop."""
+
+    for route, (locale, html_language) in GENERATED_LOCALES.items():
+        locale_directory = GENERATED_DOCS_DIRECTORY / route
+        markdown_paths = tuple(sorted(locale_directory.rglob("*.md")))
+        lesson_paths = tuple(sorted((locale_directory / "learn").glob("*.md")))
+        if len(markdown_paths) != 10 or len(lesson_paths) != len(LESSON_PATHS):
+            raise RuntimeError(
+                f"{locale} must contain 10 pages and six lessons; found "
+                f"{len(markdown_paths)} pages and {len(lesson_paths)} lessons"
+            )
+        for lesson_path in lesson_paths:
+            source = lesson_path.read_text(encoding="utf-8")
+            required_markers = (
+                'class="lesson-goals"',
+                'class="implementation-bridge"',
+                'class="learning-prompt"',
+                'class="knowledge-check"',
+                'data-role="feedback"',
+            )
+            missing = [marker for marker in required_markers if marker not in source]
+            missing_layers = [
+                layer
+                for layer in LEARNING_LAYERS
+                if f'data-layer="{layer}"' not in source
+            ]
+            if missing or missing_layers:
+                raise RuntimeError(
+                    f"{lesson_path.relative_to(PROJECT_ROOT)} is incomplete: "
+                    f"elements={missing}, layers={missing_layers}"
+                )
+            if source.count('data-role="source"') != source.count(
+                'data-role="source" aria-label='
+            ):
+                raise RuntimeError(
+                    f"{lesson_path.relative_to(PROJECT_ROOT)} has an unlabelled runner"
+                )
+            if source.index("data-source-reference=") > source.index(
+                'class="learning-prompt"'
+            ):
+                raise RuntimeError(
+                    f"{lesson_path.relative_to(PROJECT_ROOT)} must link the "
+                    "implementation before asking for a prediction"
+                )
+
+        site_index = PROJECT_ROOT / "site" / route / "index.html"
+        if not site_index.is_file():
+            raise FileNotFoundError(f"translated site is missing: {site_index}")
+        html = site_index.read_text(encoding="utf-8")
+        if f'<html lang="{html_language}"' not in html:
+            raise RuntimeError(f"{site_index} has the wrong HTML language")
+        if html.count('rel="alternate"') != 12:
+            raise RuntimeError(f"{site_index} must link all 12 course languages")
+
+    runner_source = (
+        PROJECT_ROOT / "docs" / "javascripts" / "pyodide-runner.mjs"
+    ).read_text(encoding="utf-8")
+    if 'document.documentElement.dir = "rtl"' not in runner_source:
+        raise RuntimeError("the Arabic course must switch the document to RTL")
+
+
+def all_course_markdown_paths() -> tuple[Path, ...]:
+    """Return authored and generated course Markdown."""
+
+    return tuple(
+        sorted(
+            (
+                *((PROJECT_ROOT / "docs").rglob("*.md")),
+                *GENERATED_DOCS_DIRECTORY.rglob("*.md"),
+            )
+        )
+    )
+
+
 def verify_runner_examples() -> None:
     """Run course examples to detect prose/implementation drift."""
 
-    markdown_paths = tuple(sorted((PROJECT_ROOT / "docs").rglob("*.md")))
-    for markdown_path in markdown_paths:
+    for markdown_path in all_course_markdown_paths():
         source = markdown_path.read_text(encoding="utf-8")
         for index, match in enumerate(RUNNER_SOURCE_PATTERN.finditer(source), start=1):
             example = unescape(match.group(1))
@@ -294,8 +381,7 @@ def verify_runner_examples() -> None:
 def verify_fenced_python() -> None:
     """Compile function and class excerpts as Python syntax."""
 
-    markdown_paths = tuple(sorted((PROJECT_ROOT / "docs").rglob("*.md")))
-    for markdown_path in markdown_paths:
+    for markdown_path in all_course_markdown_paths():
         source = markdown_path.read_text(encoding="utf-8")
         for index, match in enumerate(FENCED_PYTHON_PATTERN.finditer(source), start=1):
             example = dedent(match.group(1))
@@ -394,6 +480,7 @@ def main() -> None:
     verify_japanese_style()
     verify_lesson_structure()
     verify_english_lesson_structure()
+    verify_generated_locales()
     verify_natural_axiom_sequence()
     verify_runner_examples()
     verify_fenced_python()
