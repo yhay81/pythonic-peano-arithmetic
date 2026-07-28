@@ -1,0 +1,86 @@
+# Configuration file for `prek`, a Git hook framework written in Rust.
+# See https://prek.j178.dev for more information.
+#:schema https://www.schemastore.org/prek.json
+
+[[repos]]
+repo = "https://github.com/commitizen-tools/commitizen"
+rev = "v4.16.5"
+hooks = [
+  {
+    id = "commitizen",
+    stages = ["commit-msg"]
+  }
+]
+
+[[repos]]
+repo = "local"
+hooks = [
+  {
+    id = "ruff-check",
+    name = "ruff check",
+    entry = "uv run --locked ruff check --fix",
+    language = "system",
+    types_or = [
+      "python",
+      "pyi",
+      "jupyter"
+    ]
+  },
+  {
+    id = "ruff-format",
+    name = "ruff format",
+    entry = "uv run --locked ruff format",
+    language = "system",
+    types_or = [
+      "python",
+      "pyi",
+      "jupyter"
+    ]
+  },
+  {
+    id = "ty",
+    name = "ty check",
+    entry = "uv run --locked ty check",
+    language = "system",
+    pass_filenames = false,
+    always_run = true,
+    stages = ["pre-commit"]
+  }
+]
+
+[[repos]]
+repo = "https://github.com/igorshubovych/markdownlint-cli"
+rev = "v0.49.1"
+hooks = [
+  { id = "markdownlint" }
+]
+
+[[repos]]
+repo = "https://github.com/codespell-project/codespell"
+rev = "v2.4.3"
+hooks = [
+  {
+    id = "codespell",
+    args = [
+      "--exclude-file",
+      "uv.lock"
+    ]
+  }
+]
+
+[[repos]]
+repo = "builtin"
+hooks = [
+  { id = "check-added-large-files" },
+  { id = "check-case-conflict" },
+  { id = "check-executables-have-shebangs" },
+  { id = "check-json" },
+  { id = "check-merge-conflict" },
+  { id = "check-toml" },
+  { id = "check-yaml" },
+  { id = "detect-private-key" },
+  { id = "end-of-file-fixer" },
+  { id = "fix-byte-order-marker" },
+  { id = "mixed-line-ending" },
+  { id = "trailing-whitespace" }
+]

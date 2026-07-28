@@ -1,6 +1,6 @@
 import unittest
 
-from peano.natural_number import NaturalNumber, natural_number, successor
+from peano.natural_number import N_ZERO, NaturalNumber, natural_number, successor
 
 
 class TestNaturalNumber(unittest.TestCase):
@@ -11,6 +11,23 @@ class TestNaturalNumber(unittest.TestCase):
                 n = NaturalNumber(n)
             self.assertEqual(natural_number(i), n)
 
+    def test_zero_is_not_a_successor(self) -> None:
+        for i in range(20):
+            self.assertNotEqual(N_ZERO, successor(natural_number(i)))
+
+    def test_successor_is_injective(self) -> None:
+        for i in range(10):
+            for j in range(10):
+                n = natural_number(i)
+                m = natural_number(j)
+                self.assertEqual(successor(n) == successor(m), n == m)
+
+    def test_structural_str(self) -> None:
+        self.assertEqual(natural_number(0).structural_str(), "0")
+        self.assertEqual(natural_number(1).structural_str(), "S(0)")
+        self.assertEqual(natural_number(2).structural_str(), "S(S(0))")
+        self.assertEqual(natural_number(3).structural_str(), "S(S(S(0)))")
+
     def test_add(self) -> None:
         for i in range(5):
             for j in range(5):
@@ -18,7 +35,7 @@ class TestNaturalNumber(unittest.TestCase):
                     natural_number(i) + natural_number(j), natural_number(i + j)
                 )
 
-    def test_add_axioms(self) -> None:
+    def test_add_recursive_equations(self) -> None:
         for i in range(5):
             n = natural_number(i)
             self.assertEqual(n + natural_number(0), n)
@@ -35,7 +52,7 @@ class TestNaturalNumber(unittest.TestCase):
                     natural_number(i) * natural_number(j), natural_number(i * j)
                 )
 
-    def test_mul_axioms(self) -> None:
+    def test_mul_recursive_equations(self) -> None:
         for i in range(5):
             n = natural_number(i)
             self.assertEqual(n * natural_number(0), natural_number(0))

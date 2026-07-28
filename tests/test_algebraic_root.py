@@ -116,7 +116,7 @@ class TestAlgebraicRoot(unittest.TestCase):
             count_real_roots(three_roots, rational(-2, 1), rational(2, 1)),
             3,
         )
-        with self.assertRaisesRegex(ValueError, "ちょうど1つ"):
+        with self.assertRaisesRegex(ValueError, "exactly one"):
             AlgebraicRoot(
                 three_roots,
                 RationalInterval(rational(-2, 1), rational(2, 1)),
@@ -127,7 +127,7 @@ class TestAlgebraicRoot(unittest.TestCase):
         with self.assertRaises(ValueError):
             root.approximate(-1)
         with self.assertRaises(TypeError):
-            root.approximate(1.5)  # type: ignore[arg-type]
+            root.approximate(1.5)  # ty: ignore[invalid-argument-type]
 
 
 if __name__ == "__main__":

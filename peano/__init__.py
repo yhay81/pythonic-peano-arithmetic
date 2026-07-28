@@ -1,4 +1,4 @@
-"""ペアノ公理から代数的な根の近似までを辿る公開 API。"""
+"""Public API from Peano arithmetic through algebraic-root approximation."""
 
 from .algebraic_root import (
     AlgebraicRoot,

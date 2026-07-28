@@ -2,10 +2,13 @@ import unittest
 
 from peano import (
     N_ONE,
+    N_ZERO,
     P_ONE,
     P_ZERO,
     Q_ONE,
+    Q_ZERO,
     Z_ONE,
+    Z_ZERO,
     Integer,
     NaturalNumber,
     Polynomial,
@@ -27,6 +30,15 @@ class TestNumericTower(unittest.TestCase):
                 self.assertEqual(left, right)
                 self.assertEqual(hash(left), hash(right))
         self.assertEqual(len(set(self.values)), 1)
+
+    def test_zero_values_have_equal_hashes_and_integer_conversion(self) -> None:
+        values: tuple[NumericValue, ...] = (N_ZERO, Z_ZERO, Q_ZERO, P_ZERO)
+        for left in values:
+            for right in values:
+                self.assertEqual(left, right)
+                self.assertEqual(hash(left), hash(right))
+        self.assertEqual(len(set(values)), 1)
+        self.assertEqual(int(P_ZERO), 0)
 
     def test_mixed_addition_promotes_to_higher_type(self) -> None:
         expected_types = (

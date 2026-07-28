@@ -1,0 +1,62 @@
+[project]
+docs_dir = "docs/en"
+site_dir = "site/en"
+site_name = "Peano Arithmetic"
+site_description = "Read Python's data model while constructing arithmetic from Peano axioms"
+site_url = "https://peano.yusuke-hayashi.com/en/"
+repo_url = "https://github.com/yhay81/pythonic-peano-arithmetic"
+edit_uri = "edit/main/docs/en/"
+copyright = "Copyright &copy; 2026 Yusuke Hayashi"
+extra_css = ["/stylesheets/extra.css"]
+extra_javascript = ["/javascripts/pyodide-runner.mjs"]
+nav = [
+  {"Introduction" = "index.md"},
+  {"Learn" = [
+    {"00 Python mechanisms" = "learn/python-basics.md"},
+    {"01 Natural numbers" = "learn/natural-numbers.md"},
+    {"02 Integers" = "learn/integers.md"},
+    {"03 Rational numbers" = "learn/rationals.md"},
+    {"04 Polynomials" = "learn/polynomials.md"},
+    {"05 Algebraic real roots" = "learn/algebraic-roots.md"},
+  ]},
+  {"Playground" = "playground.md"},
+  {"Course and implementation" = "about.md"},
+  {"Implementation reference" = "reference/implementation.md"},
+]
+
+[project.extra]
+alternate = [
+  {name = "日本語", link = "/", lang = "ja"},
+  {name = "English", link = "/en/", lang = "en"},
+]
+
+[project.theme]
+language = "en"
+font.text = "Inter"
+font.code = "IBM Plex Mono"
+features = [
+  "navigation.instant",
+  "navigation.instant.progress",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.tracking",
+  "navigation.top",
+  "toc.follow",
+  "content.code.copy",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"

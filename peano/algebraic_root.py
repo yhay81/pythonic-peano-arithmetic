@@ -1,4 +1,4 @@
-"""有理数では表せない根を、有理区間の縮小として観察する。"""
+"""Observe non-rational roots through shrinking rational intervals."""
 
 from __future__ import annotations
 
@@ -8,14 +8,14 @@ from fractions import Fraction
 from .natural_number import NaturalNumber
 from .polynomial import Polynomial, count_real_roots
 from .rational import Rational, rational
-from .utils import log
+from .utils import LogMessage, localized, log
 
 
 @dataclass(frozen=True, slots=True)
 class RationalInterval:
-    """2つの有理数からなる閉区間。
+    """A closed interval with rational endpoints.
 
-    同じ端点を許し、その場合は厳密な有理数一点を表す。
+    Equal endpoints are allowed and represent one exact rational point.
     """
 
     lower: Rational
@@ -23,11 +23,11 @@ class RationalInterval:
 
     def __post_init__(self) -> None:
         if not isinstance(self.lower, Rational) or not isinstance(self.upper, Rational):
-            raise TypeError("区間の端点は Rational でなければなりません")
+            raise TypeError("interval endpoints must be Rational values")
         lower_fraction = _as_fraction(self.lower)
         upper_fraction = _as_fraction(self.upper)
         if lower_fraction > upper_fraction:
-            raise ValueError("lower は upper 以下でなければなりません")
+            raise ValueError("lower must be less than or equal to upper")
         object.__setattr__(self, "lower", _from_fraction(lower_fraction))
         object.__setattr__(self, "upper", _from_fraction(upper_fraction))
 
@@ -53,10 +53,11 @@ class RationalInterval:
 
 @dataclass(frozen=True, slots=True, eq=False)
 class AlgebraicRoot:
-    """多項式の1つの実根を分離区間で指定する教材用オブジェクト。
+    """Identify one real polynomial root by an isolating interval.
 
-    これは実数の完全な数値型ではない。四則演算や厳密な等号は提供せず、
-    有理数だけを使って区間が縮む過程を観察することに責務を絞る。
+    This educational object is not a complete real-number type. It deliberately
+    omits arithmetic and general equality and focuses on shrinking rational
+    intervals while preserving one root.
     """
 
     polynomial: Polynomial
@@ -64,20 +65,20 @@ class AlgebraicRoot:
 
     def __post_init__(self) -> None:
         if not isinstance(self.polynomial, Polynomial):
-            raise TypeError("polynomial は Polynomial でなければなりません")
+            raise TypeError("polynomial must be a Polynomial")
         if not isinstance(self.interval, RationalInterval):
-            raise TypeError("interval は RationalInterval でなければなりません")
+            raise TypeError("interval must be a RationalInterval")
         if self.polynomial.degree <= 0:
-            raise ValueError("根を指定する多項式は1次以上でなければなりません")
+            raise ValueError("a root-defining polynomial must have positive degree")
         if self.interval.is_point:
-            raise ValueError("初期区間には正の幅が必要です")
+            raise ValueError("the initial interval must have positive width")
 
         lower_sign = self.polynomial.sign_at(self.interval.lower)
         upper_sign = self.polynomial.sign_at(self.interval.upper)
         if lower_sign == 0 or upper_sign == 0:
-            raise ValueError("初期区間の端点を根にはできません")
+            raise ValueError("initial interval endpoints cannot be roots")
         if lower_sign == upper_sign:
-            raise ValueError("端点で多項式の符号が変わる区間を指定してください")
+            raise ValueError("the polynomial must change sign across the endpoints")
 
         number_of_roots = count_real_roots(
             self.polynomial,
@@ -86,12 +87,12 @@ class AlgebraicRoot:
         )
         if number_of_roots != 1:
             raise ValueError(
-                "初期区間には相異なる実根がちょうど1つ必要です"
-                f"（検出数: {number_of_roots}）"
+                "the initial interval must contain exactly one distinct real root "
+                f"(found {number_of_roots})"
             )
 
     def approximate(self, steps: int | NaturalNumber) -> RationalInterval:
-        """二分法を ``steps`` 回行い、根を含む閉区間を返す。"""
+        """Bisect ``steps`` times and return a closed interval containing the root."""
 
         count = _step_count(steps)
         interval = self.interval
@@ -102,7 +103,7 @@ class AlgebraicRoot:
         return interval
 
     def trace(self, steps: int | NaturalNumber) -> tuple[RationalInterval, ...]:
-        """初期区間を含む、二分法の全区間を返す。"""
+        """Return every bisection interval, including the initial interval."""
 
         count = _step_count(steps)
         intervals = [self.interval]
@@ -123,7 +124,7 @@ class AlgebraicRoot:
 def _bisect(
     polynomial_value: Polynomial,
     interval: RationalInterval,
-) -> tuple[RationalInterval, str]:
+) -> tuple[RationalInterval, LogMessage]:
     midpoint = interval.midpoint
     midpoint_sign = polynomial_value.sign_at(midpoint)
 
@@ -131,7 +132,10 @@ def _bisect(
         result = RationalInterval(midpoint, midpoint)
         return (
             result,
-            f"{polynomial_value!r}: midpoint {midpoint!r} is an exact root",
+            lambda: localized(
+                f"{polynomial_value!r}: midpoint {midpoint!r} is a root",
+                f"{polynomial_value!r}: 中点 {midpoint!r} は根",
+            ),
         )
 
     lower_sign = polynomial_value.sign_at(interval.lower)
@@ -141,7 +145,7 @@ def _bisect(
         result = RationalInterval(midpoint, interval.upper)
     return (
         result,
-        f"{polynomial_value!r}: {interval} -> {result}",
+        lambda: f"{polynomial_value!r}: {interval} -> {result}",
     )
 
 
@@ -150,7 +154,7 @@ def algebraic_root(
     lower: tuple[int, int],
     upper: tuple[int, int],
 ) -> AlgebraicRoot:
-    """Python 整数の組で端点を指定する簡便な生成関数。"""
+    """Construct an algebraic root from Python integer endpoint pairs."""
 
     return AlgebraicRoot(
         polynomial_value,
@@ -162,9 +166,9 @@ def _step_count(value: int | NaturalNumber) -> int:
     if isinstance(value, NaturalNumber):
         return int(value)
     if isinstance(value, bool) or not isinstance(value, int):
-        raise TypeError("steps は int または NaturalNumber で指定してください")
+        raise TypeError("steps must be an int or NaturalNumber")
     if value < 0:
-        raise ValueError("steps は 0 以上でなければなりません")
+        raise ValueError("steps must be non-negative")
     return value
 
 

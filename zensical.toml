@@ -1,0 +1,62 @@
+[project]
+docs_dir = "docs"
+site_dir = "site"
+site_name = "Peano Arithmetic"
+site_description = "Pythonのデータモデルを読み、Peano公理から代数的実根まで構成する教材"
+site_url = "https://peano.yusuke-hayashi.com/"
+repo_url = "https://github.com/yhay81/pythonic-peano-arithmetic"
+edit_uri = "edit/main/docs/"
+copyright = "Copyright &copy; 2026 Yusuke Hayashi"
+extra_css = ["stylesheets/extra.css"]
+extra_javascript = ["javascripts/pyodide-runner.mjs"]
+nav = [
+  {"はじめに" = "index.md"},
+  {"学習する" = [
+    {"00 Pythonの仕組み" = "learn/python-basics.md"},
+    {"01 自然数" = "learn/natural-numbers.md"},
+    {"02 整数" = "learn/integers.md"},
+    {"03 有理数" = "learn/rationals.md"},
+    {"04 多項式" = "learn/polynomials.md"},
+    {"05 代数的実根" = "learn/algebraic-roots.md"},
+  ]},
+  {"Playground" = "playground.md"},
+  {"教材と実装" = "about.md"},
+  {"実装リファレンス" = "reference/implementation.md"},
+]
+
+[project.extra]
+alternate = [
+  {name = "日本語", link = "/", lang = "ja"},
+  {name = "English", link = "/en/", lang = "en"},
+]
+
+[project.theme]
+language = "ja"
+font.text = "Noto Sans JP"
+font.code = "IBM Plex Mono"
+features = [
+  "navigation.instant",
+  "navigation.instant.progress",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.tracking",
+  "navigation.top",
+  "toc.follow",
+  "content.code.copy",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "ダークモードへ"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/moon"
+toggle.name = "ライトモードへ"

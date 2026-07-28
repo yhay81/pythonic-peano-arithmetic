@@ -93,9 +93,10 @@ ENV/
 
 # mkdocs documentation
 /site
+/docs/assets/source/
 
-# mypy
-.mypy_cache/
+# Cloudflare Wrangler
+/.wrangler/
 
 .idea
 .vscode

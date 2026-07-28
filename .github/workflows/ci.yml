@@ -15,22 +15,27 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           enable-cache: true
+          prune-cache: true
           python-version: "3.14"
       - name: Sync dependencies
         run: uv sync --locked
       - name: Run quality checks
-        run: uv run --locked pre-commit run --all-files
+        run: uv run --locked prek run --all-files
       - name: Execute notebook
         run: >
           uv run --locked jupyter nbconvert --to notebook --execute
           --ExecutePreprocessor.timeout=60 --stdout examples.ipynb > /dev/null
       - name: Build distributions
-        run: uv build
+        run: make build
+      - name: Install browser for accessibility checks
+        run: npx --yes browser-driver-manager@2.0.1 install chrome
+      - name: Audit documentation accessibility
+        run: make docs-a11y
 
   test:
     runs-on: ubuntu-latest
@@ -39,11 +44,12 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install uv and Python
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           enable-cache: true
+          prune-cache: true
           python-version: ${{ matrix.python-version }}
       - name: Run tests
         run: uv run --locked python -m unittest

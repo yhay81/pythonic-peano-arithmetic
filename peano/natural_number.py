@@ -1,28 +1,33 @@
-"""0 と後者だけから自然数とその演算を構成する。"""
+"""Construct natural numbers and their operations from zero and successor."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import total_ordering
-from typing import Any, Iterator
+from typing import TYPE_CHECKING, Iterator, cast
 
-from .utils import log
+from .utils import LogMessage, localized, log
+
+if TYPE_CHECKING:
+    from .integer import Integer
+    from .rational import Rational
 
 
 @total_ordering
 @dataclass(frozen=True, slots=True, eq=False, repr=False)
 class NaturalNumber:
-    """Peano 公理に基づく自然数。
+    """A natural number based on the Peano axioms.
 
-    ``None`` が 0、``NaturalNumber(n)`` が後者 :math:`S(n)` を表す。
-    値は不変であり、加法と乗法は Peano の再帰的定義をそのまま実装する。
+    ``None`` represents zero and ``NaturalNumber(n)`` represents the successor
+    :math:`S(n)`. Values are immutable. Addition and multiplication follow
+    their recursive definitions directly.
     """
 
     pre: NaturalNumber | None = None
 
     def __post_init__(self) -> None:
         if self.pre is not None and not isinstance(self.pre, NaturalNumber):
-            raise TypeError("pre は NaturalNumber または None でなければなりません")
+            raise TypeError("pre must be a NaturalNumber or None")
 
     def __repr__(self) -> str:
         return f"<N({int(self)})>"
@@ -38,134 +43,221 @@ class NaturalNumber:
             current = current.pre
         return value
 
+    def structural_str(self) -> str:
+        """Return the structure using only zero and successor notation."""
+
+        depth = 0
+        current = self
+        while current.pre is not None:
+            depth += 1
+            current = current.pre
+        return f"{'S(' * depth}0{')' * depth}"
+
     @log(log_level=1)
-    def __eq__(self, other: object) -> tuple[bool | Any, str]:
+    def __eq__(self, other: object) -> tuple[bool, LogMessage]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented, f"{self!r} == {other!r} = NotImplemented"
-        if self.pre is None or other.pre is None:
-            result = self.pre is None and other.pre is None
-            return result, f"{self!r} == {other!r} = {result}"
+            return (
+                cast(bool, NotImplemented),
+                lambda: f"{self!r} == {other!r} = NotImplemented",
+            )
+        left_predecessor = self.pre
+        right_predecessor = other.pre
+        if left_predecessor is None or right_predecessor is None:
+            result = left_predecessor is None and right_predecessor is None
+            return (
+                result,
+                lambda: (
+                    f"{localized('[equality: zero case]', '[等値・0の場合]')} "
+                    f"eq({self.structural_str()}, "
+                    f"{other.structural_str()}) -> {result}"
+                ),
+            )
         return (
-            self.pre == other.pre,
-            f"{self!r} == {other!r} = {self.pre!r} == {other.pre!r}",
+            left_predecessor == right_predecessor,
+            lambda: (
+                f"{localized('[equality: successor case]', '[等値・後者の場合]')} "
+                f"eq({self.structural_str()}, "
+                f"{other.structural_str()}) -> "
+                f"eq({left_predecessor.structural_str()}, "
+                f"{right_predecessor.structural_str()})"
+            ),
         )
 
     @log(log_level=2)
-    def __lt__(self, other: object) -> tuple[bool | Any, str]:
+    def __lt__(self, other: object) -> tuple[bool, LogMessage]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented, f"{self!r} < {other!r} = NotImplemented"
+            return (
+                cast(bool, NotImplemented),
+                lambda: f"{self!r} < {other!r} = NotImplemented",
+            )
         if self.pre is None:
             result = other.pre is not None
-            return result, f"{self!r} < {other!r} = {result}"
+            return result, lambda: f"{self!r} < {other!r} = {result}"
         if other.pre is None:
-            return False, f"{self!r} < {other!r} = False"
+            return False, lambda: f"{self!r} < {other!r} = False"
         return (
             self.pre < other.pre,
-            f"{self!r} < {other!r} = {self.pre!r} < {other.pre!r}",
+            lambda: f"{self!r} < {other!r} = {self.pre!r} < {other.pre!r}",
         )
 
     @log(log_level=2)
-    def __le__(self, other: object) -> tuple[bool | Any, str]:
+    def __le__(self, other: object) -> tuple[bool, LogMessage]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented, f"{self!r} <= {other!r} = NotImplemented"
+            return (
+                cast(bool, NotImplemented),
+                lambda: f"{self!r} <= {other!r} = NotImplemented",
+            )
         if self.pre is None:
-            return True, f"{self!r} <= {other!r} = True"
+            return True, lambda: f"{self!r} <= {other!r} = True"
         if other.pre is None:
-            return False, f"{self!r} <= {other!r} = False"
+            return False, lambda: f"{self!r} <= {other!r} = False"
         return (
             self.pre <= other.pre,
-            f"{self!r} <= {other!r} = {self.pre!r} <= {other.pre!r}",
+            lambda: f"{self!r} <= {other!r} = {self.pre!r} <= {other.pre!r}",
         )
 
     @log(log_level=4)
-    def __add__(self, other: object) -> tuple[NaturalNumber | Any, str]:
+    def __add__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented, f"{self!r} + {other!r} = NotImplemented"
-        if other.pre is None:
-            return self, f"{self!r} + {other!r} = {self!r}"
+            return (
+                cast(NaturalNumber, NotImplemented),
+                lambda: f"{self!r} + {other!r} = NotImplemented",
+            )
+        predecessor = other.pre
+        if predecessor is None:
+            return (
+                self,
+                lambda: (
+                    f"{localized('[addition: base]', '[加法・基底]')} "
+                    f"add({self.structural_str()}, 0) "
+                    f"-> {self.structural_str()}"
+                ),
+            )
         return (
-            successor(self + other.pre),
-            f"{self!r} + S({other.pre!r}) = S({self!r} + {other.pre!r})",
+            successor(self + predecessor),
+            lambda: (
+                f"{localized('[addition: recursive]', '[加法・再帰]')} "
+                f"add({self.structural_str()}, "
+                f"{other.structural_str()}) -> "
+                f"S(add({self.structural_str()}, {predecessor.structural_str()}))"
+            ),
         )
 
     @log(log_level=4)
-    def __sub__(self, other: object) -> tuple[NaturalNumber | Any, str]:
+    def __sub__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented, f"{self!r} - {other!r} = NotImplemented"
+            return (
+                cast(NaturalNumber, NotImplemented),
+                lambda: f"{self!r} - {other!r} = NotImplemented",
+            )
         if other.pre is None:
-            return self, f"{self!r} - {other!r} = {self!r}"
+            return self, lambda: f"{self!r} - {other!r} = {self!r}"
         if self.pre is None:
-            raise ValueError("自然数の減算結果を負にはできません")
+            raise ValueError(
+                "natural-number subtraction cannot produce a negative value"
+            )
         return (
             self.pre - other.pre,
-            f"{self!r} - {other!r} = {self.pre!r} - {other.pre!r}",
+            lambda: f"{self!r} - {other!r} = {self.pre!r} - {other.pre!r}",
         )
 
     @log(log_level=5)
-    def __mul__(self, other: object) -> tuple[NaturalNumber | Any, str]:
+    def __mul__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented, f"{self!r} * {other!r} = NotImplemented"
-        if other.pre is None:
-            return N_ZERO, f"{self!r} * {other!r} = {N_ZERO!r}"
+            return (
+                cast(NaturalNumber, NotImplemented),
+                lambda: f"{self!r} * {other!r} = NotImplemented",
+            )
+        predecessor = other.pre
+        if predecessor is None:
+            return (
+                N_ZERO,
+                lambda: (
+                    f"{localized('[multiplication: base]', '[乗法・基底]')} "
+                    f"mul({self.structural_str()}, 0) -> 0"
+                ),
+            )
         return (
-            self + self * other.pre,
-            f"{self!r} * S({other.pre!r}) = {self!r} + ({self!r} * {other.pre!r})",
+            self + self * predecessor,
+            lambda: (
+                f"{localized('[multiplication: recursive]', '[乗法・再帰]')} "
+                f"mul({self.structural_str()}, "
+                f"{other.structural_str()}) -> "
+                f"add({self.structural_str()}, "
+                f"mul({self.structural_str()}, {predecessor.structural_str()}))"
+            ),
         )
 
     @log(log_level=5)
-    def __truediv__(self, other: object) -> tuple[Any, str]:
+    def __truediv__(self, other: object) -> tuple[Rational, LogMessage]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented, f"{self!r} / {other!r} = NotImplemented"
+            return (
+                cast("Rational", NotImplemented),
+                lambda: f"{self!r} / {other!r} = NotImplemented",
+            )
         if other.pre is None:
-            raise ZeroDivisionError("0 で割ることはできません")
+            raise ZeroDivisionError("division by zero")
         from .integer import Integer
         from .rational import Rational
 
         result = Rational(Integer(self, N_ZERO), Integer(other, N_ZERO))
-        return result, f"{self!r} / {other!r} = {result!r}"
+        return result, lambda: f"{self!r} / {other!r} = {result!r}"
 
     @log(log_level=5)
-    def __floordiv__(self, other: object) -> tuple[NaturalNumber | Any, str]:
+    def __floordiv__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented, f"{self!r} // {other!r} = NotImplemented"
+            return (
+                cast(NaturalNumber, NotImplemented),
+                lambda: f"{self!r} // {other!r} = NotImplemented",
+            )
         if not other:
-            raise ZeroDivisionError("0 で割ることはできません")
+            raise ZeroDivisionError("division by zero")
         if self < other:
-            return N_ZERO, f"{self!r} // {other!r} = {N_ZERO!r}"
+            return N_ZERO, lambda: f"{self!r} // {other!r} = {N_ZERO!r}"
         return (
             N_ONE + ((self - other) // other),
-            f"{self!r} // {other!r} = "
-            f"{N_ONE!r} + (({self!r} - {other!r}) // {other!r})",
+            lambda: (
+                f"{self!r} // {other!r} = "
+                f"{N_ONE!r} + (({self!r} - {other!r}) // {other!r})"
+            ),
         )
 
     @log(log_level=5)
-    def __mod__(self, other: object) -> tuple[NaturalNumber | Any, str]:
+    def __mod__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented, f"{self!r} % {other!r} = NotImplemented"
+            return (
+                cast(NaturalNumber, NotImplemented),
+                lambda: f"{self!r} % {other!r} = NotImplemented",
+            )
         if not other:
-            raise ZeroDivisionError("0 で割ることはできません")
+            raise ZeroDivisionError("division by zero")
         if self < other:
-            return self, f"{self!r} % {other!r} = {self!r}"
+            return self, lambda: f"{self!r} % {other!r} = {self!r}"
         return (
             (self - other) % other,
-            f"{self!r} % {other!r} = ({self!r} - {other!r}) % {other!r}",
+            lambda: f"{self!r} % {other!r} = ({self!r} - {other!r}) % {other!r}",
         )
 
-    def __divmod__(self, other: object) -> tuple[NaturalNumber, NaturalNumber] | Any:
+    def __divmod__(self, other: object) -> tuple[NaturalNumber, NaturalNumber]:
         if not isinstance(other, NaturalNumber):
-            return NotImplemented
+            return cast(tuple[NaturalNumber, NaturalNumber], NotImplemented)
         return self // other, self % other
 
     @log(log_level=6)
-    def __pow__(self, exponent: object) -> tuple[NaturalNumber | Any, str]:
+    def __pow__(self, exponent: object) -> tuple[NaturalNumber, LogMessage]:
         if not isinstance(exponent, NaturalNumber):
-            return NotImplemented, f"{self!r} ** {exponent!r} = NotImplemented"
+            return (
+                cast(NaturalNumber, NotImplemented),
+                lambda: f"{self!r} ** {exponent!r} = NotImplemented",
+            )
         if exponent.pre is None:
-            return N_ONE, f"{self!r} ** {exponent!r} = {N_ONE!r}"
+            return N_ONE, lambda: f"{self!r} ** {exponent!r} = {N_ONE!r}"
         return (
             (self**exponent.pre) * self,
-            f"{self!r} ** S({exponent.pre!r}) = "
-            f"({self!r} ** {exponent.pre!r}) * {self!r}",
+            lambda: (
+                f"{self!r} ** S({exponent.pre!r}) = "
+                f"({self!r} ** {exponent.pre!r}) * {self!r}"
+            ),
         )
 
     def __bool__(self) -> bool:
@@ -177,7 +269,7 @@ class NaturalNumber:
     def __pos__(self) -> NaturalNumber:
         return self
 
-    def __neg__(self) -> Any:
+    def __neg__(self) -> Integer:
         from .integer import Integer
 
         return Integer(N_ZERO, self)
@@ -197,8 +289,8 @@ class NaturalNumber:
             current = current.pre
             yield current
 
-    def set_repr(self) -> frozenset[Any]:
-        """フォン・ノイマン順序数としての集合表示を返す。"""
+    def set_repr(self) -> frozenset[object]:
+        """Return the von Neumann ordinal representation."""
 
         if self.pre is None:
             return frozenset()
@@ -216,20 +308,20 @@ class NaturalNumber:
 
 
 def successor(number: NaturalNumber) -> NaturalNumber:
-    """後者 :math:`S(n)` を返す。"""
+    """Return the successor :math:`S(n)`."""
 
     if not isinstance(number, NaturalNumber):
-        raise TypeError("successor の引数は NaturalNumber でなければなりません")
+        raise TypeError("successor expects a NaturalNumber")
     return NaturalNumber(number)
 
 
 def natural_number(value: int) -> NaturalNumber:
-    """Python の非負整数を、0 から後者を重ねて構成する。"""
+    """Construct a natural number from a non-negative Python integer."""
 
     if isinstance(value, bool) or not isinstance(value, int):
-        raise TypeError("自然数へ変換できるのは int だけです")
+        raise TypeError("only int values can be converted to NaturalNumber")
     if value < 0:
-        raise ValueError("負の値は自然数に変換できません")
+        raise ValueError("negative values cannot be converted to NaturalNumber")
     result = N_ZERO
     for _ in range(value):
         result = successor(result)
@@ -237,7 +329,7 @@ def natural_number(value: int) -> NaturalNumber:
 
 
 def cast2n(value: object) -> NaturalNumber:
-    """NaturalNumber であることを検証する。"""
+    """Validate and return a ``NaturalNumber``."""
 
     if not isinstance(value, NaturalNumber):
         raise TypeError(f"{value!r} is not a NaturalNumber")

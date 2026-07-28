@@ -1,4 +1,4 @@
-"""有理数係数多項式と、実根を調べるための最小限の道具。"""
+"""Polynomials over the rationals and minimal tools for studying real roots."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from fractions import Fraction
 from functools import total_ordering
 from itertools import zip_longest
-from typing import Any, Iterator
+from typing import Iterator, cast
 
 from .integer import Z_ONE, Integer
 from .natural_number import N_ONE, N_ZERO, NaturalNumber
@@ -19,16 +19,17 @@ from .rational import (
     rational,
     z2r,
 )
-from .utils import log
+from .utils import LogMessage, log
 
 
 @total_ordering
 @dataclass(frozen=True, slots=True, init=False, eq=False, repr=False)
 class Polynomial:
-    """有理数係数の有限列 ``(a0, ..., an)`` を多項式とみなす。
+    """Treat a finite sequence ``(a0, ..., an)`` as a polynomial over Q.
 
-    係数は定数項から昇順に並ぶ。末尾の 0 は取り除き、係数を既約化するため、
-    0 多項式を含めて表現は一意になる。
+    Coefficients are ordered from the constant term upward. Trailing zeroes
+    are removed and every coefficient is reduced, giving each polynomial,
+    including zero, one canonical representation.
     """
 
     _coefficients: tuple[Rational, ...]
@@ -37,7 +38,7 @@ class Polynomial:
         if not coefficients:
             coefficients = (Q_ZERO,)
         if any(not isinstance(value, Rational) for value in coefficients):
-            raise TypeError("Polynomial の係数は Rational でなければなりません")
+            raise TypeError("Polynomial coefficients must be Rational")
 
         normalized = [value.reduction() for value in coefficients]
         while len(normalized) > 1 and normalized[-1] == Q_ZERO:
@@ -46,7 +47,7 @@ class Polynomial:
 
     @property
     def k(self) -> tuple[Rational, ...]:
-        """従来APIと同じ係数列。"""
+        """Return the coefficient sequence exposed by the original API."""
 
         return self._coefficients
 
@@ -56,41 +57,41 @@ class Polynomial:
 
     @property
     def degree(self) -> int:
-        """次数を返す。0 多項式の次数は便宜上 -1 とする。"""
+        """Return the degree, using -1 for the zero polynomial."""
 
         return -1 if not self else len(self.coefficients) - 1
 
     @property
     def leading_coefficient(self) -> Rational:
         if not self:
-            raise ValueError("0 多項式には最高次係数がありません")
+            raise ValueError("the zero polynomial has no leading coefficient")
         return self.coefficients[-1]
 
-    def __eq__(self, other: object) -> bool | Any:
+    def __eq__(self, other: object) -> bool:
         converted = _coerce_polynomial(other)
         if converted is None:
-            return NotImplemented
+            return cast(bool, NotImplemented)
         return self.coefficients == converted.coefficients
 
-    def _order_key(self) -> tuple[Any, ...]:
-        return (self.degree, *reversed(self.coefficients))
+    def _order_key(self) -> tuple[int, tuple[Rational, ...]]:
+        return self.degree, tuple(reversed(self.coefficients))
 
-    def __lt__(self, other: object) -> bool | Any:
+    def __lt__(self, other: object) -> bool:
         converted = _coerce_polynomial(other)
         if converted is None:
-            return NotImplemented
+            return cast(bool, NotImplemented)
         return self._order_key() < converted._order_key()
 
-    def __le__(self, other: object) -> bool | Any:
+    def __le__(self, other: object) -> bool:
         converted = _coerce_polynomial(other)
         if converted is None:
-            return NotImplemented
+            return cast(bool, NotImplemented)
         return self._order_key() <= converted._order_key()
 
-    def __add__(self, other: object) -> Polynomial | Any:
+    def __add__(self, other: object) -> Polynomial:
         converted = _coerce_polynomial(other)
         if converted is None:
-            return NotImplemented
+            return cast(Polynomial, NotImplemented)
         coefficients = [
             a + b
             for a, b in zip_longest(
@@ -101,28 +102,28 @@ class Polynomial:
         ]
         return Polynomial(*coefficients)
 
-    def __radd__(self, other: object) -> Polynomial | Any:
+    def __radd__(self, other: object) -> Polynomial:
         return self + other
 
     def __neg__(self) -> Polynomial:
         return Polynomial(*(-coefficient for coefficient in self))
 
-    def __sub__(self, other: object) -> Polynomial | Any:
+    def __sub__(self, other: object) -> Polynomial:
         converted = _coerce_polynomial(other)
         if converted is None:
-            return NotImplemented
+            return cast(Polynomial, NotImplemented)
         return self + -converted
 
-    def __rsub__(self, other: object) -> Polynomial | Any:
+    def __rsub__(self, other: object) -> Polynomial:
         converted = _coerce_polynomial(other)
         if converted is None:
-            return NotImplemented
+            return cast(Polynomial, NotImplemented)
         return converted - self
 
-    def __mul__(self, other: object) -> Polynomial | Any:
+    def __mul__(self, other: object) -> Polynomial:
         converted = _coerce_polynomial(other)
         if converted is None:
-            return NotImplemented
+            return cast(Polynomial, NotImplemented)
         if not self or not converted:
             return P_ZERO
         result = [Q_ZERO] * (len(self.coefficients) + len(converted.coefficients) - 1)
@@ -132,15 +133,15 @@ class Polynomial:
                 result[i + j] = (result[i + j] + product).reduction()
         return Polynomial(*result)
 
-    def __rmul__(self, other: object) -> Polynomial | Any:
+    def __rmul__(self, other: object) -> Polynomial:
         return self * other
 
-    def __divmod__(self, other: object) -> tuple[Polynomial, Polynomial] | Any:
+    def __divmod__(self, other: object) -> tuple[Polynomial, Polynomial]:
         divisor = _coerce_polynomial(other)
         if divisor is None:
-            return NotImplemented
+            return cast(tuple[Polynomial, Polynomial], NotImplemented)
         if not divisor:
-            raise ZeroDivisionError("0 多項式で割ることはできません")
+            raise ZeroDivisionError("cannot divide by the zero polynomial")
         if self.degree < divisor.degree:
             return P_ZERO, self
 
@@ -156,63 +157,64 @@ class Polynomial:
             remainder = remainder - divisor * term
         return Polynomial(*quotient), remainder
 
-    def __rdivmod__(self, other: object) -> tuple[Polynomial, Polynomial] | Any:
+    def __rdivmod__(self, other: object) -> tuple[Polynomial, Polynomial]:
         dividend = _coerce_polynomial(other)
         if dividend is None:
-            return NotImplemented
+            return cast(tuple[Polynomial, Polynomial], NotImplemented)
         return divmod(dividend, self)
 
-    def __floordiv__(self, other: object) -> Polynomial | Any:
+    def __floordiv__(self, other: object) -> Polynomial:
         divisor = _coerce_polynomial(other)
         if divisor is None:
-            return NotImplemented
+            return cast(Polynomial, NotImplemented)
         result = self.__divmod__(divisor)
         quotient, _ = result
         return quotient
 
-    def __rfloordiv__(self, other: object) -> Polynomial | Any:
+    def __rfloordiv__(self, other: object) -> Polynomial:
         dividend = _coerce_polynomial(other)
         if dividend is None:
-            return NotImplemented
+            return cast(Polynomial, NotImplemented)
         return dividend // self
 
-    def __mod__(self, other: object) -> Polynomial | Any:
+    def __mod__(self, other: object) -> Polynomial:
         divisor = _coerce_polynomial(other)
         if divisor is None:
-            return NotImplemented
+            return cast(Polynomial, NotImplemented)
         result = self.__divmod__(divisor)
         _, remainder = result
         return remainder
 
-    def __rmod__(self, other: object) -> Polynomial | Any:
+    def __rmod__(self, other: object) -> Polynomial:
         dividend = _coerce_polynomial(other)
         if dividend is None:
-            return NotImplemented
+            return cast(Polynomial, NotImplemented)
         return dividend % self
 
-    def __pow__(self, exponent: object) -> Polynomial | Any:
+    def __pow__(self, exponent: object) -> Polynomial:
         if not isinstance(exponent, NaturalNumber):
-            return NotImplemented
+            return cast(Polynomial, NotImplemented)
         if exponent == N_ZERO:
             return P_ONE
         return (self ** (exponent - N_ONE)) * self
 
     @log(log_level=31)
-    def evaluate(self, value: object) -> tuple[Rational, str]:
-        """Horner 法で ``x=value`` における値を計算する。"""
+    def evaluate(self, value: object) -> tuple[Rational, LogMessage]:
+        """Evaluate at ``x=value`` with Horner's method."""
 
         point = cast2r(value)
         result = Q_ZERO
         for coefficient in reversed(self.coefficients):
             result = (result * point + coefficient).reduction()
-        return result, f"{self!r} at x={point!r} = {result!r}"
+        return result, lambda: f"{self!r}: x={point!r} -> {result!r}"
 
     def sign_at(self, value: object) -> int:
-        """点での値の符号を ``-1, 0, 1`` で厳密に返す。
+        """Return the exact sign at a point as ``-1``, ``0``, or ``1``.
 
-        根の反復近似では分母が指数的に大きくなる。符号だけを知るために
-        Peano 表現の巨大な中間分母を構成する必要はないため、同じ整数比を
-        Python の任意精度整数へ写し、Horner 法で厳密に判定する。
+        Denominators grow exponentially while refining a root interval. When
+        only the sign is needed, there is no educational value in constructing
+        enormous intermediate Peano values. The same ratios are therefore
+        mapped to Python's arbitrary-precision integers and evaluated exactly.
         """
 
         point = _as_fraction(cast2r(value))
@@ -222,7 +224,7 @@ class Polynomial:
         return (result > 0) - (result < 0)
 
     def derivative(self) -> Polynomial:
-        """形式微分を返す。"""
+        """Return the formal derivative."""
 
         if self.degree <= 0:
             return P_ZERO
@@ -234,7 +236,7 @@ class Polynomial:
         )
 
     def monic(self) -> Polynomial:
-        """最高次係数を 1 にした多項式を返す。"""
+        """Return a copy whose leading coefficient is one."""
 
         if not self:
             return P_ZERO
@@ -242,17 +244,17 @@ class Polynomial:
         return Polynomial(*(coefficient / leading for coefficient in self.coefficients))
 
     def gcd(self, other: Polynomial) -> Polynomial:
-        """Euclid の互除法でモニック最大公約数を返す。"""
+        """Return the monic greatest common divisor using Euclid's algorithm."""
 
         if not isinstance(other, Polynomial):
-            raise TypeError("gcd の引数は Polynomial でなければなりません")
+            raise TypeError("gcd expects a Polynomial")
         left, right = self, other
         while right:
             left, right = right, left % right
         return left.monic()
 
     def square_free(self) -> Polynomial:
-        """重根を除いた平方因子なし部分を返す。"""
+        """Return the square-free part with repeated roots removed."""
 
         if self.degree <= 0:
             return self
@@ -269,16 +271,16 @@ class Polynomial:
         return not (len(self.coefficients) == 1 and self.coefficients[0] == Q_ZERO)
 
     def __int__(self) -> int:
-        if self.degree != 0:
-            raise TypeError("定数多項式だけを int に変換できます")
+        if self.degree > 0:
+            raise TypeError("only constant polynomials can be converted to int")
         coefficient = self.coefficients[0]
         if coefficient.q != Z_ONE:
-            raise TypeError("整数でない定数多項式は int に変換できません")
+            raise TypeError("a non-integral constant cannot be converted to int")
         return int(coefficient.p)
 
     def __hash__(self) -> int:
-        if self.degree == 0:
-            # 下位の数体系と等しい定数多項式は同じ hash を持つ。
+        if self.degree <= 0:
+            # Equal values across the numeric tower must have equal hashes.
             return hash(self.coefficients[0])
         return hash(("Polynomial", self.coefficients))
 
@@ -318,7 +320,7 @@ class Polynomial:
 
 
 class PolynomialIterator:
-    """互換性のための単純な係数イテレータ。"""
+    """A simple coefficient iterator retained for API compatibility."""
 
     def __init__(self, *coefficients: Rational) -> None:
         self._iterator = iter(Polynomial(*coefficients).coefficients)
@@ -331,7 +333,7 @@ class PolynomialIterator:
 
 
 def polynomial(*coefficients: tuple[int, int]) -> Polynomial:
-    """``(分子, 分母)`` の列から多項式を構成する。"""
+    """Construct a polynomial from ``(numerator, denominator)`` pairs."""
 
     return Polynomial(*(rational(p, q) for p, q in coefficients))
 
@@ -346,7 +348,7 @@ def z2p(value: Integer) -> Polynomial:
 
 def r2p(value: Rational) -> Polynomial:
     if not isinstance(value, Rational):
-        raise TypeError("r2p の引数は Rational でなければなりません")
+        raise TypeError("r2p expects a Rational")
     return Polynomial(value)
 
 
@@ -370,12 +372,12 @@ def cast2p(value: object) -> Polynomial:
 
 
 def sturm_sequence(value: Polynomial) -> tuple[Polynomial, ...]:
-    """実根を数えるための Sturm 列を返す。"""
+    """Return the Sturm sequence used to count real roots."""
 
     if not isinstance(value, Polynomial):
-        raise TypeError("sturm_sequence の引数は Polynomial です")
+        raise TypeError("sturm_sequence expects a Polynomial")
     if value.degree <= 0:
-        raise ValueError("定数多項式から Sturm 列は作れません")
+        raise ValueError("a constant polynomial has no Sturm sequence")
 
     square_free = value.square_free()
     sequence = [square_free, square_free.derivative()]
@@ -388,7 +390,7 @@ def sturm_sequence(value: Polynomial) -> tuple[Polynomial, ...]:
 
 
 def sign_variations(sequence: tuple[Polynomial, ...], point: Rational) -> int:
-    """Sturm 列を点で評価し、0 を除いた符号変化の回数を返す。"""
+    """Count nonzero sign changes after evaluating a Sturm sequence."""
 
     signs: list[bool] = []
     for value in sequence:
@@ -400,16 +402,16 @@ def sign_variations(sequence: tuple[Polynomial, ...], point: Rational) -> int:
 
 
 def count_real_roots(value: Polynomial, lower: Rational, upper: Rational) -> int:
-    """開区間 ``(lower, upper)`` にある相異なる実根の個数を返す。"""
+    """Count distinct real roots in the open interval ``(lower, upper)``."""
 
     if not isinstance(value, Polynomial):
-        raise TypeError("value は Polynomial でなければなりません")
+        raise TypeError("value must be a Polynomial")
     lower = cast2r(lower)
     upper = cast2r(upper)
     if lower >= upper:
-        raise ValueError("lower は upper より小さくなければなりません")
+        raise ValueError("lower must be less than upper")
     if value.sign_at(lower) == 0 or value.sign_at(upper) == 0:
-        raise ValueError("区間の端点を多項式の根にはできません")
+        raise ValueError("interval endpoints must not be roots")
     sequence = sturm_sequence(value)
     return sign_variations(sequence, lower) - sign_variations(sequence, upper)
 
