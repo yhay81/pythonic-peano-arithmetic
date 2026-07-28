@@ -114,6 +114,22 @@ body {
   background: rgba(247, 250, 249, 0.1);
 }
 
+.md-header .md-search__button::after {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1rem;
+  padding-block: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.6rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
 .md-header .md-search__button:hover,
 .md-header .md-search__button:focus-visible {
   border-color: rgba(247, 250, 249, 0.36);
