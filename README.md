@@ -10,18 +10,18 @@ visible—not to compete with Python's built-in numeric types.
 
 The interactive course runs entirely in the browser with Zensical and Pyodide.
 It is available in
-[English](https://peano.yusuke-hayashi.com/en/),
-[日本語](https://peano.yusuke-hayashi.com/),
-[简体中文](https://peano.yusuke-hayashi.com/zh/),
-[繁體中文](https://peano.yusuke-hayashi.com/zh-hant/),
-[Español](https://peano.yusuke-hayashi.com/es/),
-[Português (Brasil)](https://peano.yusuke-hayashi.com/pt-br/),
-[Français](https://peano.yusuke-hayashi.com/fr/),
-[Deutsch](https://peano.yusuke-hayashi.com/de/),
-[한국어](https://peano.yusuke-hayashi.com/ko/),
-[Русский](https://peano.yusuke-hayashi.com/ru/),
-[العربية](https://peano.yusuke-hayashi.com/ar/), and
-[हिन्दी](https://peano.yusuke-hayashi.com/hi/).
+[English](https://peano.yhay81.com/en/),
+[日本語](https://peano.yhay81.com/),
+[简体中文](https://peano.yhay81.com/zh/),
+[繁體中文](https://peano.yhay81.com/zh-hant/),
+[Español](https://peano.yhay81.com/es/),
+[Português (Brasil)](https://peano.yhay81.com/pt-br/),
+[Français](https://peano.yhay81.com/fr/),
+[Deutsch](https://peano.yhay81.com/de/),
+[한국어](https://peano.yhay81.com/ko/),
+[Русский](https://peano.yhay81.com/ru/),
+[العربية](https://peano.yhay81.com/ar/), and
+[हिन्दी](https://peano.yhay81.com/hi/).
 
 ## What you can observe
 

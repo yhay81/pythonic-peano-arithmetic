@@ -7,5 +7,9 @@ not_found_handling = "404-page"
 html_handling = "auto-trailing-slash"
 
 [[routes]]
+pattern = "peano.yhay81.com"
+custom_domain = true
+
+[[routes]]
 pattern = "peano.yusuke-hayashi.com"
 custom_domain = true

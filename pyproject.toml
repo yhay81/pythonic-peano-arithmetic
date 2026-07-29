@@ -26,8 +26,8 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Documentation = "https://peano.yusuke-hayashi.com/en/"
-Homepage = "https://peano.yusuke-hayashi.com/en/"
+Documentation = "https://peano.yhay81.com/en/"
+Homepage = "https://peano.yhay81.com/en/"
 Issues = "https://github.com/yhay81/pythonic-peano-arithmetic/issues"
 Repository = "https://github.com/yhay81/pythonic-peano-arithmetic"
 

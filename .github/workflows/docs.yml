@@ -18,7 +18,7 @@ jobs:
     name: Build and deploy
     environment:
       name: production
-      url: https://peano.yusuke-hayashi.com/
+      url: https://peano.yhay81.com/
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
