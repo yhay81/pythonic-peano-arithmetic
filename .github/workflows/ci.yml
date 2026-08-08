@@ -1,7 +1,6 @@
 name: CI
 
 on:
-  push:
   pull_request:
 
 permissions:
@@ -13,6 +12,7 @@ concurrency:
 
 jobs:
   quality:
+    timeout-minutes: 1
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,6 +38,7 @@ jobs:
         run: make docs-a11y
 
   test:
+    timeout-minutes: 1
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
