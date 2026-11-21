@@ -201,6 +201,12 @@ body {
   text-underline-offset: 0.18em;
 }
 
+.md-typeset a > code,
+.md-typeset td a {
+  color: var(--peano-ink);
+  text-decoration: underline;
+}
+
 .md-typeset code {
   border-radius: 0.18rem;
 }
