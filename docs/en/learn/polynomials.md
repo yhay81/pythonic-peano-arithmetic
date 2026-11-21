@@ -1,12 +1,8 @@
 <span class="lesson-number">04</span>
 
-# Polynomials as coefficient sequences
+# How many numbers make x²−2 zero?
 
-<p class="lesson-lead">
-  Store <code>a₀ + a₁x + … + aₙxⁿ</code> as the finite sequence
-  <code>(a₀, a₁, …, aₙ)</code>, then use exact rational arithmetic to evaluate
-  it and count real roots.
-</p>
+<p class="lesson-lead">Evaluate a polynomial using fractions, then count its roots. A root is an input that makes the result zero.</p>
 
 <div class="lesson-context" data-reveal>
   <strong>What we already know</strong>
@@ -38,6 +34,8 @@
 
 <span class="lesson-layer" data-layer="definition">Definition</span>
 
+At 1, x²−2 is −1; at 2 it is 2. The graph is continuous, so it crosses zero somewhere in between. A sign change alone does not tell us how many crossings there are.
+
 The sequence `(a₀, a₁, a₂)` means `a₀ + a₁x + a₂x²`. Coefficients start at the
 constant term. Addition combines matching positions; multiplication performs
 coefficient convolution. Substitution uses Horner's identity:
@@ -47,6 +45,8 @@ a₀ + a₁x + a₂x² = (a₂x + a₁)x + a₀
 ```
 
 <span class="lesson-layer" data-layer="representation">Representation</span>
+
+Store coefficients from lowest to highest power: (−2,0,1) means −2+0x+1x². Dropping the middle zero would change the expression to x−2. Each pair in polynomial(...) writes one coefficient as a fraction.
 
 ```python
 @dataclass(frozen=True, slots=True, init=False, eq=False, repr=False)
@@ -171,6 +171,50 @@ mathematical bridge from variations to roots.
 ratios for performance. No floating-point approximation is introduced. The
 mapping is a documented implementation boundary that avoids enormous unary
 intermediates during interval refinement.
+
+## Count roots on both sides of zero
+
+evaluate reads the list backwards, multiplying the running value by x and then adding the next coefficient. For x = 3/2 the values are 1, 3/2, then 9/4−2 = 1/4. This is Horner's method.
+
+How many distinct roots will the program count between −2 and 2?
+
+<div class="peano-runner" data-state="idle" data-reveal>
+  <div class="peano-runner__header">
+    <span>Experiment · Count roots on both sides of zero</span>
+    <span class="peano-runner__status" data-role="status">Ready</span>
+  </div>
+  <textarea class="peano-runner__source" data-role="source" aria-label="Editable Python: Count roots on both sides of zero"
+    spellcheck="false">from peano import count_real_roots, polynomial, rational, sign_variations, sturm_sequence
+
+p = polynomial((-2, 1), (0, 1), (1, 1))
+x = rational(3, 2)
+print(x, p.evaluate(x))
+
+left = rational(-2, 1)
+right = rational(2, 1)
+sequence = sturm_sequence(p)
+for point in (left, right):
+    print(point, sign_variations(sequence, point))
+print(count_real_roots(p, left, right))</textarea>
+  <div class="peano-runner__controls">
+    <button class="peano-runner__button peano-runner__button--run"
+      data-action="run">▶ Run</button>
+    <button class="peano-runner__button"
+      data-action="reset">Reset</button>
+    <span class="peano-runner__shortcut">⌘ / Ctrl + Enter</span>
+  </div>
+  <div class="peano-runner__output-wrap">
+    <span class="peano-runner__output-label">Output</span>
+    <pre class="peano-runner__output" data-role="output"
+      aria-live="polite">Run the example to see the result.</pre>
+  </div>
+</div>
+
+<details class="self-check"><summary>Check your reasoning</summary><p>For x²−2 the Sturm sequence is x²−2, 2x, 2. At −2 its signs are +,−,+ (two changes); at 2 they are +,+,+ (none). The difference is 2. Between 1 and 2 the difference is 1.</p></details>
+
+The second expression, 2x, is the derivative: when x increases by h, the square changes by 2xh+h²; dividing by h gives 2x+h, approaching 2x. Dividing x²−2 by 2x leaves −2. Negating that remainder gives the last expression, 2.
+
+Sturm's theorem justifies subtracting these counts when neither endpoint is a root. Skip zeros when counting adjacent signs. sign_at uses exact fractions, so rounding cannot change a sign near zero.
 
 <form class="knowledge-check" data-reveal>
   <fieldset>

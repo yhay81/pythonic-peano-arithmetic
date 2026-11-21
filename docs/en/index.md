@@ -6,12 +6,8 @@ hide:
 
 <section class="course-hero">
   <div class="course-hero__content">
-    <span class="course-kicker">Arithmetic construction through Python's data model</span>
-    <h1>Build numbers, one rule at a time.</h1>
-    <p>
-      Start with zero and successor. Follow each mathematical definition into
-      a class, method, branch, trace, and test.
-    </p>
+    <h1>From zero to a number we cannot write as a fraction</h1>
+    <p>Can you define addition using only zero and the next number? Each chapter builds a tool for the next. By the end you will use fractions to pin down √2 and adapt the same code to √3.</p>
     <div class="course-actions">
       <a class="course-action course-action--primary" href="learn/python-basics/">Start with the Python mechanisms</a>
       <a class="course-action" href="#route">See the route</a>
@@ -30,18 +26,7 @@ hide:
 
 ## What this course assumes
 
-You should be comfortable with ordinary Python syntax: functions, classes,
-conditionals, loops, collections, exceptions, and type annotations. You do not
-need prior knowledge of Peano arithmetic, constructed number systems,
-polynomials, or this repository.
-
-The course teaches the Python mechanisms that matter to this implementation:
-
-- operator dispatch such as `a + b` calling `a.__add__(b)`;
-- decorators that change a public call without changing its mathematical core;
-- generated and suppressed dataclass methods;
-- `__post_init__`, properties, `total_ordering`, and frozen values;
-- coercion, `NotImplemented`, equality, and hashing across a numeric tower.
+Start with variables, functions and if statements. Chapter 0 introduces classes and methods as we need them.
 
 Nothing is installed on your computer. Experiments run in the browser.
 

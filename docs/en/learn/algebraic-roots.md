@@ -1,12 +1,8 @@
 <span class="lesson-number">05</span>
 
-# Algebraic real roots through rational intervals
+# How can an interval identify √2 exactly?
 
-<p class="lesson-lead">
-  The positive root of <code>x² - 2</code> is not rational. Identify it with a
-  polynomial and an interval containing exactly one root, then shrink the
-  interval without leaving exact rational arithmetic.
-</p>
+<p class="lesson-lead">Specify the number by a polynomial and an interval, then narrow that interval without losing the root.</p>
 
 <div class="lesson-context" data-reveal>
   <strong>What we already know</strong>
@@ -38,6 +34,8 @@
 
 <span class="lesson-layer" data-layer="definition">Definition</span>
 
+Both √2 and −√2 solve x²−2 = 0. The previous chapter counted just one root between 1 and 2. Storing the expression and those endpoints therefore identifies the positive root.
+
 An algebraic real number is a real root of a nonzero polynomial with integer
 coefficients. This project studies one root through:
 
@@ -51,6 +49,8 @@ For `x² - 2`, the interval `[1,2]` satisfies these conditions for the positive
 root. The root itself is not replaced by either endpoint.
 
 <span class="lesson-layer" data-layer="representation">Representation</span>
+
+At construction, check that the endpoints are ordered, neither is a root, their signs differ and the root count is one. The stored interval includes its endpoints; the root starts strictly inside.
 
 ```python
 @dataclass(frozen=True, slots=True)
@@ -186,6 +186,44 @@ documented invariant for representative cases.
 algebraic number type. It does not define arithmetic between roots or general
 mathematical equality. The course stops after exposing why rational endpoints
 can approach a non-rational value without ever becoming that value.
+
+## Find the square root of three
+
+`_bisect` tests the sign of the polynomial at the midpoint. A zero gives a single-point interval. Otherwise keep the half whose endpoint signs differ. The initial check means the root in that half must be the same root.
+
+Change the constant from −2 to −3. Starting at [1,2], which interval contains √3 after two steps?
+
+<div class="peano-runner" data-state="idle" data-reveal>
+  <div class="peano-runner__header">
+    <span>Experiment · Find the square root of three</span>
+    <span class="peano-runner__status" data-role="status">Ready</span>
+  </div>
+  <textarea class="peano-runner__source" data-role="source" aria-label="Editable Python: Find the square root of three"
+    spellcheck="false">from peano import algebraic_root, polynomial
+
+p = polynomial((-2, 1), (0, 1), (1, 1))
+root = algebraic_root(p, (1, 1), (2, 1))
+for interval in root.trace(2):
+    print(interval)</textarea>
+  <div class="peano-runner__controls">
+    <button class="peano-runner__button peano-runner__button--run"
+      data-action="run">▶ Run</button>
+    <button class="peano-runner__button"
+      data-action="reset">Reset</button>
+    <span class="peano-runner__shortcut">⌘ / Ctrl + Enter</span>
+  </div>
+  <div class="peano-runner__output-wrap">
+    <span class="peano-runner__output-label">Output</span>
+    <pre class="peano-runner__output" data-role="output"
+      aria-live="polite">Run the example to see the result.</pre>
+  </div>
+</div>
+
+<details class="self-check"><summary>Check your reasoning</summary><p>At 3/2 the value of x²−3 is −3/4, so keep [3/2,2]. At 7/4 it is 1/16, so keep [3/2,7/4]. The same branches work for both polynomials.</p></details>
+
+trace(2) includes the initial interval and both new intervals unless a midpoint is an exact root. Check the signs as well as the width: always keeping the wrong half would halve the width too.
+
+After seven halvings of [1,2] the width is 1/128, so its midpoint is at most 1/256 from the root. The interval gives an error bound; the original polynomial and isolating interval identify the number exactly.
 
 <form class="knowledge-check" data-reveal>
   <fieldset>

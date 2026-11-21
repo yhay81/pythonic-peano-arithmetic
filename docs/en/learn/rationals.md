@@ -1,11 +1,8 @@
 <span class="lesson-number">03</span>
 
-# Rational numbers as ratios
+# How do we compare fractions without dividing?
 
-<p class="lesson-lead">
-  A pair of integers <code>(p, q)</code>, with <code>q ≠ 0</code>, represents
-  the ratio <code>p/q</code>. Cross multiplication defines equality.
-</p>
+<p class="lesson-lead">Use integer products to decide whether two fractions are equal, then use the same common denominator to add them.</p>
 
 <div class="lesson-context" data-reveal>
   <strong>What we already know</strong>
@@ -37,6 +34,8 @@
 
 <span class="lesson-layer" data-layer="definition">Definition</span>
 
+Write 1/2 and 2/4 with denominator 8. Their numerators are 1×4 and 2×2. This is why p/q and r/s are equal when p×s = q×r, provided both denominators are nonzero.
+
 For nonzero denominators:
 
 <div class="peano-equation" data-reveal>
@@ -53,6 +52,8 @@ p/q + r/s = (p·s + q·r)/(q·s)
 These formulas use only operations already constructed for integers.
 
 <span class="lesson-layer" data-layer="representation">Representation</span>
+
+`Rational` stores the numerator in p and denominator in q. After creating them, `__post_init__` rejects q = 0. Making 2/4 preserves both numbers until `reduction()` is requested.
 
 ```python
 @dataclass(frozen=True, slots=True, eq=False, repr=False)
@@ -151,6 +152,44 @@ provide the general mathematical reasoning.
 Rationals contain every integer but still have gaps: there is no rational whose
 square is 2. The next chapters keep rational arithmetic and use a polynomial
 plus an interval to identify such a real number.
+
+## From a common denominator to a square root
+
+For addition, add the two cross-products and keep the product of the denominators. For multiplication, multiply the numerators together and the denominators together. Both methods use the integer products from the last chapter.
+
+What fraction will 1/2 + 1/3 display?
+
+<div class="peano-runner" data-state="idle" data-reveal>
+  <div class="peano-runner__header">
+    <span>Experiment · From a common denominator to a square root</span>
+    <span class="peano-runner__status" data-role="status">Ready</span>
+  </div>
+  <textarea class="peano-runner__source" data-role="source" aria-label="Editable Python: From a common denominator to a square root"
+    spellcheck="false">from peano import rational
+
+left = rational(1, 2)
+right = rational(1, 3)
+print(left + right)
+print(rational(1, 2) == rational(2, 4))</textarea>
+  <div class="peano-runner__controls">
+    <button class="peano-runner__button peano-runner__button--run"
+      data-action="run">▶ Run</button>
+    <button class="peano-runner__button"
+      data-action="reset">Reset</button>
+    <span class="peano-runner__shortcut">⌘ / Ctrl + Enter</span>
+  </div>
+  <div class="peano-runner__output-wrap">
+    <span class="peano-runner__output-label">Output</span>
+    <pre class="peano-runner__output" data-role="output"
+      aria-live="polite">Run the example to see the result.</pre>
+  </div>
+</div>
+
+<details class="self-check"><summary>Check your reasoning</summary><p>The numerator is 1×3+2×1 = 5; the denominator is 2×3 = 6. Change both inputs to 1/2 and the same rule gives 4/4, equal to 1.</p></details>
+
+To reduce 6/8, use remainders: 8 divided by 6 leaves 2, and 6 divided by 2 leaves 0. The last nonzero divisor is 2, so divide both parts by 2. Equal fractions must also have equal hashes so either one can find the same dictionary entry.
+
+Could a fully reduced p/q square to 2? Then p² = 2q². Its square is even, so p is even. Put p = 2k and you get q² = 2k², making q even too. That contradicts the fraction being reduced. We need another way to specify √2.
 
 <form class="knowledge-check" data-reveal>
   <fieldset>

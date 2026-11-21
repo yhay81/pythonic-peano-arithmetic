@@ -1,11 +1,8 @@
 <span class="lesson-number">00</span>
 
-# Python mechanisms used by the library
+# How does Python know what + means?
 
-<p class="lesson-lead">
-  Basic Python syntax is assumed. This preparation chapter explains the data
-  model and metaprogramming that make the mathematical notation meaningful.
-</p>
+<p class="lesson-lead">Follow one addition from the + sign to a method, and find out why the answer can be used in the next sum.</p>
 
 <div class="lesson-context" data-reveal>
   <strong>Why start here?</strong>
@@ -37,7 +34,46 @@
   </p>
 </div>
 
-## Operators are method dispatch
+## Create two scores
+
+A class describes a kind of value and the operations it supports. `Score(2)` creates a score. Its `__init__` method stores 2 in `self.points`, where `self` is the score being created.
+
+For two scores, writing `a + b` calls `a.__add__(b)`. Inside the method, `self` is the score on the left and `other` is the score on the right. The new score can take part in another sum.
+
+The experiment adds scores of 2 and 1. If you change b to Score(4), what will (a + b).points display?
+
+<div class="peano-runner" data-state="idle" data-reveal>
+  <div class="peano-runner__header">
+    <span>Experiment · Add two scores</span>
+    <span class="peano-runner__status" data-role="status">Ready</span>
+  </div>
+  <textarea class="peano-runner__source" data-role="source" aria-label="Editable Python: Add two scores"
+    spellcheck="false">class Score:
+    def __init__(self, points):
+        self.points = points
+    def __add__(self, other):
+        return Score(self.points + other.points)
+
+a = Score(2)
+b = Score(1)
+print((a + b).points)</textarea>
+  <div class="peano-runner__controls">
+    <button class="peano-runner__button peano-runner__button--run"
+      data-action="run">▶ Run</button>
+    <button class="peano-runner__button"
+      data-action="reset">Reset</button>
+    <span class="peano-runner__shortcut">⌘ / Ctrl + Enter</span>
+  </div>
+  <div class="peano-runner__output-wrap">
+    <span class="peano-runner__output-label">Output</span>
+    <pre class="peano-runner__output" data-role="output"
+      aria-live="polite">Run the example to see the result.</pre>
+  </div>
+</div>
+
+self.points remains 2 and other.points becomes 4. The new score contains 6. The dot in .points reads that stored number. Try (a + b) + b. The second + works because the first returned a score. Returning a plain integer or an answer-message pair would break that chain.
+
+## From a plus sign to a method
 
 For a user-defined object, `left + right` asks the left operand to handle the
 operation:

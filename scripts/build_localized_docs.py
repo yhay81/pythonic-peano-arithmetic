@@ -6,6 +6,7 @@ import json
 import shutil
 import subprocess
 from dataclasses import dataclass
+from html import escape
 from pathlib import Path
 from typing import cast
 
@@ -50,45 +51,77 @@ LESSONS = (
         "python-basics",
         "peano/utils.py",
         "tests/test_utils.py",
-        "`+` → `__add__`; `==` → `__eq__`; `@log` → `inner`",
     ),
     (
         "natural-numbers",
         "peano/natural_number.py",
         "tests/test_natural_number.py",
-        "`0` / `S(n)` → `NaturalNumber.pre`; recursive addition → `__add__`",
     ),
     (
         "integers",
         "peano/integer.py",
         "tests/test_integer.py",
-        "`(a,b) ~ (c,d)` → `a + d == b + c` → `Integer.__eq__`",
     ),
     (
         "rationals",
         "peano/rational.py",
         "tests/test_rational.py",
-        "`p/q ~ r/s` → `p * s == q * r` → `Rational.__eq__`",
     ),
     (
         "polynomials",
         "peano/polynomial.py",
         "tests/test_polynomial.py",
-        "`(a₀,a₁,…)` → `Polynomial`; `#roots` → `sturm_sequence`",
     ),
     (
         "algebraic-roots",
         "peano/algebraic_root.py",
         "tests/test_algebraic_root.py",
-        "`(p,(a,b))` → `AlgebraicRoot`; `Iₙ → Iₙ₊₁` → `_bisect`",
     ),
 )
-RUNNER_SOURCES = {
-    "python-basics": """from peano import natural_number
+# Short excerpts isolate the operation used in the worked example.
+CALCULATION_EXCERPTS = {
+    "python-basics": """result, message = func(*args, **kwargs)
+if logger.isEnabledFor(log_level):
+    logger.log(log_level, message if isinstance(message, str) else message())
+return result""",
+    "natural-numbers": """predecessor = other.pre
+if predecessor is None:
+    return self
+return successor(self + predecessor)""",
+    "integers": """result = Integer(
+    self.a * converted.a + self.b * converted.b,
+    self.a * converted.b + self.b * converted.a,
+)""",
+    "rationals": """result = Rational(
+    self.p * converted.q + self.q * converted.p,
+    self.q * converted.q,
+)""",
+    "polynomials": """result = Q_ZERO
+for coefficient in reversed(self.coefficients):
+    result = (result * point + coefficient).reduction()""",
+    "algebraic-roots": """midpoint = interval.midpoint
+midpoint_sign = polynomial_value.sign_at(midpoint)
+lower_sign = polynomial_value.sign_at(interval.lower)
+if midpoint_sign == 0:
+    result = RationalInterval(midpoint, midpoint)
+elif lower_sign != midpoint_sign:
+    result = RationalInterval(interval.lower, midpoint)
+else:
+    result = RationalInterval(midpoint, interval.upper)""",
+}
 
-two = natural_number(2)
-print(two.structural_str())
-print(two + natural_number(1))""",
+RUNNER_SOURCES = {
+    "python-basics": """class Score:
+    def __init__(self, points):
+        self.points = points
+
+    def __add__(self, other):
+        return Score(self.points + other.points)
+
+
+a = Score(2)
+b = Score(1)
+print((a + b).points)""",
     "natural-numbers": """from peano import config_log, natural_number
 
 config_log(log_level=4, max_lines=20, locale="{locale}")
@@ -97,27 +130,68 @@ right = natural_number(2)
 print(left + right)""",
     "integers": """from peano import Integer, natural_number
 
-left = Integer(natural_number(3), natural_number(1))
-right = Integer(natural_number(4), natural_number(2))
-print(left == right)
-print(left.normalize())""",
+left = Integer(natural_number(0), natural_number(2))
+right = Integer(natural_number(3), natural_number(0))
+print(left * right)""",
+    "rationals": """from peano import rational
+
+left = rational(1, 2)
+right = rational(1, 3)
+print(left + right)
+print(rational(1, 2) == rational(2, 4))""",
+    "polynomials": """from peano import count_real_roots, polynomial, rational, sign_variations, sturm_sequence
+
+p = polynomial((-2, 1), (0, 1), (1, 1))
+x = rational(3, 2)
+print(x, p.evaluate(x))
+
+left = rational(-2, 1)
+right = rational(2, 1)
+sequence = sturm_sequence(p)
+for point in (left, right):
+    print(point, sign_variations(sequence, point))
+print(count_real_roots(p, left, right))""",
+    "algebraic-roots": """from peano import algebraic_root, polynomial
+
+p = polynomial((-2, 1), (0, 1), (1, 1))
+root = algebraic_root(p, (1, 1), (2, 1))
+for interval in root.trace(2):
+    print(interval)""",
+}
+
+# These short experiments establish facts used by the next calculation.
+WARMUP_SOURCES = {
+    "natural-numbers": """from peano import natural_number
+
+two = natural_number(2)
+one = natural_number(1)
+print(two == two)
+print(two == one)""",
     "rationals": """from peano import rational
 
 half = rational(1, 2)
-two_fourths = rational(2, 4)
-print(half == two_fourths)
-print(two_fourths.reduction())""",
-    "polynomials": """from peano import Polynomial, Q_ONE, Q_ZERO, rational
+quarters = rational(2, 4)
+print(half == quarters)
+print(quarters.p, quarters.q)""",
+}
 
-polynomial = Polynomial(rational(-2, 1), Q_ZERO, Q_ONE)
-print(polynomial.evaluate(rational(1, 1)))
-print(polynomial.evaluate(rational(2, 1)))""",
-    "algebraic-roots": """from peano import Polynomial, Q_ONE, Q_ZERO, algebraic_root, rational
 
-polynomial = Polynomial(rational(-2, 1), Q_ZERO, Q_ONE)
-root = algebraic_root(polynomial, (1, 1), (2, 1))
-for interval in root.trace(3):
-    print(interval)""",
+# The options use the same mathematical notation in every edition.
+QUIZ_OPTIONS = {
+    "python-basics": ("3", "6", "4"),
+    "natural-numbers": ("2 + 0", "2 + 1", "2 + 2"),
+    "integers": ("6", "−2", "−6"),
+    "rationals": ("2/5", "5/6", "1/6"),
+    "polynomials": ("2", "0", "1"),
+    "algebraic-roots": ("[1, 3/2]", "[7/4, 2]", "[3/2, 7/4]"),
+}
+QUIZ_ANSWERS = {
+    "python-basics": "6",
+    "natural-numbers": "2 + 0",
+    "integers": "−6",
+    "rationals": "5/6",
+    "polynomials": "2",
+    "algebraic-roots": "[3/2, 7/4]",
 }
 
 
@@ -144,19 +218,6 @@ def text(record: dict[str, object], key: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise RuntimeError(f"missing translated string: {key}")
     return value
-
-
-def string_list(record: dict[str, object], key: str, length: int) -> list[str]:
-    """Read a translated string list with an exact expected length."""
-
-    value = record.get(key)
-    if (
-        not isinstance(value, list)
-        or len(value) != length
-        or any(not isinstance(item, str) or not item.strip() for item in value)
-    ):
-        raise RuntimeError(f"{key} must contain {length} translated strings")
-    return cast(list[str], value)
 
 
 def lesson_records(record: dict[str, object]) -> list[dict[str, object]]:
@@ -186,7 +247,7 @@ def render_runner(
     <span class="peano-runner__status" data-role="status">{text(common, "not_run")}</span>
   </div>
   <textarea class="peano-runner__source" data-role="source" aria-label="{text(common, "source_label")}: {title}"
-    spellcheck="false">{source}</textarea>
+    spellcheck="false">{escape(source, quote=False)}</textarea>
   <div class="peano-runner__controls">
     <button class="peano-runner__button peano-runner__button--run"
       data-action="run">▶ {text(common, "run")}</button>
@@ -213,7 +274,7 @@ def render_home(
     common = cast(dict[str, object], record["common"])
     lesson_links = "\n".join(
         f"- [{index:02d} · {text(lesson, 'title')}](learn/{slug}.md)"
-        for index, ((slug, _, _, _), lesson) in enumerate(
+        for index, ((slug, _, _), lesson) in enumerate(
             zip(LESSONS, lessons, strict=True)
         )
     )
@@ -255,110 +316,93 @@ def render_lesson(
     """Render one translated lesson with the shared learning progression."""
 
     common = cast(dict[str, object], record["common"])
-    slug, source_path, test_path, mapping = LESSONS[index]
-    goals = "\n".join(
-        (
-            f"    <li>{goal.format(title=text(lesson, 'title'))}</li>"
-            for goal in string_list(common, "goal_templates", 3)
+    slug, source_path, test_path = LESSONS[index]
+    title = text(lesson, "title")
+    question = text(lesson, "prediction")
+    options = []
+    for option in QUIZ_OPTIONS[slug]:
+        correct = option == QUIZ_ANSWERS[slug]
+        feedback = text(lesson, "trace") if correct else text(common, "wrong_feedback")
+        marker = " data-correct" if correct else ""
+        options.append(
+            f'<label><input type="radio" name="{slug}-check"{marker} '
+            f'data-feedback="{escape(feedback, quote=True)}"> '
+            f'<bdi dir="ltr">{option}</bdi></label>'
         )
+    worked_example = text(lesson, "worked")
+    if slug in WARMUP_SOURCES:
+        warmup = render_runner(
+            common, text(common, "representation"), WARMUP_SOURCES[slug]
+        )
+        worked_example += "\n\n" + warmup
+    choices = "\n    ".join(options)
+    lessons = lesson_records(record)
+    next_link = (
+        f"[{text(lessons[index + 1], 'title')}]({LESSONS[index + 1][0]}.md)"
+        if index + 1 < len(lessons)
+        else f"[{text(record, 'nav_playground')}](../playground.md)"
     )
-    runtime_source = RUNNER_SOURCES[slug].format(locale=locale.code)
-    source_url = f"/assets/source/{source_path}"
-    test_url = f"/assets/source/{test_path}"
-    return f"""<span class="lesson-number">{index:02d} · {text(lesson, "title")}</span>
+    runner = render_runner(
+        common, title, RUNNER_SOURCES[slug].format(locale=locale.code)
+    )
+    if slug == "python-basics":
+        worked_example += "\n\n" + runner
+        runner = ""
+    return f"""<span class="lesson-number">{index:02d}</span>
 
-# {text(lesson, "title")}
+# {title}
 
-<p class="lesson-lead">{text(lesson, "lead")}</p>
+<div class="lesson-goals"><p>{text(lesson, "lead")}</p></div>
 
-<div class="lesson-context" data-reveal>
-  <strong>{text(common, "prior_knowledge")}</strong>
-  <p>{text(lesson, "prior")}</p>
-</div>
-
-<div class="lesson-goals" data-reveal>
-  <strong>{text(common, "goals")}</strong>
-  <ul>
-{goals}
-  </ul>
-</div>
-
-<div class="implementation-bridge" data-reveal
-  data-source-reference="{source_path}"
-  data-test-reference="{test_path}">
-  <div><strong>{text(common, "definition")}</strong><p>{text(lesson, "definition")}</p></div>
-  <div><strong>{text(common, "representation")}</strong><p>{text(lesson, "representation")}</p></div>
-  <div><strong>{text(common, "implementation")}</strong><p><code>{mapping}</code></p></div>
-</div>
-
-<div class="source-reference">
-  <strong>{text(common, "read_source")}</strong>
-  <p>
-    <a href="{source_url}"><code>{source_path}</code></a> ·
-    <a href="{test_url}"><code>{test_path}</code></a>
-  </p>
-</div>
-
-<span class="lesson-layer" data-layer="definition">{text(common, "definition")}</span>
-
-## {text(common, "definition")}
+<h2 data-layer="definition">{text(common, "definition")}</h2>
 
 {text(lesson, "definition")}
 
-<span class="lesson-layer" data-layer="representation">{text(common, "representation")}</span>
-
-## {text(common, "representation")}
+<h2 data-layer="representation">{text(common, "representation")}</h2>
 
 {text(lesson, "representation")}
 
-<span class="lesson-layer" data-layer="implementation">{text(common, "implementation")}</span>
+{worked_example}
 
-## {text(common, "implementation")}
+<div class="implementation-bridge" data-source-reference="{source_path}" data-test-reference="{test_path}">
+  <a href="/assets/source/{source_path}">{source_path}</a>
+  <a href="/assets/source/{test_path}">{test_path}</a>
+</div>
+
+<h2 data-layer="implementation">{text(common, "implementation")}</h2>
 
 {text(lesson, "implementation")}
 
-{text(common, "correspondence")}:
-
-```text
-{mapping}
+```python
+{CALCULATION_EXCERPTS[slug]}
 ```
 
-<span class="lesson-layer" data-layer="trace">{text(common, "trace")}</span>
+<h2 data-layer="trace">{text(common, "trace")}</h2>
 
-## {text(common, "trace")}
+<div class="learning-prompt"><strong>{text(common, "prediction")}</strong><p>{question}</p></div>
 
-{text(lesson, "trace")}
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>{text(common, "prediction")}</strong>
-  <p>{text(lesson, "prediction")}</p>
-</div>
-
-{render_runner(common, text(lesson, "title"), runtime_source)}
-
-<span class="lesson-layer" data-layer="test">{text(common, "test")}</span>
-
-## {text(common, "test")}
-
-{text(lesson, "test")}
-
-<span class="lesson-layer" data-layer="boundary">{text(common, "boundary")}</span>
-
-## {text(common, "boundary")}
-
-{text(lesson, "boundary")}
+{runner}
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
-    <legend>{text(common, "check_question").format(title=text(lesson, "title"))}</legend>
-    <label><input type="radio" name="{slug}-check" data-correct
-      data-feedback="{text(common, "correct_feedback")}"> {text(lesson, "implementation")}</label>
-    <label><input type="radio" name="{slug}-check"
-      data-feedback="{text(common, "wrong_feedback")}"> {text(common, "check_wrong")}</label>
+    <legend>{text(common, "check")}</legend>
+    {choices}
   </fieldset>
   <button type="submit">{text(common, "check")}</button>
   <p data-role="feedback" aria-live="polite"></p>
 </form>
+
+<details class="self-check"><summary>{text(common, "output")}</summary><p>{text(lesson, "trace")}</p></details>
+
+<h2 data-layer="test">{text(common, "test")}</h2>
+
+{text(lesson, "test")}
+
+<h2 data-layer="boundary">{text(common, "boundary")}</h2>
+
+{text(lesson, "boundary")}
+
+{next_link}
 """
 
 
@@ -420,7 +464,7 @@ def render_reference(
         f"| {text(lesson, 'title')} | "
         f"[`{source}`](/assets/source/{source}) | "
         f"[`{test}`](/assets/source/{test}) |"
-        for (_, source, test, _), lesson in zip(LESSONS, lessons, strict=True)
+        for (_, source, test), lesson in zip(LESSONS, lessons, strict=True)
     )
     return f"""# {text(record, "reference_title")}
 
@@ -456,9 +500,7 @@ def render_config(locale: Locale, record: dict[str, object]) -> str:
         for item in LOCALES
     )
     lesson_nav_entries = []
-    for index, ((slug, _, _, _), lesson) in enumerate(
-        zip(LESSONS, lessons, strict=True)
-    ):
+    for index, ((slug, _, _), lesson) in enumerate(zip(LESSONS, lessons, strict=True)):
         label = f"{index:02d} {text(lesson, 'title')}"
         lesson_nav_entries.append(
             f"{{{toml_string(label)} = {toml_string(f'learn/{slug}.md')}}}"
@@ -545,9 +587,7 @@ def build_locale(locale: Locale, record: dict[str, object]) -> None:
     (reference_destination / "implementation.md").write_text(
         render_reference(record, lessons), encoding="utf-8"
     )
-    for index, ((slug, _, _, _), lesson) in enumerate(
-        zip(LESSONS, lessons, strict=True)
-    ):
+    for index, ((slug, _, _), lesson) in enumerate(zip(LESSONS, lessons, strict=True)):
         (lessons_destination / f"{slug}.md").write_text(
             render_lesson(locale, record, lesson, index), encoding="utf-8"
         )

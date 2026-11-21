@@ -1,11 +1,8 @@
 <span class="lesson-number">01</span>
 
-# Natural numbers from zero and successor
+# Can we define addition without assuming addition?
 
-<p class="lesson-lead">
-  Represent every natural number as either zero or the successor of a natural
-  number, then read equality and addition directly from those cases.
-</p>
+<p class="lesson-lead">Start from zero and the successor S. Explain why the first completed step of 2 + 2 is 2 + 0.</p>
 
 <div class="lesson-context" data-reveal>
   <strong>What we already know</strong>
@@ -38,6 +35,8 @@
 
 <span class="lesson-layer" data-layer="definition">Definition</span>
 
+S(n) means the next number after n. Zero has no predecessor, and different numbers have different successors. To compare 2 with 1, step back on both sides: now it is 1 against 0, so they differ.
+
 ## Axioms and recursive definitions
 
 We use these Peano ideas:
@@ -60,6 +59,8 @@ successor smaller. These equations are definitions of addition, not additional
 Peano axioms.
 
 <span class="lesson-layer" data-layer="representation">Representation</span>
+
+For zero, pre is None. For S(n), pre holds n. Follow pre twice from 2 and you reach zero. The display S(S(0)) shows exactly these two links.
 
 ## One field stores the predecessor chain
 
@@ -193,6 +194,14 @@ natural numbers.
 Unary predecessor chains make the structure visible and arithmetic slow. Large
 numbers are intentionally outside the useful range. Python's built-in `int`
 appears only at input and display boundaries.
+
+## Use addition to build multiplication
+
+Start at zero groups and add one group at a time.
+With the right operand counting groups, the steps for two groups of three are
+3 × 0 = 0, then 3 × 1 = 3 + 0, then 3 × 2 = 3 + 3.
+That explains the recursive branch of `__mul__`: `self + self * predecessor`.
+The next chapter uses these products inside the two fields of an integer.
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
