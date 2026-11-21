@@ -1,127 +1,22 @@
 <span class="lesson-number">第5章 · 代数的実根</span>
 
-# √2は、1.45より大きい？　小さい？
+# √2の値を書き切らずに、√2を正確に指定する
 
-<p class="lesson-lead">面積が2の正方形の一辺を √2（ルート2）と書きます。1.4の2乗は1.96、1.5の2乗は2.25。つまり √2 は1.4と1.5の間にあります。</p>
+「1.41」というメモだけでは、続きを丸めたのか、ぴったり1.41なのかは分かりません。一方、「2乗して2になる数で、1と2の間にあるもの」と書けば、指している数は一つに決まります。この違いを、そのままプログラムに使います。
 
-では、真ん中の1.45で試しましょう。1.45 × 1.45＝2.1025。面積が大きすぎるので、右半分を消して、1.4から1.45までを残せます。真ん中で試すたびに、残る幅は半分になります。これが<strong>二分法</strong>です。
+<div class="lesson-goals"><strong>この章の目標</strong><p>√2を指すデータを作り、その数を取り逃さずに範囲を半分ずつ狭めます。最後に、計算で得た範囲と、その中の数を区別して説明します。</p></div>
 
-コンピューターには「x²−2 が0になる」「1と2の間にある」の二つを覚えさせます。正の数は大きいほど2乗も大きいので、この範囲に答えは一つだけ。小数を最後まで書かなくても、どの数かぴったり指定できます。
+<span class="lesson-layer" data-layer="definition">どの根かを決める</span>
 
-<div class="lesson-goals" data-reveal>
-  <strong>x²−2 が0になる、という条件だけで √2 に決まる？</strong>
-  <details><summary>答えを確かめる</summary><p>−√2 も2乗すると2になります。「1と2の間」という手がかりで、正のほうを選べます。</p></details>
-</div>
+## 式と区間は、なぜ両方いる？
 
-[実験ページで試す](../playground.md)
+方程式 x²−2＝0 には負の根と正の根があります。前章では1から2までの間には根がちょうど一つあると確かめました。そこで、式と区間 [1, 2] をセットで保存します。角かっこは両端を含むという意味です。特定したい根だけを含む範囲を**分離区間**と呼びます。
 
-## Pythonのコードで確かめる
+√2のように、係数がすべて有理数で、少なくとも一つは0でない多項式の根になる実数を**代数的実数**といいます。この章で作るのは、その中でも両端の符号が異なる区間で一つに絞れる根です。たとえば x² は0で横軸に触れて引き返すので、[−1, 1] の両端で符号が変わらず、この作り方では受け付けません。
 
-<div class="implementation-bridge" data-reveal aria-label="代数的実根の数学・表現・実装">
-  <div>
-    <strong>数学</strong>
-    <p>多項式の根を一つだけ含む閉区間を保ち、幅を二分法で縮めます。</p>
-  </div>
-  <div>
-    <strong>データ表現</strong>
-    <p><code>AlgebraicRoot</code> が多項式と有理端点の <code>RationalInterval</code> を持ちます。</p>
-  </div>
-  <div>
-    <strong>実装</strong>
-    <p><code>__post_init__</code> が前提を検査し、<code>trace</code> が <code>_bisect</code> を繰り返します。</p>
-  </div>
-</div>
+<span class="lesson-layer" data-layer="representation">データの形を決める</span>
 
-<div class="source-reference"
-     data-source-reference="peano/algebraic_root.py"
-     data-test-reference="tests/test_algebraic_root.py">
-  <strong>この章で横に置く実装</strong>
-  <p>
-    区間・根・二分法:
-    <a href="/assets/source/peano/algebraic_root.py"><code>peano/algebraic_root.py</code></a>。
-    本文では二つの <code>__post_init__</code>、<code>trace</code>、
-    <code>_bisect</code> を抜粋します。
-  </p>
-  <p>
-    有効・無効な区間と二分結果の検査:
-    <a href="/assets/source/tests/test_algebraic_root.py"><code>tests/test_algebraic_root.py</code></a>。
-    ファイル索引は<a href="/reference/implementation/">実装リファレンス</a>にあります。
-  </p>
-</div>
-
-<span class="lesson-layer" data-layer="definition">数学上の定義</span>
-
-## 根を一つだけ含む区間を用意する
-
-**代数的実数**とは、有理数係数を持つ0でない多項式の実数の根です。
-`√2` は `x²−2` の実数の根なので代数的実数です。この章の `AlgebraicRoot` は、
-代数的実数すべての演算を行う型ではなく、そのうち一つの根を
-「多項式と、その根を一つだけ含む区間」で指定する教材用の表現です。
-
-`[1,2]` は1以上2以下の数をすべて含む**閉区間**です。
-角括弧は端点も含むことを表します。前章で、`x²−2` は1で負、2で正になり、
-開区間 `(1,2)` に根がちょうど一つあると確認しました。
-
-多項式の相異なる実根を一つだけ含み、端点自身は根でない区間を、
-ここでは根の**分離区間**として使います。`x²−2` の正の根に対する
-`[1,2]` がその例です。
-
-区間の中点 `m=(lower+upper)/2` で多項式の符号を調べます。
-
-- 中点が根なら、区間を一点 `[m,m]` にする
-- 左端と中点の符号が違えば、左半分 `[lower,m]` を残す
-- そうでなければ、右半分 `[m,upper]` を残す
-
-連続性により、符号が変わる側には根があります。元の区間に根が一つだけなら、
-残した半区間にもその一つだけが残ります。これが二分法で保つ**不変条件**です。
-
-<span class="lesson-layer" data-layer="representation">データの表し方</span>
-
-## 多項式と区間を、別々の型で保存する
-
-`RationalInterval` は、二つの有理数を持ちます。
-
-```python
-@dataclass(frozen=True, slots=True)
-class RationalInterval:
-    lower: Rational
-    upper: Rational
-
-    def __post_init__(self) -> None:
-        if not isinstance(self.lower, Rational) or not isinstance(self.upper, Rational):
-            raise TypeError("interval endpoints must be Rational values")
-        lower_fraction = _as_fraction(self.lower)
-        upper_fraction = _as_fraction(self.upper)
-        if lower_fraction > upper_fraction:
-            raise ValueError("lower must be less than or equal to upper")
-        object.__setattr__(self, "lower", _from_fraction(lower_fraction))
-        object.__setattr__(self, "upper", _from_fraction(upper_fraction))
-```
-
-作成時に端点が有理数であること、`lower <= upper` であることを検査します。
-同じ端点は許され、`[m,m]` は有理数の根をちょうど見つけた一点区間を表します。
-`width` と `midpoint` は、保存した端点から計算するプロパティです。
-
-```python
-@property
-def width(self) -> Rational:
-    return _from_fraction(_as_fraction(self.upper) - _as_fraction(self.lower))
-```
-
-`_as_fraction` は構成した有理数を同じ値のPython `Fraction` へ移し、
-`_from_fraction` は結果をこのライブラリの `Rational` へ戻します。
-これは後で説明する、反復を実用的にするための境界です。
-
-<div class="meta-note" data-meta="property" data-reveal>
-  <strong>保存した属性と、取得時に計算する属性を分ける</strong>
-  <p>
-    保存されるのは <code>lower</code> と <code>upper</code> です。
-    <code>interval.width</code> を読むと、<code>@property</code> が包んだメソッドが
-    実行されます。幅を重複して保存しないため、端点と食い違う状態を作れません。
-  </p>
-</div>
-
-`AlgebraicRoot` は、多項式と区間を一緒に持ちます。
+<div class="implementation-bridge"><p><code>AlgebraicRoot</code> は式と区間を持ちます。区間は、下端 <code>lower</code> と上端 <code>upper</code> の二つの有理数を持ちます。</p></div>
 
 ```python
 @dataclass(frozen=True, slots=True, eq=False)
@@ -130,21 +25,31 @@ class AlgebraicRoot:
     interval: RationalInterval
 ```
 
-ここでも `frozen=True` により作成後の指定を変えられません。
-`eq=False` は意図的です。同じ実数を別の多項式や区間で指定できるため、
-二属性の一致から根の数学的等号を自動生成するのは不適切です。
-この教材用クラスは、根どうしの一般的な等号を実装しない範囲を選んでいます。
+```python
+@property
+def width(self) -> Rational:
+    return _from_fraction(_as_fraction(self.upper) - _as_fraction(self.lower))
+```
 
-これは `1.414...` のような小数近似を保存する型ではありません。
-「多項式 `x²−2` の、区間 `[1,2]` に分離された根」という指定を保存します。
+<p data-meta="property">二つ目の抜粋は区間のクラスにある <code>width</code> です。<code>@property</code> が付いているので <code>interval.width</code> と読むと、その場で上端から下端を引きます。幅も中点も分数で計算できます。√2そのものを小数に直す必要はありません。</p>
 
-作成直後の `__post_init__` は、次を順に検査します。
+<p class="source-reference" data-source-reference="peano/algebraic_root.py" data-test-reference="tests/test_algebraic_root.py">元のファイルを読む　<a href="/assets/source/peano/algebraic_root.py">peano/algebraic_root.py</a> ／ <a href="/assets/source/tests/test_algebraic_root.py">tests/test_algebraic_root.py</a></p>
 
-1. 多項式が1次以上で、初期区間に正の幅がある
-2. 両端自身は根ではなく、両端で符号が異なる
-3. `count_real_roots` の結果が1である
+## 作るときに、どこまで確かめる？
 
-実ファイルでは、この三段階が次のように並びます。
+```python
+def algebraic_root(
+    polynomial_value: Polynomial,
+    lower: tuple[int, int],
+    upper: tuple[int, int],
+) -> AlgebraicRoot:
+    return AlgebraicRoot(
+        polynomial_value,
+        RationalInterval(rational(*lower), rational(*upper)),
+    )
+```
+
+`algebraic_root(p, (1, 1), (2, 1))` の二つの組は、1/1 と 2/1 を表します。`rational(*lower)` の星印は、組の中身を二つの引数に分ける記号です。この関数が最後に `AlgebraicRoot` を作ると、次の検査が走ります。
 
 ```python
 def __post_init__(self) -> None:
@@ -176,47 +81,19 @@ def __post_init__(self) -> None:
         )
 ```
 
-どれかを満たさなければ `ValueError` になり、不完全な
-`AlgebraicRoot` は作られません。前章のスツルム列は、ここでは
-コンストラクタの不変条件を支える部品として再利用されています。
+上から順に、まず式と区間の種類を確認します。`degree <= 0` は定数の式、`is_point` は幅が0の区間を除くためです。次に、端そのものが根である場合を除き、両端の符号が異なることを確認します。これで途中に根があると分かります。最後に `count_real_roots` で個数を確かめます。符号が変わっても、途中で3回横軸を横切った可能性が残るからです。
 
-<span class="lesson-layer" data-layer="implementation">Pythonでの実装</span>
+<span class="lesson-layer" data-layer="implementation">半分を選ぶ</span>
 
-## 公開された補助関数が二つの型を組み立てる
+## 真ん中で一度計算すると、なぜ半分を消せる？
 
-実験で使う `algebraic_root` は、短い入力から上の二種類のオブジェクトを作る
-公開された補助関数です。
+x²−2 の値は、左端1では−1、右端2では2。真ん中の 3/2 では 9/4−2＝1/4 で正です。左端と真ん中の間で負から正に変わったので、ここに根が一つはあります。元の区間に根が一つしかないことはもう確かめたので、右半分を捨ててもその根を失いません。これが**二分法**の一歩です。
 
-```python
-def algebraic_root(
-    polynomial_value: Polynomial,
-    lower: tuple[int, int],
-    upper: tuple[int, int],
-) -> AlgebraicRoot:
-    return AlgebraicRoot(
-        polynomial_value,
-        RationalInterval(rational(*lower), rational(*upper)),
-    )
-```
-
-たとえば `lower=(1, 1)` なら、`rational(*lower)` は
-`rational(1, 1)` と同じタプルの展開です。この補助関数は数学的な検査を省略せず、
-構築した `RationalInterval` と `AlgebraicRoot` の `__post_init__` へ委譲します。
-したがって、短縮記法を使っても分離区間の不変条件は同じです。
-
-## `_bisect` の三つの経路を読む
-
-実装の中心は、先ほどの数学的な場合分けと同じです。
-
-<div class="meta-note" data-meta="free-function-decorator" data-reveal>
-  <strong>デコレータはメソッド専用ではない</strong>
-  <p>
-    <code>_bisect</code> はクラスのメソッドではなくモジュール内の関数ですが、
-    <code>@log(log_level=41)</code> で同じように包まれます。
-    元の関数は区間と説明文を返し、モジュール内でその名前に割り当てられるラッパーは
-    説明文を記録して区間だけを返します。
-  </p>
-</div>
+| 試す前の区間 | 中点 | 中点での x²−2 | 残す区間 |
+| --- | --- | --- | --- |
+| [1, 2] | 3/2 | 1/4（正） | [1, 3/2] |
+| [1, 3/2] | 5/4 | −7/16（負） | [5/4, 3/2] |
+| [5/4, 3/2] | 11/8 | −7/64（負） | [11/8, 3/2] |
 
 ```python
 @log(log_level=41)
@@ -231,7 +108,11 @@ def _bisect(
         result = RationalInterval(midpoint, midpoint)
         return (
             result,
-            lambda: f"{polynomial_value!r}: 中点 {midpoint!r} は根",
+            lambda: translate(
+                "midpoint_root",
+                polynomial=repr(polynomial_value),
+                midpoint=repr(midpoint),
+            ),
         )
 
     lower_sign = polynomial_value.sign_at(interval.lower)
@@ -245,17 +126,9 @@ def _bisect(
     )
 ```
 
-`x²−2` と `[1,2]` では、中点は `3/2` です。
+最初の `if` には、表に出てこない場合が書かれています。中点そのものが根なら、両端をその中点にそろえて終われます。そうでなければ `lower_sign != midpoint_sign` で左端と中点の符号を比べます。違えば左半分、同じなら右半分です。元から両端の符号が違うので、後者では中点と右端の符号が違うことも分かります。
 
-| 点 | 多項式の値 | 符号 |
-| --- | ---: | --- |
-| 左端 `1` | `−1` | 負 |
-| 中点 `3/2` | `1/4` | 正 |
-| 右端 `2` | `2` | 正 |
-
-左端と中点の符号が異なるため、2番目の経路で `[1,3/2]` を返します。
-
-`trace` は初期区間をリストへ入れ、指定回数だけ `_bisect` の戻り値を追加します。
+<span class="lesson-layer" data-layer="trace">区間の履歴を読む</span>
 
 ```python
 def trace(
@@ -271,25 +144,9 @@ def trace(
     return tuple(intervals)
 ```
 
-`_` は繰り返し番号自体を使わないときの慣習的な名前です。
-中点が厳密な根なら一点区間になり、それ以上狭める必要がないので `break` します。
+`intervals = [self.interval]` で最初の区間も履歴に入れます。`intervals[-1]` は一番新しい区間、`append` は次の区間を末尾に加える操作です。一点に決まったら `break` でそこで止まります。`approximate` は最後の区間だけ、`trace` は途中も含むすべての区間を返します。
 
-<span class="lesson-layer" data-layer="trace">実行して確かめる</span>
-
-## 区間二分ログで、どちらの半分を残したか確かめる
-
-`_bisect` には `@log(log_level=41)` が付いています。ログは各回の
-入力区間と戻り値を一行で記録します。
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>最初の二回を、実装の分岐から予想</strong>
-  <p>
-    上に抜粋した <code>_bisect</code> の <code>midpoint_sign</code> と
-    <code>lower_sign</code> の分岐を参照します。
-    最初の中点 <code>3/2</code> と、次の中点 <code>5/4</code> の符号を調べ、
-    最初の二つの区間二分ログで残る区間を書いてください。
-  </p>
-</div>
+<div class="learning-prompt"><strong>実行する前に</strong><p>表の最後の区間で、もう一度二分します。中点 23/16 を2乗して2と比べると、左右のどちらを残すでしょう。実行結果の最後の区間と比べてください。</p></div>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -317,28 +174,11 @@ for interval in intervals:
   </div>
 </div>
 
-実行順に注目してください。`sqrt_two.trace(4)` が4回の二分とログ記録を
-すべて終えてから、下の `for` が保存済みの5区間を `print` します。
-したがって、出力では二分ログが先にまとまり、そのあと区間列が並びます。
+<details class="self-check"><summary>4回目の区間を確かめる</summary><p>23²＝529、2×16²＝512。中点で式の値が正になるので、負だった左端11/8と中点23/16の間を残します。幅は 23/16−22/16＝1/16。初めの区間も含めて、最後の for 文は五つの区間を表示します。</p></details>
 
-| 二分後 | 残る区間 | 幅 |
-| ---: | --- | --- |
-| 0回 | `[1,2]` | 1 |
-| 1回 | `[1,3/2]` | `1/2` |
-| 2回 | `[5/4,3/2]` | `1/4` |
-| 3回 | `[11/8,3/2]` | `1/8` |
-| 4回 | `[11/8,23/16]` | `1/16` |
+<span class="lesson-layer" data-layer="test">何を検査すればよいか</span>
 
-設定値41では、多項式の `sign_at` が内部で行う計算はログに出ません。
-ログの矢印だけを信用するのではなく、中点の符号と `_bisect` の分岐へ戻して
-区間選択の妥当性を判断します。
-
-<span class="lesson-layer" data-layer="test">テストで確かめる</span>
-
-## テストは「狭くなる」と「根を失わない」を同時に調べる
-
-3回二分すると幅は `1/8` です。テストは幅だけでなく、
-新しい両端でも符号が異なることを確かめます。
+## 幅が正しくても、答えを外すことがある
 
 ```python
 approximation = root.approximate(3)
@@ -355,45 +195,17 @@ self.assertGreater(
 self.assertEqual(len(root.trace(3)), 4)
 ```
 
-中点が厳密な根だった場合には一点区間になることも、別の経路として検査します。
+毎回間違った側を残しても、幅だけは半分になります。そこでテストでは、3回後の幅が 1/8 かに加えて、左端で式の値が負か、右端で正かも確かめます。`assertLess(..., 0)` は0より小さいことの検査です。最初に根が一つだと確かめた範囲の中でこの符号が保たれれば、同じ根をまだ挟んでいます。
 
-```python
-approximation = root.approximate(1)
-self.assertTrue(approximation.is_point)
-self.assertEqual(approximation.midpoint, Q_ZERO)
-```
+中点が根になる場合も試せます。式を x、区間を [−1, 1] とすれば、中点0が根です。1回の二分で [0, 0] が返り、その先は区間を増やしません。
 
-さらに、根を含まない `[2,3]` や複数の根を含む区間は、
-作成時に拒否されることをテストします。正常な反復だけでなく、
-不変条件を破る入力が通らないことも型の責務です。
+<span class="lesson-layer" data-layer="boundary">ここまでで何が分かったか</span>
 
-<span class="lesson-layer" data-layer="boundary">有限の計算で分かること</span>
+## 指定は正確でも、近似には幅がある
 
-## 有限回の区間と、実数としての根を区別する
+√2の例では、k 回二分すると幅は 1/2ᵏ です。幅を 1/100 より小さくしたければ、2⁶＝64、2⁷＝128 なので7回で足ります。答えを小数で言う前に、「どこからどこまで」と精度を示せます。何回計算しても両端は有理数なので、両端のどちらも √2 にはなりません。
 
-4回でも100回でも、プログラムが直接返すのは有理数の端点を持つ区間です。
-`√2` と厳密に等しい有理数を返してはいません。
-
-| 根拠 | ここで保証すること |
-| --- | --- |
-| `_bisect` の実装 | 符号が変わる半区間を選ぶ |
-| テスト | 調べた例で幅と不変条件が期待どおり保たれる |
-| スツルムの定理 | 初期区間に相異なる根が一つある |
-| 入れ子区間の定理・実数の完備性 | 幅が0へ近づく全区間に共通の実数が一つある |
-
-ここで**入れ子**とは、次の区間が必ず前の区間に含まれることです。
-二分のたびに幅は半分になり、0へ近づきます。実数の**完備性**は、
-このような無限列が指し示す極限に「穴がない」ことを保証します。
-有限回のプログラム実行が無限回を終えたという意味ではなく、
-数学の定理が有限の各区間を一つの実数へ結び付けています。
-
-`AlgebraicRoot` は、あらゆる実数を扱う完全な数値型ではありません。
-根どうしの四則演算や一般の等号は提供せず、多項式・分離区間・二分法の
-対応を学ぶための機能に絞っています。
-
-また、区間の端点計算と符号判定では、前章で説明した `Fraction` への変換を使います。
-そのため「自然数から構成した演算だけで任意回数を進める実装」ではありません。
-構成の意味を保ちながら、反復を実用的にする明示的な境界です。
+最初に保存した**式と分離区間**は、初めから正確に一つの根を指しています。一方、二分して得た**区間**は、その根がどこにあるかを知るための有限回の計算結果です。区間を際限なく狭めた先にも実数が存在するという議論には、実数に隙間がないという性質（完備性）を使います。プログラムが無限回の処理を終えるわけではありません。
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
@@ -415,16 +227,13 @@ self.assertEqual(approximation.midpoint, Q_ZERO)
   </fieldset>
 </form>
 
-## ここまでで身に付けた読み方
+## 仕上げの問題　同じコードで √3 を探す
 
-1. 数学上の対象と規則を言葉と式で区別する
-2. その対象をライブラリがどの属性へ保存するか調べる
-3. 演算子が呼ぶメソッドと、条件分岐を定義へ対応付ける
-4. 実装から出力を予想し、実際のログと照らし合わせる
-5. テストが検査する性質と、数学の定理が保証する範囲を分ける
-6. 高速化のための選択や、この実装で扱わないことを明示する
+上の実験で、定数の係数を `(-2, 1)` から `(-3, 1)` に変えてください。式は x²−3 になります。最初の区間は [1, 2] のままでよいでしょうか。二分を2回したあとの区間を紙に書いてから、`trace(2)` を実行してみましょう。
 
-この手順を使えば、別の演算や別の数体系も「ログが出たから正しい」で終わらず、
-定義・実装・観察結果の対応として読めます。
+<details class="self-check">
+  <summary>区間を選んだ理由と、計算結果を確かめる</summary>
+  <p>1²−3 は負、2²−3 は正です。正の範囲では2乗は大きくなる一方なので、この間に根は一つだけです。中点 3/2 では 9/4−3＝−3/4。左端を 3/2 に替えます。次の中点 7/4 では 49/16−3＝1/16。今度は右端を替え、[3/2, 7/4] が残ります。変えたのは式の係数と計算回数だけで、区間を選ぶコードはそのまま使えました。</p>
+</details>
 
-[実験室で自分の予想を確かめる →](../playground.md)
+[実験ページで、入力を一つ変えて予想を確かめる](../playground.md)

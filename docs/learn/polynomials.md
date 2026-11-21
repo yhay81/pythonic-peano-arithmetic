@@ -1,94 +1,24 @@
 <span class="lesson-number">第4章 · 多項式</span>
 
-# 面積が2の正方形、一辺はどれくらい？
+# 式の値を計算し、答えがいくつあるかを調べる
 
-<p class="lesson-lead">一辺が1なら面積は1、一辺が2なら面積は4。面積が2になる一辺の長さは、1と2の間にありそうです。</p>
+前章で、2乗して2になる正の数 √2 は分数で書き切れないと分かりました。けれども、その数を見分ける条件「x²−2＝0」は短く書けます。そこで今度は、数の代わりに式をコンピューターに持たせます。
 
-一辺の長さを x と書くと、面積は x × x、短く書けば x² です。そこで x²−2 を計算してみます。答えが負なら面積が足りず、正なら大きすぎます。ちょうど0になる長さが探している答えです。
+<div class="lesson-goals"><strong>この章の目標</strong><p>x²−2 に値を代入する手順を作り、1と2の間に答えがちょうど一つあることを確かめます。</p></div>
 
-x²−2 のように、数や x や x² などに数を掛けて足し合わせた式を<strong>多項式</strong>といいます。式の値を0にする x が、その式の<strong>根</strong>です。ここで探しているのは長さなので、正の根に注目します。
+<span class="lesson-layer" data-layer="definition">式と、その根</span>
 
-<div class="lesson-goals" data-reveal>
-  <strong>一辺が1.5だと、面積は足りる？</strong>
-  <details><summary>答えを確かめる</summary><p>1.5 × 1.5＝2.25。面積が少し大きいので、探している長さは1.5より短いと分かります。</p></details>
-</div>
+## 「一つはある」と「一つだけある」
 
-[代数的実根の話へ](algebraic-roots.md)
+式に入れると値が0になる数を、その式の**根**と呼びます。x²−2 に1を入れると−1、2を入れると2です。この式のグラフは途中で途切れないので、負の高さから正の高さへ行く途中、どこかで高さ0を通ります。これは**中間値の定理**を使った考え方です。
 
-## Pythonのコードで確かめる
+今回は正の数が大きくなるほど2乗も大きくなるので、1から2の間で0を通るのは一度だけです。でも、一般の式ではグラフが何度も上下するかもしれません。そこで「少なくとも一つ」と「ちょうど一つ」を別々に調べます。
 
-<div class="implementation-bridge" data-reveal aria-label="多項式の数学・表現・実装">
-  <div>
-    <strong>数学</strong>
-    <p>有限個の有理数係数を持つ式へ値を代入し、0になる根を調べます。</p>
-  </div>
-  <div>
-    <strong>データ表現</strong>
-    <p><code>Polynomial.coefficients</code> が、定数項から順に係数を保存します。</p>
-  </div>
-  <div>
-    <strong>実装</strong>
-    <p>コンストラクタが表現を正規化し、ホーナー法とスツルム列が根を調べます。</p>
-  </div>
-</div>
+<span class="lesson-layer" data-layer="representation">式の保存方法</span>
 
-<div class="source-reference"
-     data-source-reference="peano/polynomial.py"
-     data-test-reference="tests/test_polynomial.py">
-  <strong>この章で横に置く実装</strong>
-  <p>
-    完全なクラスと根数え関数:
-    <a href="/assets/source/peano/polynomial.py"><code>peano/polynomial.py</code></a>。
-    本文では <code>__init__</code>、<code>evaluate</code>、
-    <code>sturm_sequence</code>、<code>count_real_roots</code> を抜粋します。
-  </p>
-  <p>
-    正規化・代入・根数の検査:
-    <a href="/assets/source/tests/test_polynomial.py"><code>tests/test_polynomial.py</code></a>。
-    ファイル索引は<a href="/reference/implementation/">実装リファレンス</a>にあります。
-  </p>
-</div>
+## x の項がないのに、なぜ0を入れる？
 
-<span class="lesson-layer" data-layer="definition">数学上の定義</span>
-
-## `x²−2` の根として√2を指定する
-
-`x` は、あとから数を代入する場所です。`x²` は `x×x` の短い表記です。
-数と `x` のべき乗を足して作る式を**多項式**と呼びます。
-
-<div class="peano-equation" data-reveal>
-x²−2 = −2 + 0x + 1x²
-</div>
-
-`−2`、`0`、`1` は各項の**係数**です。`x²−2` へ `x=1` を代入すると
-`−1`、`x=2` なら `2` です。代入した結果が0になる `x` を**根**と呼びます。
-したがって、探している正の `√2` は `x²−2` の根です。
-
-多項式の値は、入力を少し動かしたとき突然飛びません。この**連続性**と
-中間値の定理により、1で負、2で正なら、**開区間** `(1,2)` に根が
-少なくとも一つあります。ただし、端点の符号だけでは根が一つとは限りません。
-開区間 `(1,2)` は、1と2そのものを含まず、その間にある実数全体です。
-ここでは中間値の定理を証明せず、連続な関数が負から正へ変わる途中では
-0を通る、という保証として使います。
-
-<span class="lesson-layer" data-layer="representation">データの表し方</span>
-
-## 式を、定数項から始まる係数列として保存する
-
-ライブラリは多項式の見た目の文字列を保存しません。係数を
-`x⁰, x¹, x², …` の順に並べた、変更できない列として保存します。
-
-| 数学の式 | 保存する係数列 |
-| --- | --- |
-| `x²−2` | `(−2,0,1)` |
-| `1+x` | `(1,1)` |
-| `3` | `(3)` |
-
-`polynomial((-2,1),(0,1),(1,1))` の各組は、係数を
-`(分子,分母)` で書いたものです。内部では三つの `Rational` を作り、
-`Polynomial` へ渡します。
-
-このクラスは、これまでの数のクラスと違って `init=False` です。
+<div class="implementation-bridge"><p>x²−2 を次数の低い順に書くと −2＋0x＋1x² です。各項に掛かっている数を<strong>係数</strong>と呼びます。係数を (−2, 0, 1) と並べれば、位置が定数、x、x² のどれかを表します。</p></div>
 
 ```python
 @total_ordering
@@ -108,44 +38,15 @@ class Polynomial:
         object.__setattr__(self, "_coefficients", tuple(normalized))
 ```
 
-<div class="meta-note" data-meta="custom-init" data-reveal>
-  <strong>dataclassの生成を止め、正規化するコンストラクタを書く</strong>
-  <p>
-    係数を受け取ったまま保存すると、末尾の0や未約分の係数が残ります。
-    そこで <code>init=False</code> で自動生成を止め、
-    正規化してから一つのタプルへ保存する <code>__init__</code> を手書きします。
-    <code>dataclass</code>は<code>frozen</code>と<code>slots</code>の制約には引き続き使われます。
-  </p>
-</div>
+<p data-meta="custom-init"><code>init=False</code> なのは、係数を保存する前に並びを整えたいからです。<code>normalized[-1]</code> は最後の係数。そこが0なら <code>pop()</code> で削ります。たとえば (−2, 0, 1, 0) の最後の0は 0x³ なので削れます。一方、途中の0を削ると (−2, 1) となり、式は x−2 に変わります。</p>
 
-`Q_ZERO` は前章で構成した有理数0を一度作って名前を付けた定数です。
+`len(normalized) > 1` は、全部0でも最後の一つは残す条件です。`tuple(normalized)` が、整えた係数を順番の決まった組にします。このように整数や分数の係数と x の0乗、1乗、2乗、…を組み合わせて足した式が**多項式**です。ここでは有理数を係数に使います。
 
-1. すべての有理数係数を約分する
-2. 最高次側に続く0を取り除く
-3. 変更できない `tuple` として保存する
+<p class="source-reference" data-source-reference="peano/polynomial.py" data-test-reference="tests/test_polynomial.py">元のファイルを読む　<a href="/assets/source/peano/polynomial.py">peano/polynomial.py</a> ／ <a href="/assets/source/tests/test_polynomial.py">tests/test_polynomial.py</a></p>
 
-`1+0x` と `1` は同じ多項式なので、どちらも係数列 `(1)` へ正規化されます。
-整数と有理数では入力した代表元を残しましたが、多項式では表現を一意に寄せます。
-これは型ごとの設計上の違いです。
+<span class="lesson-layer" data-layer="implementation">係数から計算する</span>
 
-`frozen=True` では通常の `self._coefficients = ...` も拒否されるため、
-初期化中だけ基底の `object.__setattr__` を明示的に呼びます。
-これは不変オブジェクトを手書きで初期化するためのPythonデータモデル上の処理で、
-数学的な操作ではありません。
-
-<span class="lesson-layer" data-layer="implementation">Pythonでの実装</span>
-
-## ホーナー法で係数列から値を計算する
-
-係数が `(a₀,a₁,a₂)` の多項式は `a₀+a₁x+a₂x²` です。
-同じ式を次のように括ると、`x` の掛け算を一段ずつ進められます。
-
-<div class="peano-equation" data-reveal>
-a₀ + x(a₁ + xa₂)
-</div>
-
-これを**ホーナー法**と呼びます。`Polynomial.evaluate` は係数列を逆向きに読み、
-有理数の乗法と加法を繰り返します。
+## 2乗を先に計算せず、後ろから一項ずつ読む
 
 ```python
 @log(log_level=31)
@@ -157,76 +58,19 @@ def evaluate(self, value: object) -> tuple[Rational, LogMessage]:
     return result, lambda: f"{self!r}: x={point!r} -> {result!r}"
 ```
 
-- `cast2r` は、自然数・整数・有理数の入力を有理数へ揃える
-- `reversed` によって、最高次の係数から読む
-- 毎回 `reduction()` して、途中の分数表現が膨らみすぎないようにする
+`point` は代入する数、`result` は途中の値です。`reversed` で係数を後ろから読み、毎回「途中の値×代入する数＋次の係数」を計算します。x＝3/2 を代入して一周ずつ追いましょう。
 
-`x²−2` へ1を代入すると、内部状態は次のように変わります。
+| 読む係数 | 計算 | 新しい result |
+| --- | --- | --- |
+| 1 | 0×(3/2)＋1 | 1 |
+| 0 | 1×(3/2)＋0 | 3/2 |
+| −2 | (3/2)×(3/2)−2 | 1/4 |
 
-| 読んだ係数 | 更新式 | `result` |
-| ---: | --- | ---: |
-| 1 | `0×1+1` | 1 |
-| 0 | `1×1+0` | 1 |
-| −2 | `1×1−2` | −1 |
+これは x²−2 を (1×x＋0)×x−2 とかっこでくくっただけです。高い次数にも同じループが使えます。この計算法を**ホーナー法**と呼びます。
 
-この表は実装のループを手で実行したものです。
+<span class="lesson-layer" data-layer="trace">手計算と比べる</span>
 
-スツルム列の実装は、根を数えるために別の計算を組み立てます。
-次は入力検査と戻り値を含む完全な関数です。
-
-```python
-def sturm_sequence(value: Polynomial) -> tuple[Polynomial, ...]:
-    if not isinstance(value, Polynomial):
-        raise TypeError("sturm_sequence expects a Polynomial")
-    if value.degree <= 0:
-        raise ValueError("a constant polynomial has no Sturm sequence")
-
-    square_free = value.square_free()
-    sequence = [square_free, square_free.derivative()]
-    while sequence[-1]:
-        remainder = sequence[-2] % sequence[-1]
-        if not remainder:
-            break
-        sequence.append(-remainder)
-    return tuple(sequence)
-```
-
-`square_free()` は、同じ場所に重なっている根を一つとして数えられる形へ直します。
-`x²−2` には重なった根がないため、ここでは元の式のままです。
-次の `derivative()` は**導関数**を作ります。係数と指数を掛けて次数を一つ下げるので、
-各項 `aₖxᵏ` は `k×aₖxᵏ⁻¹` へ変わり、`x²−2` の導関数は `2x` です。
-
-その後は前二つを多項式として割り、余りの符号を反転して追加します。
-`x²−2` なら、実装のループを次のように手で追えます。
-
-| 段階 | 割る計算 | 余り | 列へ追加するもの |
-| ---: | --- | ---: | ---: |
-| 初期化 | — | — | `x²−2`, `2x` |
-| 1 | `(x²−2) ÷ 2x` | `−2` | 符号を反転した `2` |
-| 2 | `2x ÷ 2` | `0` | 追加せず終了 |
-
-最初の余りは、`x²−2 = (x/2)(2x)−2` と書けば `−2` だと確認できます。
-したがってスツルム列は次の三つです。
-
-<div class="peano-equation" data-reveal>
-x²−2,　2x,　2
-</div>
-
-<span class="lesson-layer" data-layer="trace">実行して確かめる</span>
-
-## 代入ログと符号変化を、別の証拠として読む
-
-`evaluate` には `@log(log_level=31)` が付いています。ログはループの各周ではなく、
-すべての係数を処理して戻り値ができたあとに一行だけ出ます。
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>実行前に、ホーナー法を一度手で追う</strong>
-  <p>
-    上に抜粋した <code>evaluate</code> のループを参照し、
-    <code>x=2</code> の三つの
-    <code>result</code> を書いてから実行してください。
-  </p>
-</div>
+<div class="learning-prompt"><strong>実行する前に</strong><p>実験では同じ式に1と2を入れます。手で符号を予想してから実行し、片方の入力を 3/2 に変えて表の最後の値も確かめてください。</p></div>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -254,22 +98,41 @@ print("x = 2:", value_at_2)</textarea>
   </div>
 </div>
 
-`<P(-2 + x^2)>` は保存された多項式、`<Q(1/1)>` は代入した有理数、
-最後の `<Q(-1/1)>` はホーナー法で得た有理数です。代入ログの一行だけでは
-ループ途中は見えないため、実装を根拠に上の表を作ることに意味があります。
+## 根の個数を数えるための、もう一つの表
 
-次にスツルム列の符号を端点で調べます。0を除いた符号が何回切り替わるかを
-`sign_variations` が数えます。
+ここからは少し先の数学です。**スツルムの定理**という道具を使います。根を端に含まない区間なら、決まった作り方で並べた式について、左端と右端で「符号が隣と何回入れ替わるか」を調べると、その差が区間の中の異なる実数の根の個数になります。まずこの定理の使い方を、実際の数で確かめます。
 
-| 点 | `x²−2, 2x, 2` の符号 | 変化回数 |
-| ---: | --- | ---: |
-| 1 | `−,+,+` | 1 |
-| 2 | `+,+,+` | 0 |
+x²−2 の場合、並べる式は **x²−2、2x、2** です。端の数を三つの式すべてに入れ、左から符号を読みます。
 
-スツルムの定理により、左端の変化回数から右端の回数を引いた値が、
-開区間の相異なる実根の個数です。
+| 入れる数 | 三つの値 | 符号の並び | 入れ替わる回数 |
+| --- | --- | --- | ---: |
+| 1 | −1, 2, 2 | −, ＋, ＋ | 1 |
+| 2 | 2, 4, 2 | ＋, ＋, ＋ | 0 |
 
-実装も、その差をそのまま返します。次は二つの関数の完全な実装です。
+左の回数から右の回数を引くと1−0＝1。これで1と2の間の根は**ちょうど一つ**と分かります。根が一つだと知ってから区間を半分にするのが、次章の出発点です。
+
+## その三つの式はどこから来たか
+
+```python
+def sturm_sequence(value: Polynomial) -> tuple[Polynomial, ...]:
+    if not isinstance(value, Polynomial):
+        raise TypeError("sturm_sequence expects a Polynomial")
+    if value.degree <= 0:
+        raise ValueError("a constant polynomial has no Sturm sequence")
+
+    square_free = value.square_free()
+    sequence = [square_free, square_free.derivative()]
+    while sequence[-1]:
+        remainder = sequence[-2] % sequence[-1]
+        if not remainder:
+            break
+        sequence.append(-remainder)
+    return tuple(sequence)
+```
+
+`square_free()` は、同じ根が重なる因子を一つずつに整理します。今回の x²−2 はそのままです。`derivative()` は、式からその変化のしかたを表す別の式（導関数）を作ります。たとえば x が h だけ増えると、2乗の増え方は (x＋h)²−x²＝2xh＋h²。これを h で割ると 2x＋h で、h を0に近づけると 2x に近づきます。これが x² の導関数が 2x になる理由です。定数 −2 は x が動いても変わらないので導関数は0です。初めの二つの式がこれで決まりました。
+
+次の `%` は式の割り算の余りです。x²−2＝(x/2)×(2x)−2 なので、最初の式を次の式で割った余りは−2。`append(-remainder)` で符号を反転して2を追加します。次に2xを2で割ると余りが0なので終了です。この作り方で得られる並びを**スツルム列**と呼びます。なぜこれであらゆる多項式の根を数えられるかという証明は、この章では定理として使っています。
 
 ```python
 def sign_variations(
@@ -302,16 +165,7 @@ def count_real_roots(
     return sign_variations(sequence, lower) - sign_variations(sequence, upper)
 ```
 
-表示幅に合わせて関数のシグネチャと最後の式を改行していますが、処理は実ファイルと同じです。
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>存在と個数を分けて予想</strong>
-  <p>
-    上の <code>count_real_roots</code> のreturnを参照してください。
-    中間値の定理が保証することと、符号変化の差
-    <code>1−0</code> が保証することを、それぞれ一文で書いてください。
-  </p>
-</div>
+最初の関数では、0を飛ばし、各値が「負かどうか」を並べます。`zip(signs, signs[1:])` は一つずらして隣同士を組にする書き方です。左と右が違う組だけを数えれば、表の最後の列になります。二つ目の関数の最後の一行が、左端での回数から右端での回数を引いています。
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -346,20 +200,11 @@ print("根の個数:", count_real_roots(p, one, two))</textarea>
   </div>
 </div>
 
-<span class="lesson-layer" data-layer="test">テストで確かめる</span>
+<details class="self-check"><summary>左端を−2にしたら？</summary><p>−2を入れると三つの符号は ＋, −, ＋ で、入れ替わりは2回。右端の2では0回。差は2です。両端で元の式の値が正でも、途中に根が二つある例です。</p></details>
 
-## テストは表現・計算・根の個数を分離する
+<span class="lesson-layer" data-layer="test">別の入力で確かめる</span>
 
-係数列の正規化は、末尾の0がある表現とない表現が等しいことで検査します。
-
-```python
-self.assertEqual(
-    Polynomial(rational(1, 1), rational(0, 1)),
-    Polynomial(rational(1, 1)),
-)
-```
-
-代入は、`x²−2` へ `3/2` を入れた結果が `1/4` になることを確かめます。
+## テストが見分ける二つの間違い
 
 ```python
 self.assertEqual(
@@ -368,8 +213,7 @@ self.assertEqual(
 )
 ```
 
-スツルム列については、`(−2,2)` に二つの実根 `−√2` と `√2` があること、
-列の長さが3になることを検査します。
+このテストは先ほどの手計算の 1/4 と、代入の結果を比べます。たとえば係数を逆向きに保存したら、違う式の値になり、見つけられます。
 
 ```python
 self.assertEqual(
@@ -379,20 +223,11 @@ self.assertEqual(
 self.assertEqual(len(sturm_sequence(self.sqrt_two_polynomial)), 3)
 ```
 
-一つの大きなテストではなく、表現の不変条件、代入、根の個数という責務ごとに
-失敗箇所を切り分けられる形になっています。
+こちらは −2 と 2 の間の根の個数を調べます。式を正しく計算できても、「両端の符号が同じなら根は0個」と決めてしまう実装はこの検査で失敗します。
 
-<span class="lesson-layer" data-layer="boundary">高速化のための選択</span>
+<span class="lesson-layer" data-layer="boundary">正確さと計算量</span>
 
-## 構成を見せる経路と、高速に符号だけ調べる経路
-
-`evaluate` は、これまで構成した `Rational` の演算を実際に使うため、
-数体系の積み上げを観察できます。一方、二分法やスツルム列では、多項式の
-**符号だけ**を何度も調べます。
-
-そこで `sign_at` は、同じ整数比をPythonの任意精度整数を使う `Fraction` へ
-一時的に写し、ホーナー法で厳密に符号を判定します。浮動小数点の近似ではありませんが、
-ペアノ表現だけを通す経路でもありません。
+## 値の全部が要るときと、符号だけで足りるとき
 
 ```python
 def sign_at(self, value: object) -> int:
@@ -403,16 +238,7 @@ def sign_at(self, value: object) -> int:
     return (result > 0) - (result < 0)
 ```
 
-ここでは、構成を見せる処理と、繰り返し計算を現実的な時間で行う処理を
-意図的に分けています。
-
-| メソッド | 優先するもの |
-| --- | --- |
-| `evaluate` | 構成した数体系の演算が見えること |
-| `sign_at` | 同じ有理数の意味を保ったまま、反復判定を実用的に行うこと |
-
-中間値の定理は根が少なくとも一つあること、スツルムの定理は相異なる根の個数を
-保証します。プログラムの出力だけから定理そのものが証明されるわけではありません。
+`sign_at` も同じホーナー法です。ただし分数をPython標準の `Fraction` に移して計算します。分母が大きくなると、分子や分母を「次の数」の鎖で毎回組み立てるのに時間がかかるからです。分子と分母は整数のまま扱うので、小数への丸めは入りません。最後の行は正なら1、負なら−1、0なら0を返します。次章の二分法で必要なのは、この三通りの答えです。
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
@@ -434,9 +260,4 @@ def sign_at(self, value: object) -> int:
   </fieldset>
 </form>
 
-## 次へ
-
-多項式と区間 `(1,2)` を結び付け、そこに根が一つだけあると確認できました。
-次章では、この条件をオブジェクトの不変条件として保存し、区間を半分ずつ狭めます。
-
-[代数的実根へ進む →](algebraic-roots.md)
+[第5章へ。根を一つ含む区間を狭める](algebraic-roots.md)

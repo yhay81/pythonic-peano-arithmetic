@@ -1,45 +1,40 @@
 ---
-title: 0から足し算を作ってみよう
+title: 数はどこまで自分で作れるか
 hide:
   - toc
 ---
 
 <section class="course-hero">
   <div class="course-hero__content">
-    <h1>0から足し算を作ってみよう</h1>
-    <p>電卓に「次の数へ」というボタンしかなかったら、どうやって 2＋3 を計算しますか？</p>
+    <h1>数はどこまで自分で作れるか</h1>
+    <p>0と「次の数」だけを使って、足し算の手順を書けるでしょうか。そこから負の数、分数へ進み、最後は小数に頼らずに √2 の位置を求めます。</p>
     <div class="course-actions">
-      <a class="course-action course-action--primary" href="learn/natural-numbers/">自然数の話から読む</a>
+      <a class="course-action course-action--primary" href="learn/python-basics/">第0章から読む</a>
     </div>
   </div>
   <figure class="course-hero__diagram">
-    <figcaption>2から始めて、3回押してみよう</figcaption>
+    <figcaption>√2を探すのに必要なもの</figcaption>
     <ol>
-      <li><strong>1回目</strong><span>2の次は3</span></li>
-      <li><strong>2回目</strong><span>3の次は4</span></li>
-      <li><strong>3回目</strong><span>4の次は5</span></li>
+      <li><strong>分数</strong><span>候補の長さを 3/2 と書ける</span></li>
+      <li><strong>式</strong><span>候補を2乗して、2より大きいか調べる</span></li>
+      <li><strong>区間</strong><span>答えを挟む二つの端を決める</span></li>
     </ol>
   </figure>
 </section>
 
-最後に出た5が答えです。足し算のボタンがなくても、「次へ」を繰り返すだけで足し算ができました。
+## 学ぶ順番 { #route }
 
-この教材では、0から始めて、次の数、そのまた次の数を作ります。これが「ペアノ算術」の出発点です。そこから、負の数や分数も自分で作っていきます。
+普段使っている整数や分数を、今度は中身から作ります。前の章で作った数と計算が、次の章の材料になります。Pythonの変数、関数、条件分岐を少し読める人向けに、第0章ではクラスと演算記号のつながりから説明します。
 
-## 気になる問いから読む { #route }
-
-各章のはじめに、紙と鉛筆で試せる短い話があります。
-
-<nav class="learning-path" aria-label="気になる問いから読む">
-  <a href="learn/natural-numbers/" data-step="01"><span><strong>自然数</strong>「次へ」を3回押すと、2はいくつになる？</span></a>
-  <a href="learn/integers/" data-step="02"><span><strong>整数</strong>右へ1歩、左へ3歩。どこに着く？</span></a>
-  <a href="learn/rationals/" data-step="03"><span><strong>有理数</strong>ピザの半分は、4切れのうち何切れ？</span></a>
-  <a href="learn/polynomials/" data-step="04"><span><strong>多項式</strong>面積が2の正方形、一辺はどれくらい？</span></a>
-  <a href="learn/algebraic-roots/" data-step="05"><span><strong>代数的実根</strong>√2は、1.45より大きい？　小さい？</span></a>
+<nav class="learning-path" aria-label="学ぶ順番">
+  <a href="learn/python-basics/" data-step="00"><span><strong>Pythonの仕組み</strong>足し算の記号から、動くコードを見つける</span></a>
+  <a href="learn/natural-numbers/" data-step="01"><span><strong>自然数</strong>足し算の規則を二行で決める</span></a>
+  <a href="learn/integers/" data-step="02"><span><strong>整数</strong>自然数の組で負の数を表す</span></a>
+  <a href="learn/rationals/" data-step="03"><span><strong>有理数</strong>分数の比較と足し算を作る</span></a>
+  <a href="learn/polynomials/" data-step="04"><span><strong>多項式</strong>式の値を計算し、根を数える</span></a>
+  <a href="learn/algebraic-roots/" data-step="05"><span><strong>代数的実根</strong>根を取り逃さずに範囲を半分にする</span></a>
 </nav>
 
-## Pythonで試すには
+## コードを動かす
 
-コードも読んでみたい人は、[Pythonの仕組み](learn/python-basics.md)からどうぞ。関数やクラスを使ったことがあると、各章の後半を読み進めやすくなります。
-
-[実験ページ](playground.md)では、ブラウザの中でコードを動かせます。インストールは不要です。
+各章の「実行」を押すと、その場で例を試せます。まず手で結果を予想し、入力を一つ変えてみてください。章ごとの追加課題は[実験ページ](playground.md)にあります。

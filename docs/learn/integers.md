@@ -1,86 +1,22 @@
 <span class="lesson-number">第2章 · 整数</span>
 
-# 右へ1歩、左へ3歩。どこに着く？
+# 引き算がまだなくても、負の数を作れるか
 
-<p class="lesson-lead">数直線の0に立って、右へ1歩、左へ3歩動くと、0の左隣を通って−2に着きます。</p>
+前章では自然数を足せるようになりました。けれども1から3を引こうとすると、0の先で行き止まります。そこで「1から3を引いた答え」の代わりに、まず材料の1と3をそのまま記録します。ここで問題になるのは、1−3と2−4のように、記録が違っても同じ場所に着く場合です。
 
-コンピューターには歩いた回数を順番に (1, 3) と記録しておきます。右へ2歩、左へ4歩なら記録は (2, 4)。行き帰りが1歩ずつ増えただけなので、着く場所はやはり−2です。
+<div class="lesson-goals"><strong>この章の目標</strong><p>自然数の足し算だけで二組が同じ整数を表すか判定し、組を取り替えても足し算の答えが変わらない理由を説明します。</p></div>
 
-こうして「右へ何歩、左へ何歩」という二つの自然数で、0より小さい数も表せます。0から左右に丸ごと一歩ずつ動いて着ける数が<strong>整数</strong>です。
+<span class="lesson-layer" data-layer="definition">等しさを決める</span>
 
-<div class="lesson-goals" data-reveal>
-  <strong>(3, 1) と (4, 2) の着く場所は同じ？</strong>
-  <details><summary>答えを確かめる</summary><p>どちらも出発点の右に2歩の場所です。記録の数字が違っても、表す整数は同じです。</p></details>
-</div>
+## 引き算を、両辺の足し算に書き換える
 
-[有理数の話へ](rationals.md)
+組 (a, b) を「右へ a 歩、左へ b 歩」と読みます。(3, 1) と (4, 2) はどちらも0から右へ2歩の位置に着きます。引き算が使える人には 3−1＝4−2 でおしまいです。前章のプログラムにも分かる形にしてみましょう。
 
-## Pythonのコードで確かめる
+両辺に1と2を足すと、左では −1 と ＋1 が、右では −2 と ＋2 が消えます。残るのは **3＋2＝4＋1**。これなら計算できます。一般に (a, b) と (c, d) が同じ整数を表す条件は **a＋d＝b＋c** です。この規則で同じ値をまとめることを**同値関係**、値を表す個々の組を**代表元**と呼びます。
 
-<div class="implementation-bridge" data-reveal aria-label="整数の数学・表現・実装">
-  <div>
-    <strong>数学</strong>
-    <p>組 <code>(a,b)</code> を差 <code>a−b</code> と読み、同じ差を表す組をまとめます。</p>
-  </div>
-  <div>
-    <strong>データ表現</strong>
-    <p><code>Integer.a</code> と <code>Integer.b</code> に、二つの自然数をそのまま保存します。</p>
-  </div>
-  <div>
-    <strong>実装</strong>
-    <p><code>__eq__</code> が交差和、<code>__add__</code> が成分ごとの加法を実行します。</p>
-  </div>
-</div>
+<span class="lesson-layer" data-layer="representation">組を保存する</span>
 
-<div class="source-reference"
-     data-source-reference="peano/integer.py"
-     data-test-reference="tests/test_integer.py">
-  <strong>この章で横に置く実装</strong>
-  <p>
-    完全なクラス:
-    <a href="/assets/source/peano/integer.py"><code>peano/integer.py</code></a>
-    の <code>Integer</code> と <code>_coerce_integer</code>。
-    本文では等号・加法・正規化を省略せずに抜粋します。
-  </p>
-  <p>
-    代表元と演算の検査:
-    <a href="/assets/source/tests/test_integer.py"><code>tests/test_integer.py</code></a>。
-    ファイル索引は<a href="/reference/implementation/">実装リファレンス</a>にあります。
-  </p>
-</div>
-
-<span class="lesson-layer" data-layer="definition">数学上の定義</span>
-
-## 自然数の組を「差」と読む
-
-自然数の中では `1−2` の答えを表せません。そこで自然数を二つ並べた
-`(a,b)` を用意し、「左から右を引いた差」を表すと決めます。
-
-| 組 | 差として読む | 表す整数 |
-| --- | --- | ---: |
-| `(3,1)` | `3−1` | 2 |
-| `(1,3)` | `1−3` | −2 |
-| `(2,2)` | `2−2` | 0 |
-
-ただし、一つの整数を表す組は一つではありません。`(3,1)`、`(4,2)`、
-`(5,3)` はどれも2を表します。このような一つひとつの組を**代表元**と呼びます。
-
-まだ整数の引き算を実装していなくても、自然数の加法だけなら使えます。
-そこで二つの組が同じ整数を表す条件を、次のように定義します。
-
-<div class="peano-equation" data-reveal>
-(a,b) ∼ (c,d) ⇔ a+d = b+c
-</div>
-
-`∼` は「同じ整数を表す」という関係です。`(3,1)` と `(4,2)` なら、
-`3+2=1+4` が成り立ちます。このように、違う表現を同じ値としてまとめる関係を
-**同値関係**と呼びます。
-
-<span class="lesson-layer" data-layer="representation">データの表し方</span>
-
-## ライブラリは代表元を消さずに保存する
-
-実装の中心は、`Integer` が持つ二つの属性です。
+<div class="implementation-bridge"><p>数学で (a, b) と書いた二つの欄を、Pythonでは <code>self.a</code> と <code>self.b</code> に保存します。負の数でも、欄の中身はどちらも自然数です。</p></div>
 
 ```python
 @total_ordering
@@ -98,42 +34,24 @@ class Integer:
             )
 ```
 
-`a` と `b` は、どちらも前章の `NaturalNumber` です。生成された `__init__` のあと、
-`__post_init__` が両方の型を検査します。
+<p data-meta="dataclass-equality"><code>__post_init__</code> は二つの欄が自然数かを確認します。<code>eq=False</code> と指定したのは、欄を一つずつ比べる自動判定を使うと、(3, 1) と (4, 2) が違う答えになってしまうからです。</p>
 
-<div class="meta-note" data-meta="dataclass-equality" data-reveal>
-  <strong>属性の一致ではなく、構成した整数の等しさを使う</strong>
-  <p>
-    <code>eq=False</code> が重要です。dataclassに等号を生成させると、
-    二つの属性を順に比較するため、異なる代表元を同じ整数として扱えません。
-    手書きの <code>__eq__</code> が同値関係を実行し、
-    <code>@total_ordering</code> はその比較をもとに残りの順序演算を補います。
-  </p>
-</div>
+<p class="source-reference" data-source-reference="peano/integer.py" data-test-reference="tests/test_integer.py">元のファイルを読む　<a href="/assets/source/peano/integer.py">peano/integer.py</a> ／ <a href="/assets/source/tests/test_integer.py">tests/test_integer.py</a></p>
 
-Pythonに自動生成させる等号では `(3,1)` と `(4,2)` は
-異なります。このライブラリは、数学で定めた同値関係を使う
-`Integer.__eq__` を自分で実装します。
+<span class="lesson-layer" data-layer="implementation">自分で比較を書く</span>
 
-`Integer(natural_number(4), natural_number(2))` を作っても、内部の組は
-`(2,0)` へ自動変換されません。`repr` では `<Z(4,2)>` と表示されます。
-一方、`print` は差を計算して `2` と表示します。
+## 同じ型にそろえてから、斜めに足す
 
-| 観察したいもの | Pythonの表示 | `(4,2)` の場合 |
-| --- | --- | --- |
-| 保存された代表元 | `repr(value)` | `<Z(4,2)>` |
-| 人が読む整数値 | `print(value)` | `2` |
+```python
+def _coerce_integer(value: object) -> Integer | None:
+    if isinstance(value, NaturalNumber):
+        return n2z(value)
+    if isinstance(value, Integer):
+        return value
+    return None
+```
 
-!!! note "数学の必然ではなく、教材としての設計"
-    常に `(2,0)` のような形へ直す実装も可能です。このライブラリは、
-    同じ整数に複数の代表元があることを観察できるよう、入力された組を残します。
-
-<span class="lesson-layer" data-layer="implementation">Pythonでの実装</span>
-
-## `==` を同値関係へ接続する
-
-Pythonで `left == right` と書くと、`left.__eq__(right)` が呼ばれます。
-次は、直前のデコレータを含む `Integer.__eq__` の完全な実装です。
+`_coerce_integer` は計算相手の種類を調べる関数です。自然数 n が来たら、同じ値を表す整数 (n, 0) に直します。整数ならそのまま通し、それ以外なら `None` で「ここでは扱えない」と伝えます。
 
 ```python
 @log(log_level=11)
@@ -155,82 +73,21 @@ def __eq__(self, other: object) -> tuple[bool, LogMessage]:
     )
 ```
 
-`self` が左、`converted` が右の整数です。`_coerce_integer` は、
-次の実装で、比較相手が自然数なら `(n,0)` という整数へ持ち上げます。
+等しさを決めるのは `result =` の一行です。左の組を `self`、右の組を `converted` と読めば、左の a と右の b を足すのが式の左辺、左の b と右の a を足すのが右辺です。二つの和は自然数なので、最後の `==` には前章の比較が使えます。
+
+## 足し算で、どちらの組を選んでもよい理由
+
+(3, 1) に (1, 4) を足します。動きを続けて行うなら、右へは合計4歩、左へは合計5歩。だから答えを (4, 5) と記録できます。`__add__` は次の一行でこの組を作ります。
 
 ```python
-def _coerce_integer(value: object) -> Integer | None:
-    if isinstance(value, NaturalNumber):
-        return n2z(value)
-    if isinstance(value, Integer):
-        return value
-    return None
+result = Integer(self.a + converted.a, self.b + converted.b)
 ```
 
-整数にも自然数にも変換できない相手なら `None` を返し、特殊メソッドは
-`NotImplemented` を返します。これは偽という判定ではなく、
-「この左辺の実装では扱えない」というPythonデータモデル上の合図です。
-Pythonは必要なら右辺側の反射演算を試し、それでも扱えなければ演算に応じて
-`False` や `TypeError` へ進みます。
+最初の組を (4, 2) に取り替えると、答えは (5, 6) です。右と左が同じだけ増えたので、着く場所はやはり−1。一般にも、片方の組の両方の欄に同じ数を足せば、答えの二つの欄にも同じ数が加わります。これで、たまたま選んだ代表元に左右されずに足し算ができます。
 
-このように**型をそろえる処理**と `NotImplemented` を組み合わせることで、
-`integer_value + natural_value` のような異なる型の組合せを、
-各演算本体へ重複して書かずに扱えます。
-その後の一行は数学の定義と同じ順序になっています。
+<span class="lesson-layer" data-layer="trace">比較を実行する</span>
 
-| 数学の記号 | 実装 |
-| --- | --- |
-| `a` | `self.a` |
-| `b` | `self.b` |
-| `c` | `converted.a` |
-| `d` | `converted.b` |
-| `a+d = b+c` | `self.a + converted.b == self.b + converted.a` |
-
-加法も同じ方針です。
-
-<div class="peano-equation" data-reveal>
-(a,b) + (c,d) = (a+c,b+d)
-</div>
-
-```python
-@log(log_level=14)
-def __add__(self, other: object) -> tuple[Integer, LogMessage]:
-    converted = _coerce_integer(other)
-    if converted is None:
-        return (
-            cast(Integer, NotImplemented),
-            lambda: f"{self!r} + {other!r} = NotImplemented",
-        )
-    result = Integer(self.a + converted.a, self.b + converted.b)
-    return (
-        result,
-        lambda: (
-            f"{self!r} + {converted!r} = "
-            f"({self.a!r} + {converted.a!r}, "
-            f"{self.b!r} + {converted.b!r})"
-        ),
-    )
-```
-
-たとえば `(3,1)+(1,2)=(4,3)` です。代表する値で読むと
-`2+(−1)=1` になります。
-
-<span class="lesson-layer" data-layer="trace">実行して確かめる</span>
-
-## 整数の等号ログを、実装へ戻して読む
-
-`Integer.__eq__` には `@log(log_level=11)` が付いています。
-次のコードは、整数の等号だけが見える最小の設定です。
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>実行前に、定義と実装から予想</strong>
-  <p>
-    上に抜粋した <code>Integer.__eq__</code> の <code>result</code> と
-    ログ文字列を参照し、ログに現れる二つの自然数の和を書いてください。
-    最後の値が
-    <code>True</code> になる理由を一文で説明してください。
-  </p>
-</div>
+<div class="learning-prompt"><strong>実行する前に</strong><p>下の right の最後の2を3にすると、斜めの和はそれぞれいくつになるでしょう。まず元のまま実行し、次に一か所だけ変えてください。</p></div>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -256,31 +113,11 @@ print(left == right)</textarea>
   </div>
 </div>
 
-<details class="self-check" data-reveal>
-  <summary>ログを4つの部分へ分ける</summary>
-  <ol>
-    <li><code>&lt;Z(3,1)&gt; == &lt;Z(4,2)&gt;</code> は、比較した代表元です。</li>
-    <li><code>⇔</code> は、左右が同値であることを表します。</li>
-    <li><code>&lt;N(3)&gt;+&lt;N(2)&gt;</code> と <code>&lt;N(1)&gt;+&lt;N(4)&gt;</code> は、実装が作る交差和です。</li>
-    <li>最後の <code>True</code> はログではなく、<code>print</code> が表示した判定結果です。</li>
-  </ol>
-</details>
+<details class="self-check"><summary>二つの和と答えを確かめる</summary><p>元の組なら 3＋2 と 1＋4 がともに5なので True。変更後は 3＋3＝6 と 1＋4＝5 なので False です。数字が何組表示されても、最後の print が答える問いは「同じ整数か」です。</p></details>
 
-`log_level=11` の11は、11番目の処理や再帰の深さではありません。
-このライブラリは自然数を1〜6、整数を11〜16、有理数を21〜26という範囲に分けています。
-設定値は**表示する最小レベル**なので、11では内部の自然数加法ログを隠します。
-この内部値は通常のログ本文には表示されません。
+<span class="lesson-layer" data-layer="test">違う組でも試す</span>
 
-`config_log(log_level=4)` に変えてもう一度実行すると、二つの交差和を作る
-自然数加法のログも現れ、最後に整数の等号ログが出ます。これは証明の詳細度を
-変えているのではなく、同じ実行をどの層まで観察するか変えています。
-
-<span class="lesson-layer" data-layer="test">テストで確かめる</span>
-
-## 値を変えながら、同じ性質を確かめる
-
-この実験は `(3,1)` と `(4,2)` の一例です。実際のテストは、整数 `i` と
-余分に足す自然数 `j` を範囲内で変え、`(i+j,j)` が同じ整数になることを調べます。
+## 負の数についても確かめる
 
 ```python
 for i in range(-10, 10):
@@ -291,27 +128,11 @@ for i in range(-10, 10):
         )
 ```
 
-加法についても、小さなすべての組合せでライブラリの結果と
-Python整数の `i+j` を照合します。
+`i` は表したい整数、`j` は両方の欄をどれだけずらすかを決める数です。i＝−2、j＝3 なら右側の組は (1, 3)。次の j＝4 なら (2, 4)。どちらも左側の−2と等しいはずです。`j` を `abs(i)` 以上にしているので、i が負でも `i + j` は自然数の範囲に収まります。
 
-```python
-self.assertEqual(integer(i) + integer(j), integer(i + j))
-```
+<span class="lesson-layer" data-layer="boundary">表し方をそろえる</span>
 
-ログは「今回どの規則を通ったか」を見せ、テストは「多数の入力でも期待する性質が
-壊れていないか」を繰り返し調べます。どちらも一般の場合の数学的証明そのものではありません。
-
-<span class="lesson-layer" data-layer="boundary">代表元を使うときの注意</span>
-
-## 代表元と、表される値を混同しない
-
-代表元を使った演算は、別の代表元を選んでも同じ整数を表さなければなりません。
-この性質を「**代表元の選び方によらず定まる**」といいます。
-テストは具体例を確認しますが、一般の場合には同値関係の定義から証明する必要があります。
-
-`normalize()` は `(4,2)` を `(2,0)` のような見やすい代表元へ変えます。
-元のオブジェクトは不変なので、書き換えるのではなく新しい `Integer` を返します。
-正規化前後で `repr` は変わっても、`==` の結果は変わりません。
+## 値を比べることと、組を書き直すこと
 
 ```python
 def normalize(self) -> Integer:
@@ -319,6 +140,8 @@ def normalize(self) -> Integer:
         return Integer(self.a - self.b, N_ZERO)
     return Integer(N_ZERO, self.b - self.a)
 ```
+
+`normalize()` は右と左で打ち消し合う歩数を取り除きます。(1, 3) なら2行目の条件が偽なので最後の行に進み、(0, 2) を返します。引く向きを場合分けしたおかげで、欄の中で必要になる引き算は常に自然数の範囲に収まります。このように代表の形をそろえる操作が**正規化**です。比較だけなら、先ほどの斜めの足し算で十分です。
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
@@ -340,9 +163,4 @@ def normalize(self) -> Integer:
   </fieldset>
 </form>
 
-## 次へ
-
-整数で `1−2` を表せるようになりました。しかし `1÷2` はまだ整数ではありません。
-次章では、整数の組の間に同値関係を定めて有理数を構成します。
-
-[有理数へ進む →](rationals.md)
+[第3章へ。分子と分母の組で、分数を作る](rationals.md)

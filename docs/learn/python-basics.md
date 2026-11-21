@@ -1,102 +1,33 @@
 <span class="lesson-number">第0章 · Pythonの仕組み</span>
 
-# Pythonで「ねこ」＋「ねこ」を計算したら？
+# 自分で作った数に、どうやって「＋」を使う？
 
-<p class="lesson-lead">Pythonで 2 + 3 を計算すると5です。では、文字を引用符で囲んで "ねこ" + "ねこ" と書くとどうなるでしょう。</p>
+Pythonは整数の足し算を知っています。これから作る数は、私たちが保存のしかたを決めたデータです。それでも、使う側では普通に `two + one` と書きたい。計算の途中を表示できて、答えは次の計算にも使えるようにするには、どう書けばよいでしょう。
 
-答えは「ねこねこ」。同じ + でも、数どうしなら足し算、文字どうしなら前後につなぐ操作になります。記号の意味は、そこに置いたものの種類で決まります。
+<div class="lesson-goals"><strong>この章の目標</strong><p>最後に、足し算の手順を呼ぶ行、途中経過を書く行、答えを返す行の三つを見つけます。</p></div>
 
-自分で新しい種類の数を作ったときも、+ を使えます。その種類の数を足す手順に <code>__add__</code> という名前を付けておけば、Pythonが + を読んだときにその手順を呼び出してくれます。
+## 記号から、実行する関数を見つける
 
-<div class="lesson-goals" data-reveal>
-  <strong>"2" + "3" の答えは？</strong>
-  <details><summary>答えを確かめる</summary><p>引用符が付いているので、どちらも文字です。順番につないだ結果は "23" です。</p></details>
-</div>
+Pythonでは、同じ種類のデータと、それに使える手順をひとまとめにしたものを**クラス**と呼びます。クラスに書いた関数が**メソッド**です。たとえば、次は点数を一つ持つ小さなクラスです。
 
-[自然数の話へ](natural-numbers.md)
+```python
+class Score:
+    def __init__(self, points):
+        self.points = points
 
-## Pythonのコードで確かめる
+    def __add__(self, other):
+        return Score(self.points + other.points)
+```
 
-<div class="implementation-bridge" data-reveal aria-label="Pythonの構文・データモデル・ライブラリ実装">
-  <div>
-    <strong>表面の構文</strong>
-    <p><code>a + b</code> や <code>obj.width</code> を利用者が書きます。</p>
-  </div>
-  <div>
-    <strong>Pythonの規約</strong>
-    <p>特殊メソッドや<code>property</code>へ処理が委譲されます。</p>
-  </div>
-  <div>
-    <strong>このライブラリ</strong>
-    <p>委譲先へ、数の定義・検査・ログを実装します。</p>
-  </div>
-</div>
+`a = Score(2)` と書くと、新しく作る点数が `self`、受け取った2が `points` になります。`self.points = points` が、その2を点数の中に保存する行です。
 
-## 基本構文は前提、実行環境はブラウザ
+<p data-meta="operator-protocol">次に <code>b = Score(1)</code> として <code>a + b</code> を計算します。ここではPythonが左の点数の <code>__add__</code> を呼ぶので、<code>self</code> は <code>a</code>、<code>other</code> は <code>b</code> です。中身の整数を足し、3を持つ新しい点数を返します。</p>
 
-各実験のコード欄は編集でき、実行すると結果が「出力」欄へ表示されます。
-最初の実行だけはPythonとライブラリの読み込みに数秒かかることがあります。
-「環境をリセット」は、このページで作った名前を消して最初からやり直す操作です。
+<div class="implementation-bridge"><p>これから使う自然数のクラスも、同じ名前のメソッドを持っています。記号から手順を見つけるしくみは同じです。中でどんな足し算をするかは、次章で変わります。</p></div>
 
-以後、代入、関数定義、クラス定義、`if`、`while`、内包表記、添字、
-タプルの展開、例外、型注釈そのものは説明しません。
-一方、次の節で扱うPythonのデータモデルとメタプログラミングは、
-このライブラリの数学的な意味を決めるため、教材の本題として説明します。
+<p class="source-reference" data-source-reference="peano/utils.py" data-test-reference="tests/test_utils.py">元のファイルを読む　<a href="/assets/source/peano/utils.py">peano/utils.py</a> ／ <a href="/assets/source/tests/test_utils.py">tests/test_utils.py</a></p>
 
-## `+` は型へ処理を依頼する
-
-<div class="meta-note" data-meta="operator-protocol" data-reveal>
-  <strong>Pythonのデータモデル · 特殊メソッド</strong>
-  <p>
-    <code>a + b</code> は、組み込みの足し算だけを意味しません。
-    Pythonは <code>a</code> の型が持つ <code>__add__</code> へ処理を委譲します。
-    そのため、クラスの作者が <code>+</code> の意味を定義できます。
-  </p>
-</div>
-
-この教材のコードを追うときは、まず次の対応で実装の入口を探します。
-
-| 利用者が書く形 | 最初に探す実装 | この教材で決める意味 |
-| --- | --- | --- |
-| `a + b` | `a.__add__(b)` | 足し算 |
-| `a * b` | `a.__mul__(b)` | 掛け算 |
-| `a == b` | `a.__eq__(b)` | 数学的に同じ値か |
-| `a < b` | `a.__lt__(b)` | 大小関係 |
-| `str(a)` | `a.__str__()` | 学習者向けの表示 |
-| `repr(a)` | `a.__repr__()` | 内部表現を示す表示 |
-| `int(a)` | `a.__int__()` | 組み込み整数への変換 |
-
-厳密な演算子探索には、右側の型による反射演算や継承関係も関わります。
-まずはこのライブラリ内の同じ型どうしの演算を読み、必要になった整数章で
-異なる型を受け入れる処理へ進みます。
-
-<div class="source-reference"
-     data-source-reference="peano/utils.py"
-     data-test-reference="tests/test_utils.py">
-  <strong>この章で参照する実ファイル</strong>
-  <p>
-    デコレータ本体:
-    <a href="/assets/source/peano/utils.py"><code>peano/utils.py</code></a>
-    の <code>log</code>。
-    演算メソッドの例:
-    <a href="/assets/source/peano/natural_number.py"><code>peano/natural_number.py</code></a>
-    の <code>NaturalNumber.__add__</code>。
-  </p>
-  <p>
-    メタデータの検査:
-    <a href="/assets/source/tests/test_utils.py"><code>tests/test_utils.py</code></a>。
-    全章の索引は<a href="/reference/implementation/">実装リファレンス</a>にあります。
-  </p>
-</div>
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>実行前に予想</strong>
-  <p>
-    <code>two + one</code> と <code>two.__add__(one)</code> は、
-    上の演算子対応だけから考えると、同じ処理へ到達するでしょうか。
-    内部用のタプルを公開しない理由は、実行後に次節の実装で確認します。
-  </p>
-</div>
+<div class="learning-prompt"><strong>実行する前に</strong><p>下の two と one は、この教材の自然数です。記号で足した答えと、メソッドを直接呼んだ答えを比べると、何が表示されるでしょう。</p></div>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -124,58 +55,13 @@ print(via_operator == via_method)</textarea>
   </div>
 </div>
 
-どちらも公開された同じ `__add__` を通るため、結果は `3` と `True` です。
-「内部用のタプルを返さない」理由は、次のデコレータにあります。
+<details class="self-check"><summary>2行の出力を読む</summary><p>最初の print は足し算の答えの3を、次の print は二つの計算結果が等しいかを表示します。等しいときのPythonの答えは True です。</p></details>
 
-## デコレータは、関数を受け取って公開関数を作る
+## 答えを変えずに、計算の記録を付ける
 
-<div class="meta-note" data-meta="decorator" data-reveal>
-  <strong>メタプログラミング · 関数を別の関数で包む</strong>
-  <p>
-    Pythonでは関数も値です。デコレータは関数を受け取り、
-    元の関数を呼ぶ別の関数を返します。クラスの外から見える振る舞いを、
-    本体を書き換えずに追加・変換できます。
-  </p>
-</div>
+計算するたびに「今回はどの規則を使ったか」を読みたいとします。けれども、足し算の答えと説明文をセットで受け取ったら、続けて1を足すたびに答えを取り出す手間がかかります。そこで、計算する関数と、説明文を記録する関数に仕事を分けます。
 
-引数のないデコレータなら、次の二つは同じ意味です。
-
-```python
-@decorator
-def operation(value):
-    # 関数本体
-    ...
-```
-
-```python
-def operation(value):
-    # 関数本体
-    ...
-
-
-operation = decorator(operation)
-```
-
-このライブラリの `@log(log_level=4)` は、先にログレベルを受け取り、
-その結果として得たデコレータでメソッドを包みます。
-
-```python
-@log(log_level=4)
-def __add__(self, other):
-    # 演算本体
-    ...
-```
-
-概念上は、次の再代入です。
-
-```python
-original_add = __add__
-__add__ = log(log_level=4)(original_add)
-```
-
-元の `__add__` は、計算結果と「説明文を必要なときに作る関数」のタプルを返します。
-公開された `__add__` は、ラッパー `inner` です。
-次は `peano/utils.py` の `log` から、実行に関わる部分をそのまま抜粋したものです。
+<p data-meta="decorator">関数を受け取り、その前後に仕事を加えた関数を用意するしくみが<strong>デコレータ</strong>です。関数の上に書く <code>@log(...)</code> は、「以後、この名前で呼ぶときは記録係を通してね」という指定です。</p>
 
 ```python
 def outer(func: Callable[P, tuple[T, LogMessage]]) -> Callable[P, T]:
@@ -191,36 +77,17 @@ def outer(func: Callable[P, tuple[T, LogMessage]]) -> Callable[P, T]:
     return inner
 ```
 
-`...` の箇所だけは、次の小節で説明するメタデータの更新を省略しています。
-完全な実装は上の `peano/utils.py` から参照できます。
-したがって利用者が `two + one` と書いたときに受け取るのは計算結果だけです。
-説明文は戻り値には混ざらず、設定されたログへ送られます。ログが無効なら
-`message()` を呼ばないため、表示のためだけの文字列も作りません。
-自然数の章では、この変換と再帰呼び出しを組み合わせてログ順を予想します。
+`def` の行にある `Callable` は「呼び出せるもの」、`tuple[T, LogMessage]` は「答えと説明の組」という型のメモです。矢印 `-> T` の先には、記録係から受け取れる答えの型が書かれています。
 
-### ラッパーが名前や型情報を壊さないための処理
+内側の `inner` が記録係です。`*args, **kwargs` は、渡された引数をまとめて次の関数に渡す書き方です。次の3行に絞ると役割が見えます。
 
-実際の `log` は `functools.wraps` を使い、`__name__` や `__wrapped__` を保存します。
-さらに、元の内部実装が `tuple[Result, LogMessage]` を返すという型注釈から
-公開結果 `Result` を取り出し、`__annotations__` と `__signature__` を更新します。
+1. `result, message = func(...)` で元の計算を呼び、答えと説明を受け取ります。
+2. 記録する設定なら `logger.log(...)` が説明を書きます。`message()` は、この時点で初めて説明文を作ります。
+3. `return result` が答えだけを返します。だから足した結果を、また足し算に使えます。
 
-これは単なる表示機能ではありません。「内部では説明文を遅延生成できるが、
-公開APIは数だけ返す」
-という二層の契約を、実行時のラッパーと、プログラムから関数情報を調べる
-**イントロスペクション**用メタデータの両方へ反映するメタプログラミングです。
+外側の `return inner` は、クラスを用意するときに「これを記録係として使う」と関数を渡す行です。内側の `return result` は、実際に足し算したときに動きます。`@wraps(func)` は、記録係を通しても元の関数の名前などを調べられるようにします。抜粋中の `...` では、外から戻り値の型を調べたときにも、答えの型が見えるよう設定しています。
 
-## `dataclass` はクラス定義からコードを生成する
-
-<div class="meta-note" data-meta="dataclass" data-reveal>
-  <strong>メタプログラミング · 宣言からメソッドを生成する</strong>
-  <p>
-    <code>@dataclass</code> は型注釈付きの属性を読み、
-    主に <code>__init__</code> などを生成します。この教材では、
-    数の保存方法を短く宣言しつつ、数学的な等しさや表示は手書きします。
-  </p>
-</div>
-
-たとえば整数クラスの先頭は次の形です。
+## 数のどの部分を保存するか
 
 ```python
 @total_ordering
@@ -230,26 +97,13 @@ class Integer:
     b: NaturalNumber
 ```
 
-| 指定 | 生成または制限されるもの | このライブラリでの理由 |
-| --- | --- | --- |
-| 型注釈付き属性 | `__init__(a, b)` | 何を保存する型かを宣言する |
-| `frozen=True` | 作成後の属性変更を拒否 | 数の内部表現を途中で変えない |
-| `slots=True` | 属性名を固定 | 宣言していない状態を持たせない |
-| `eq=False` | dataclass版`__eq__`を生成しない | 属性の一致ではない数学的な等しさを書く |
-| `repr=False` | dataclass版`__repr__`を生成しない | 数学的構成が見える表示を書く |
-| `init=False` | `__init__`を生成しない | 多項式で正規化する独自コンストラクタを書く |
+<p data-meta="dataclass">ここで <code>a</code> と <code>b</code> は整数の材料になる二つの自然数です。<code>@dataclass</code> は、この二つを受け取って保存する <code>__init__</code> を用意します。先ほどの Score で手書きした仕事です。</p>
 
-生成された `__init__` は、属性を設定したあと `__post_init__` を自動で呼びます。
-有理数はそこで「分母が0ではない」という、作成後も常に守る条件を検査します。
-このような条件を、この教材では**不変条件**と呼びます。
+`frozen=True` は作った数の中身をあとから書き換えないための指定、`slots=True` は使う属性名をあらかじめ定める指定です。`eq=False` と `repr=False` は等しさの判定と表示を自分で書くために付けます。たとえば分数は分子と分母が違っても同じ値になるので、二つの欄をそのまま比べるだけでは困ります。
 
-`@total_ordering` もコード生成です。クラスが核となる等値・順序比較を実装すると、
-残りの `>`, `<=`, `>=` を補います。各数体系では、生成される便利さより先に、
-核として手書きされた比較が数学のどの定義に対応するかを読みます。
+`@total_ordering` は、等しいか、小さいかの判定から残りの大小比較を補います。作った直後に分母の確認などが必要なクラスは、`__post_init__` にその手順を書きます。
 
-## `property` はメソッド呼び出しを属性アクセスに見せる
-
-次は `peano/polynomial.py` にある、実ファイルからの短い抜粋です。
+## 値を読むときに計算する
 
 ```python
 @property
@@ -257,40 +111,13 @@ def coefficients(self) -> tuple[Rational, ...]:
     return self._coefficients
 ```
 
-`@property` もデコレータです。利用者は `polynomial.coefficients()` ではなく
-`polynomial.coefficients` と書きますが、取得時には上の関数が実行されます。
-最終章では、端点から毎回計算する `interval.width` と `interval.midpoint` を
-実コードと一緒に読みます。
+`@property` を付けると、利用者は `p.coefficients` と書くだけで上の関数を呼べます。この例では、保存済みの係数（式の各項に掛かる数）を返します。最終章の `interval.width` も同じ書き方ですが、その場で「右端−左端」を計算します。
 
-## テストコードの読み方を揃える
+## テストの一行を日本語で読む
 
-<div class="meta-note" data-meta="test-api" data-reveal>
-  <strong>同じ <code>self</code> でも、指す値は文脈で変わる</strong>
-  <p>
-    演算メソッドの <code>self</code> は左辺の数です。
-    <code>unittest.TestCase</code> のテストメソッドでは、
-    <code>assertEqual</code> などの検査メソッドを提供するテストケース自身です。
-  </p>
-</div>
+<p data-meta="test-api"><code>self.assertEqual(two + one, three)</code> は、「二つの値を計算し、等しいかを確認する」と読みます。この行の <code>self</code> は検査を行う側です。足し算の中の <code>self</code> がどの数を指すかは、左辺の <code>two</code> で決まります。</p>
 
-| テストコード | 確かめること |
-| --- | --- |
-| `self.assertEqual(actual, expected)` | 二つが等しい |
-| `self.assertTrue(condition)` | 条件が真になる |
-| `self.assertLess(left, right)` | 左が右より小さい |
-| `with self.assertRaises(Error):` | 内側の処理が指定した例外を出す |
-
-テストが通ることは、調べた入力について実装が期待どおりだった証拠です。
-すべての数について成り立つ数学的証明とは区別します。
-
-## 各章で答える六つの質問
-
-1. どの数学的対象と規則を使うのか
-2. その対象をどの属性と不変条件で保存するのか
-3. どの特殊メソッドや生成された処理が規則を実行するのか
-4. デコレータを含む実装から、どのログを予想できるか
-5. テストはどの性質を、どの入力で調べるのか
-6. 数学の定理、実装上の選択、未実装の範囲はどこか
+もし記録係が `return result, message` と書いてあったら、利用者に届くのは二つの値の組です。途中経過が正しく表示されても、上のテストは通りません。最後の問いでは、画面に出る説明と、計算の答えがどこへ行くかを追ってみてください。
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
@@ -312,10 +139,4 @@ def coefficients(self) -> tuple[Rational, ...]:
   </fieldset>
 </form>
 
-## 次へ
-
-これで、`+` から `__add__` を探し、デコレータ適用前後の戻り値を分け、
-`dataclass` が生成した処理と手書きの処理を見分けられます。
-次章では、この読み方だけを使って0から自然数を構成します。
-
-[自然数へ進む →](natural-numbers.md)
+[第1章で、自然数の足し算そのものを作る](natural-numbers.md)

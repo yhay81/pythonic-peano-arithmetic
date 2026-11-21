@@ -1,87 +1,24 @@
 <span class="lesson-number">第1章 · 自然数</span>
 
-# 「次へ」を3回押すと、2はいくつになる？
+# 足し算を使わずに、足し算を定義する
 
-<p class="lesson-lead">2から始めて、数直線を右へ一目盛りずつ進んでみましょう。</p>
+2＋2を「2に1を2回足す」と説明すると、その説明の中でもう足し算を使っています。そこで、最初に使えるのは0と「次の数を作る」操作だけと決めてみましょう。これだけで、どの二つの自然数についても答えが決まるでしょうか。
 
-1回目で3、2回目で4、3回目で5に着きます。これが「2に3を足す」という計算です。では、2に0を足したら？　一度も動かないので、答えは出発点の2です。
+<div class="lesson-goals"><strong>この章の目標</strong><p>2＋2を計算するプログラムを読み、なぜ最初に2＋0の記録が出るのか説明します。</p></div>
 
-この教材では0も自然数に含めます。0から「次へ」を1回押した数が1、もう1回押した数が2です。どの自然数にも次の数があります。数学ではその「次の数」を<strong>後者</strong>と呼びます。
+<span class="lesson-layer" data-layer="definition">数の規則</span>
 
-<div class="lesson-goals" data-reveal>
-  <strong>4から「次へ」を2回押すと？</strong>
-  <details><summary>答えを確かめる</summary><p>5、6と進むので、4＋2＝6です。</p></details>
-</div>
+## まず、何を出発点にするか
 
-[整数の話へ](integers.md)
+この章では0も自然数に含めます。ある数 n の次の数を **後者** と呼び、`S(n)` と書きます。1は `S(0)`、2は `S(S(0))` の略だと思ってください。
 
-## Pythonのコードで確かめる
+最初に認める規則を**公理**といいます。0は自然数で、どの自然数にも後者があります。0はどの数の後者にもならず、違う数が同じ後者を持つこともありません。こうして0から始めた列が途中で輪になったり、別の数と合流したりすることを防ぎます。すべての自然数について考えるときには、後で使う数学的帰納法の規則もあります。
 
-<div class="implementation-bridge" data-reveal aria-label="自然数の数学・表現・実装">
-  <div>
-    <strong>数学</strong>
-    <p><code>0</code> と後者 <code>S</code> を出発点にし、再帰で加法を定義します。</p>
-  </div>
-  <div>
-    <strong>データ表現</strong>
-    <p><code>pre=None</code> が0、<code>pre=n</code> が <code>S(n)</code> です。</p>
-  </div>
-  <div>
-    <strong>実装</strong>
-    <p><code>successor</code>、<code>structural_str</code>、<code>__eq__</code>、<code>__add__</code>、<code>@log</code> を読みます。</p>
-  </div>
-</div>
+<span class="lesson-layer" data-layer="representation">数を保存する</span>
 
-<div class="source-reference"
-     data-source-reference="peano/natural_number.py"
-     data-test-reference="tests/test_natural_number.py">
-  <strong>この章で横に置く実装</strong>
-  <p>
-    完全なクラスと生成関数:
-    <a href="/assets/source/peano/natural_number.py"><code>peano/natural_number.py</code></a>。
-    本文では <code>NaturalNumber</code>、<code>successor</code>、
-    <code>natural_number</code>、<code>structural_str</code>、
-    <code>__eq__</code>、<code>__add__</code> を必要な順に抜粋します。
-  </p>
-  <p>
-    定義式の検査:
-    <a href="/assets/source/tests/test_natural_number.py"><code>tests/test_natural_number.py</code></a>。
-    ファイル索引は<a href="/reference/implementation/">実装リファレンス</a>にあります。
-  </p>
-</div>
+## 2の中に、何を入れておく？
 
-<span class="lesson-layer" data-layer="definition">数学上の定義</span>
-
-## 公理と定義を分ける
-
-**公理**とは、その体系で出発点として採用する規則です。ペアノ算術では、
-自然数について大まかに次のことを認めます。
-
-| 公理の役割 | この章での読み方 |
-| --- | --- |
-| 0が自然数である | 出発点が一つある |
-| 自然数 `n` には後者 `S(n)` がある | 次の数を作れる |
-| 0は誰かの後者ではない | 0と `S(n)` を区別できる |
-| `S(n)=S(m)` なら `n=m` | 次の数が同じなら、元の数も同じ |
-| 数学的帰納法 | 0で成り立ち、後者へ進める性質は全自然数で成り立つ |
-
-一方、次の二式はペアノの**公理そのものではなく**、
-0と後者を使って加法を決める**再帰的定義**です。
-
-<div class="peano-equation" data-reveal>
-n + 0 = n<br>
-n + S(m) = S(n + m)
-</div>
-
-最初の式は計算を止める**基底ケース**、二つ目は右の数を一段小さくする
-**再帰ケース**です。この区別が、そのままPythonの `if` の二つの枝になります。
-
-<span class="lesson-layer" data-layer="representation">データの表し方</span>
-
-## 0と後者を、Pythonの値にする
-
-実装の先頭は次の形です。準備章で見たdataclassの指定が、
-ペアノの表現を作成後に変更できない値として支えます。
+<div class="implementation-bridge"><p>2を作るときには1を、1を作るときには0を中に入れます。逆向きにたどれば、どんな手順でできた数かを取り出せます。</p></div>
 
 ```python
 @total_ordering
@@ -94,28 +31,7 @@ class NaturalNumber:
             raise TypeError("pre must be a NaturalNumber or None")
 ```
 
-`pre` は predecessor、つまり「一つ前の自然数」です。`None` は
-「前の数がない」というPythonの値です。
-生成された `__init__` が `pre` を保存したあと、`__post_init__` が自動で呼ばれます。
-これにより `pre` は `None` か別の `NaturalNumber` に限られ、鎖の途中へ
-無関係な型が入ることを防ぎます。
-
-<div class="meta-note" data-meta="natural-dataclass" data-reveal>
-  <strong>生成を使う部分と、止める部分</strong>
-  <p>
-    <code>__init__</code> はdataclassに生成させます。一方、
-    <code>eq=False</code> と <code>repr=False</code> により、
-    再帰構造をたどる等値比較と、構成を見せる表示は手書きします。
-  </p>
-</div>
-
-| 数学 | 実際の構築 | `pre` の中身 |
-| --- | --- | --- |
-| `0` | `NaturalNumber()` | `None` |
-| `S(0)=1` | `NaturalNumber(zero)` | 0のオブジェクト |
-| `S(S(0))=2` | `NaturalNumber(one)` | 1のオブジェクト |
-
-実ファイルでは、0と1、後者、教材用の生成関数を次のように用意しています。
+`pre` は一つ前の数です。0には前の数がないので、そこには `None` を入れます。`NaturalNumber | None` は「ここに来るのは自然数か None」という型の読み方です。最後の `if` は、文字列などが紛れたらその場で止めます。
 
 ```python
 N_ZERO = NaturalNumber()
@@ -139,13 +55,7 @@ def natural_number(value: int) -> NaturalNumber:
     return result
 ```
 
-`successor(n)` が `NaturalNumber(n)` を返すことから、数学の `S(n)` と
-Pythonの `NaturalNumber(pre=n)` の対応を確認できます。
-また、`natural_number(2)` のループを読むと、Python整数2を保存するのではなく、
-0から `successor` を2回呼び、`S(S(0))` を構築すると分かります。
-
-同じ値には、用途の異なる三つの表示があります。`str`と`repr`は値を短く読み、
-`structural_str`は0と後者だけで構築過程を読みます。
+`natural_number(2)` の `result` を追うと、ループの前は0、1周目は0を中に持つ数、2周目はその数を中に持つ数です。こうしてできた2の `pre` を2回読むと0に戻れます。
 
 ```python
 def structural_str(self) -> str:
@@ -157,26 +67,15 @@ def structural_str(self) -> str:
     return f"{'S(' * depth}0{')' * depth}"
 ```
 
-| 呼び出し | `natural_number(2)`の表示 | 用途 |
-| --- | --- | --- |
-| `str(n)` | `2` | 最終結果を人が読む |
-| `repr(n)` | `<N(2)>` | Pythonオブジェクトの種類と値を短く読む |
-| `n.structural_str()` | `S(S(0))` | 0と後者の構成を読む |
+この `while` は戻った回数を `depth` に数えます。2なら2回なので、`S(` を二つ、0を一つ、閉じかっこを二つ並べて `S(S(0))` と表示します。あとで計算の途中に出てくる表記です。
 
-自然数の核となる等値・加法・乗法のログでは、通常の数字と後者表記を混ぜず、
-三つ目の構造表示を使います。
+<p class="source-reference" data-source-reference="peano/natural_number.py" data-test-reference="tests/test_natural_number.py">元のファイルを読む　<a href="/assets/source/peano/natural_number.py">peano/natural_number.py</a> ／ <a href="/assets/source/tests/test_natural_number.py">tests/test_natural_number.py</a></p>
 
-!!! note "この表現から分かるライブラリの特性"
-    各値は一つ前の値をたどれる鎖です。値は作成後に変更できない不変オブジェクトで、
-    高速な整数計算より、0と後者の構造が実装から見えることを優先しています。
-
-<span class="lesson-layer" data-layer="implementation">Pythonでの実装</span>
+<span class="lesson-layer" data-layer="implementation">コードを読む</span>
 
 ## 等しさの実装で、二つの公理を読む
 
-`eq=False`にした理由は、dataclassの属性比較へ任せず、0と後者の規則を
-コードに残すためです。次の`__eq__`では、`NaturalNumber`以外の型を扱う
-最初の分岐を除くと、二つのペアノの公理との対応が見えます。
+2と1を比べます。両方とも後者なので、等しいかを調べるには、それぞれを一つ戻して1と0を比べれば十分です。違う数は同じ後者になれないからです。この性質を**単射性**と呼びます。
 
 ```python
 @log(log_level=1)
@@ -210,26 +109,9 @@ def __eq__(self, other: object) -> tuple[bool, LogMessage]:
     )
 ```
 
-| 公理 | 実装上の対応 |
-| --- | --- |
-| 0は誰かの後者ではない | 一方の`predecessor`だけが`None`なら`result`は`False` |
-| `S(n)=S(m)`なら`n=m` | 両方に前者があれば二つの`predecessor`の比較へ戻る |
+長い `lambda` は、比較の途中を文章にする部分です。答えを決めるのはその手前です。片方の `pre` が `None` ならその数は0。もう片方も0のときだけ `True` を返します。両方に前の数があれば、最後の `left_predecessor == right_predecessor` で一段短い比較を始めます。
 
-後者が等しいなら元の数も等しく、異なる二数から同じ後者が生まれない性質を
-**単射性**と呼びます。ログの`eq(a, b)`は、新しいPython関数ではなく、
-`a.__eq__(b)`による比較を数式に近い形で表した記号です。
-
-二つの後者を比較するたびに、一段前の値の比較へ進みます。最後に
-`0 == 0`なら真、`0 == S(n)`なら偽になるため、有限の鎖全体の等しさが決まります。
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>公理から実装の分岐を予想</strong>
-  <p>
-    <code>eq(S(S(0)), S(0))</code>は、
-    <code>eq(S(0), 0)</code>へ進んだあと真と偽のどちらになるか。
-    <code>pre is None</code>を根拠に答えてください。
-  </p>
-</div>
+<div class="learning-prompt"><strong>実行する前に</strong><p>2と1を比べたとき、どちらが先に0になりますか。続いて右側も2に変えたら、最後に比較する二つの数は何でしょう。</p></div>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -256,34 +138,24 @@ print(answer)</textarea>
   </div>
 </div>
 
-<details class="self-check" data-reveal>
-  <summary>等値ログを公理へ戻して確認する</summary>
-  <ol>
-    <li><code>等値・0の場合</code>で<code>eq(S(0), 0)</code>が偽だと決まります。</li>
-    <li><code>等値・後者の場合</code>は、元の比較が一つ前の値の比較へ帰着したことを記録します。</li>
-    <li>最後の<code>False</code>は、<code>left == right</code>の公開結果です。</li>
-  </ol>
-</details>
+<details class="self-check"><summary>比較が止まるところを見る</summary><p>2と1なら、一つ戻したところで1と0になり、答えは False です。2と2なら、1と1、次に0と0へ進むので True になります。</p></details>
 
 ## 帰納法と再帰を、同じものにしない
 
-通常の公開APIから作る`NaturalNumber`は、0か、既に作られた自然数の後者です。
-したがって、値を処理する関数は「0の場合」と「`S(n)`の場合」に分けられます。
-加法は、この**再帰原理**を右辺へ適用したものです。
+いまの比較が必ず止まるのは、`pre` を読むたびに鎖が短くなるからです。小さい場合の答えを使って次の場合を計算する、この書き方を**再帰**と呼びます。
 
-一方、数学的帰納法は、ある性質が0で成り立ち、`n`から`S(n)`へ受け継がれるなら、
-すべての自然数で成り立つと示す**証明原理**です。Pythonのクラスや有限個のテストが、
-帰納法そのものを証明するわけではありません。この実装は、帰納法で読みやすい
-0と後者の有限構造を提供しています。
+一方、「どの自然数でも成り立つ」と説明したいときに使うのが**数学的帰納法**です。たとえば「n回『次へ』と進んで作った数は、n回戻ると0に着く」と示してみます。出発点の0なら0回で着きます。ある数でこれが正しいとすると、その後者からはまず1回で元の数へ戻り、あとは既に分かっている道をたどれます。この二つを示すと、どこまで先の数にも説明が届きます。
 
 ## `+` は、どのメソッドを呼ぶのか
 
-準備章の対応どおり、`n + m` は `n.__add__(m)` へ委譲されます。
-ここで `self` は左辺 `n`、`other` は右辺 `m` です。
+2＋2の右側の2には「1の次」という情報があります。そこで、先に2＋1を計算し、その答えの次を取ることにします。2＋1でも同じことができます。最後に必要な2＋0の答えは2です。左側を n、右側の一つ前を m と書けば、足し算の**定義**は次の二行になります。
 
-次は `NaturalNumber.__add__` の完全な実装です。直前の `@log` も含めて読みます。
-各 `return` は、計算結果とログ用の説明文を遅延生成する関数を組にして返します。
-まずログ用の部分を脇へ置いて結果だけ読むと、数学的な核は次の二行です。
+| 右側の形 | 答え |
+| --- | --- |
+| 0 | n＋0＝n |
+| S(m) | n＋S(m)＝S(n＋m) |
+
+この二行を `NaturalNumber.__add__` の中で探しましょう。`self` が左の数、`other` が右の数です。まず記録用の処理を外して読むと、計算部分は次の形です。
 
 ```python
 predecessor = other.pre
@@ -291,8 +163,6 @@ if predecessor is None:
     return self
 return successor(self + predecessor)
 ```
-
-実ファイルでは、この結果に「どの規則を適用したか」を返す処理を加えています。
 
 ```python
 @log(log_level=4)
@@ -323,85 +193,23 @@ def __add__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
     )
 ```
 
-最初の `isinstance` はPythonの型境界です。数学の二つの定義式に対応するのは、
-そのあとの基底ケースと再帰ケースです。
-数学と実装を一行ずつ対応させると、偶然似ているのではなく、
-同じ定義を別の記法で書いていることが分かります。
+`isinstance` は、この足し算で扱える相手かを確かめます。扱えない型のときに返す `NotImplemented` は「この組み合わせはこのメソッドでは計算できない」というPythonへの合図です。自然数どうしなら、`predecessor` が空かどうかで上の表の行が決まります。
 
-| 加法の定義 | 実装の条件・処理 |
+<span class="lesson-layer" data-layer="trace">順番を追う</span>
+
+## 先に呼んだ計算が、最後に表示される理由
+
+<p data-meta="log-decorator">第0章の記録係 <code>@log</code> は、元の関数から答えと説明を受け取ってから説明を書きます。そこで、呼び出す順と、答えが決まる順を別々に書いてみます。</p>
+
+| 呼び出す順 | その場で答えが出るか |
 | --- | --- |
-| `n + 0 = n` | `predecessor is None`なら`self`を返す |
-| `n + S(m) = S(n + m)` | `successor(self + predecessor)`を返す |
+| 2＋2 | 2＋1の答えを待つ |
+| 2＋1 | 2＋0の答えを待つ |
+| 2＋0 | 2をすぐ返せる |
 
-`predecessor = other.pre`は、`S(m)`から一つ前の`m`を取り出します。
-そのため再帰呼び出しの右辺は必ず一段小さくなり、最後は0へ到達します。
-`lambda: f"..."` は、呼ばれたときに説明文を作る引数なしの関数です。
-ログを表示しない実行では呼ばれません。`[加法・基底]`と
-`[加法・再帰]`は、どちらの再帰式を適用したかを示す規則名です。
-ログの`add(a, b)`は`a + b`、つまり`a.__add__(b)`を表す表示上の記号であり、
-別の公開関数を呼んでいるわけではありません。
+ここから表を下から読んでください。2＋0が2を返すと、待っていた2＋1は `successor(2)`、つまり3を返せます。それを待っていた2＋2が4を返して計算終了です。
 
-<span class="lesson-layer" data-layer="trace">実行して確かめる</span>
-
-## ログは「呼び出し時」ではなく「戻り時」に出る
-
-<div class="meta-note" data-meta="log-decorator" data-reveal>
-  <strong>デコレータ適用前後を分ける</strong>
-  <p>
-    元の <code>__add__</code> は <code>(result, message_factory)</code> を返します。
-    クラスから公開される <code>__add__</code> は <code>@log</code> が作ったラッパーで、
-    ログ有効時だけmessage_factoryを呼んで記録し、resultだけを返します。
-  </p>
-</div>
-
-ラッパーは元の `__add__` を呼び、その二つを受け取って次の順に動きます。
-
-```python
-result, message = func(...)
-if logger.isEnabledFor(log_level):
-    logger.log(log_level, message if isinstance(message, str) else message())
-return result
-```
-
-重要なのは、`func(...)` の計算が終わった**あと**でログを書くことです。
-`2+2` では、まず呼び出しが0へ向かって深くなります。
-
-| 呼び出しの順番 | 右の値 | 実装が次にすること |
-| ---: | --- | --- |
-| 1 | `S(S(0))` | `add(S(S(0)), S(0))`を先に計算する |
-| 2 | `S(0)` | `add(S(S(0)), 0)`を先に計算する |
-| 3 | `0` | 基底ケースなので`S(S(0))`を返す |
-
-その後、結果とログが内側から外側へ戻ります。
-
-| 戻る順番 | 得られる結果 | 記録する定義 |
-| ---: | --- | --- |
-| 1 | `S(S(0))` | `[加法・基底] add(S(S(0)), 0) → S(S(0))` |
-| 2 | `S(S(S(0)))` | `[加法・再帰] add(S(S(0)), S(0)) → S(add(S(S(0)), 0))` |
-| 3 | `S(S(S(S(0))))` | `[加法・再帰] add(S(S(0)), S(S(0))) → S(add(S(S(0)), S(0)))` |
-
-したがってログは、紙で式を展開する上から下の順ではありません。
-**再帰呼び出しから結果が戻った順**です。また、各行はその段階で適用した
-定義を記録しており、各行の末尾に計算済みの3や4を表示する形式ではありません。
-
-## 実装から出力を予想する
-
-ログの`S(S(0))`は、表現の節で読んだ`structural_str`による構造表記です。
-`加法・基底`と`加法・再帰`を見れば、完全な式を暗記しなくても実装の分岐へ戻れます。
-最後の`print(answer)`だけは、人が読むための`str`表記を使うので`4`になります。
-
-`config_log(log_level=4)`の4は再帰の深さや4番目の手順ではありません。
-自然数の加法と減法を表示対象に含めるための内部フィルタ値です。
-計算の理解には不要なので、通常のログ本文には表示しません。
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>実行前に、実装を根拠に予想</strong>
-  <p>
-    <code>__add__</code> と <code>@log</code> の順序から、
-    最初の規則名が <code>加法・基底</code> と <code>加法・再帰</code> の
-    どちらになるかを決め、その理由を一文で書いてください。
-  </p>
-</div>
+<div class="learning-prompt"><strong>実行する前に</strong><p>最初に答えが決まる行には「加法・基底」、小さい計算から戻る行には「加法・再帰」と出ます。2＋2ではそれぞれ何行出るでしょう。</p></div>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -428,104 +236,24 @@ print(answer)</textarea>
   </div>
 </div>
 
-<details class="self-check" data-reveal>
-  <summary>4行を実装へ戻して確認する</summary>
-  <ol>
-    <li>1行目の <code>加法・基底</code> は、<code>if predecessor is None</code> の基底ケースです。</li>
-    <li>2行目の <code>加法・再帰</code> は、右辺が <code>S(0)</code> だった呼び出しです。</li>
-    <li>3行目の <code>加法・再帰</code> は、右辺が <code>S(S(0))</code> だった最初の呼び出しです。</li>
-    <li>最後の4は、すべての <code>successor</code> が結果へ反映されたあとに <code>print</code> が表示します。</li>
-  </ol>
-  <p>
-    つまり、このログは単独で読む説明文ではなく、
-    <code>__add__</code> のどの分岐を通ったか検査する実装トレースです。
-  </p>
-</details>
+<details class="self-check"><summary>画面の4行を読む</summary><p>基底が1行、再帰が2行、最後の print が1行です。途中の S は「次の数」、add は足し算を表す表示です。右辺を3にすると、答えを待つ呼び出しが一つ増えます。</p></details>
 
-<span class="lesson-layer" data-layer="test">テストで確かめる</span>
+<span class="lesson-layer" data-layer="test">規則をテストする</span>
 
-## テストは、定義との対応を機械的に確かめる
-
-ログは理解を助けますが、それだけで実装の正しさを証明するものではありません。
-このライブラリのテストは、まず小さな複数の値について二つの公理に対応する
-実装上の性質を確認します。
-準備章で確認したとおり、ここでの `self` は数ではなくテストケースです。
-
-```python
-self.assertNotEqual(N_ZERO, successor(n))
-self.assertEqual(successor(n) == successor(m), n == m)
-```
-
-続いて、加法の二つの再帰式を直接確認します。
+## たまたま4になっただけではないか
 
 ```python
 self.assertEqual(n + natural_number(0), n)
 self.assertEqual(n + successor(m), successor(n + m))
 ```
 
-テスト名も`test_add_axioms`ではなく`test_add_recursive_equations`とし、
-この教材で採用した「公理」と「演算の再帰的定義」の区別をコード上でも保ちます。
-ただし、どちらも有限個の入力に対するテストであり、一般の場合の数学的証明ではありません。
+最初のテストは「右が0なら左を返す」、次は「右が後者なら、小さい計算の後者を返す」という約束を調べます。たとえば2行目に n＝3、m＝1 を入れると、左は3＋2、右は「3＋1の次」です。違う入力も試せば、4を返すだけの間違った実装を見つけられます。有限個のテストを通ったことと、任意の n、m について示す証明は別です。
 
-公理・表現・定義、実装、ログ、テストにはそれぞれ違う役割があります。
+<span class="lesson-layer" data-layer="boundary">掛け算へ進む</span>
 
-| 層 | 役割 |
-| --- | --- |
-| 公理 | 0と後者について出発点となる性質を定める |
-| 表現 | `None`と`pre`の鎖で0と後者を構築する |
-| 再帰的定義 | その構造上で加法や乗法を一意に決める |
-| 実装 | その規則をPythonで実行可能にする |
-| ログ | 実行時にどの規則を通ったか観察する |
-| テスト | 実装結果が規則を満たす具体例を継続的に検査する |
+## 同じ考え方で、3×2を組み立てる
 
-<span class="lesson-layer" data-layer="boundary">この実装で重視すること</span>
-
-## 掛け算でも同じ対応を探す
-
-掛け算は次の再帰的定義です。
-
-<div class="peano-equation" data-reveal>
-n × 0 = 0<br>
-n × S(m) = n + (n × m)
-</div>
-
-実装の`NaturalNumber.__mul__`も、`predecessor is None`なら0を返し、
-それ以外なら`self + self * predecessor`を返します。加法で学んだ
-「定義 → 分岐 → 再帰 → 戻り時のログ」という読み方を、そのまま再利用できます。
-
-```python
-@log(log_level=5)
-def __mul__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
-    if not isinstance(other, NaturalNumber):
-        return (
-            cast(NaturalNumber, NotImplemented),
-            lambda: f"{self!r} * {other!r} = NotImplemented",
-        )
-    predecessor = other.pre
-    if predecessor is None:
-        return (
-            N_ZERO,
-            lambda: f"[乗法・基底] mul({self.structural_str()}, 0) -> 0",
-        )
-    return (
-        self + self * predecessor,
-        lambda: (
-            f"[乗法・再帰] mul({self.structural_str()}, "
-            f"{other.structural_str()}) -> "
-            f"add({self.structural_str()}, "
-            f"mul({self.structural_str()}, {predecessor.structural_str()}))"
-        ),
-    )
-```
-
-<div class="concept-note" data-reveal>
-  <strong>このライブラリが優先するもの</strong>
-  <p>
-    Python標準の整数より遅くても、数学上の構造、演算の定義、
-    実装の分岐が対応して見えることを優先しています。
-    そのため2や3のような小さな値で、コードとログの妥当性を調べます。
-  </p>
-</div>
+右側が0なら積は0。右側が一つ増えたら、前の積に左の数を一つ足します。3×2なら、3×0＝0、3×1＝3＋0、3×2＝3＋3です。この二行の規則を `__mul__` では、右が0なら `N_ZERO`、それ以外なら `self + self * predecessor` と書いています。今度は、さきほど自分で定義した足し算が道具として使えます。
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
@@ -547,9 +275,4 @@ def __mul__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
   </fieldset>
 </form>
 
-## 次へ
-
-自然数の章で身につけた読み方を、次章から繰り返します。
-数学上の構成、保存するデータ、演算メソッド、ログの順に整数を調べます。
-
-[整数の表現と実装へ進む →](integers.md)
+[第2章へ。自然数の足し算だけで、負の数の等しさを決める](integers.md)

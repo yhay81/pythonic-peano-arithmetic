@@ -1,84 +1,27 @@
 <span class="lesson-number">第3章 · 有理数</span>
 
-# ピザの半分は、4切れのうち何切れ？
+# 割り算を使わずに、二つの分数を比べる
 
-<p class="lesson-lead">丸いピザを半分に切り、片方をお皿に取ります。そのあと両方の半円をもう半分に切ったら、お皿の上の量は増えるでしょうか。</p>
+整数を作るときは二つの数を「差」と読みました。今度は整数の組 (p, q) を「p を q で割った量」と読みます。すると (1, 2) と (2, 4) は同じ量です。小数にも直さず、約分もせずに、それをプログラムに判定させられるでしょうか。
 
-お皿には同じ大きさの4切れのうち2切れがあります。切り方を変えても、食べられる量は同じです。だから 1/2＝2/4 です。
+<div class="lesson-goals"><strong>この章の目標</strong><p>分数の比較と足し算を整数の掛け算で書き、約分が必要になる場面を見分けます。</p></div>
 
-分数を比べるときも、切れの大きさをそろえれば比べられます。たとえば 2/3 と 3/4 は、12等分で数えると8切れと9切れ。大きいのは 3/4 です。整数を整数で割った形で表せる数を<strong>有理数</strong>と呼びます。分母には0を使えません。
+<span class="lesson-layer" data-layer="definition">分母をそろえる</span>
 
-<div class="lesson-goals" data-reveal>
-  <strong>2/3 と 4/6 は同じ量？</strong>
-  <details><summary>答えを確かめる</summary><p>3等分した一切れをさらに半分にすると、2切れが4切れになります。どちらも6切れのうち4切れです。</p></details>
-</div>
+## 斜めに掛ける理由
 
-[多項式の話へ](polynomials.md)
+1/2 と 2/4 の分母を、両方の分母の積である8にそろえます。左は (1×4)/8、右は (2×2)/8。分母が同じなので、比べるのは **1×4 と 2×2** です。どちらも4なので、この二つは同じ量です。
 
-## Pythonのコードで確かめる
+同じように p/q と r/s の分母を q×s にすれば、分子は p×s と q×r になります。だから二つの積が等しいかどうかで判定できます。この積を**交差積**といいます。分母が0だとこの話は始められないので、数を作る時点で除きます。整数どうしの分数で表せる数のことを**有理数**といいます。
 
-<div class="implementation-bridge" data-reveal aria-label="有理数の数学・表現・実装">
-  <div>
-    <strong>数学</strong>
-    <p>整数の比 <code>p/q</code> を作り、交差積が等しい比を同じ値とします。</p>
-  </div>
-  <div>
-    <strong>データ表現</strong>
-    <p><code>Rational.p</code> と <code>Rational.q</code> に、分子と分母の整数を保存します。</p>
-  </div>
-  <div>
-    <strong>実装</strong>
-    <p><code>__post_init__</code> が分母を検査し、<code>__eq__</code> が交差積を比較します。</p>
-  </div>
-</div>
+<span class="lesson-layer" data-layer="representation">分子と分母を保存する</span>
 
-<div class="source-reference"
-     data-source-reference="peano/rational.py"
-     data-test-reference="tests/test_rational.py">
-  <strong>この章で横に置く実装</strong>
-  <p>
-    完全なクラス:
-    <a href="/assets/source/peano/rational.py"><code>peano/rational.py</code></a>
-    の <code>Rational</code>。本文では作成時検査、等号、加法、約分、ハッシュを抜粋します。
-  </p>
-  <p>
-    分母0・交差積・約分の検査:
-    <a href="/assets/source/tests/test_rational.py"><code>tests/test_rational.py</code></a>。
-    ファイル索引は<a href="/reference/implementation/">実装リファレンス</a>にあります。
-  </p>
-</div>
+```python
+def rational(numerator: int, denominator: int) -> Rational:
+    return Rational(integer(numerator), integer(denominator))
+```
 
-<span class="lesson-layer" data-layer="definition">数学上の定義</span>
-
-## 分数の等しさを、整数の演算だけで定義する
-
-`p/q` の上の `p` を**分子**、下の `q` を**分母**と呼びます。
-分母は0にできません。0で割ることは有理数の演算として定義しないためです。
-
-`1/2` と `2/4` は表記が違いますが、同じ大きさです。小数へ直さなくても、
-斜めに掛けた二つの積で判定できます。
-
-<div class="peano-equation" data-reveal>
-p/q ∼ r/s ⇔ p×s = q×r
-</div>
-
-`1/2` と `2/4` なら `1×4=2×2` です。前章と同じく、`∼` は
-「違う代表元だが同じ値を表す」という同値関係です。この関係で整数の比を
-まとめたものを**有理数**と呼びます。
-
-有理数の加法も、整数の演算だけで定義できます。
-
-<div class="peano-equation" data-reveal>
-p/q + r/s = (p×s + q×r)/(q×s)
-</div>
-
-たとえば `1/2+1/3=(1×3+2×1)/(2×3)=5/6` です。
-
-<span class="lesson-layer" data-layer="representation">データの表し方</span>
-
-## 作成時に守る条件と、あえて変えない表現
-
-実装では、有理数一つが二つの `Integer` を持ちます。
+<div class="implementation-bridge"><p>小文字の <code>rational(2, 4)</code> は、Pythonの整数2と4を前章の整数に変え、大文字の <code>Rational</code> に渡します。できた数では <code>p</code> が分子、<code>q</code> が分母です。</p></div>
 
 ```python
 @total_ordering
@@ -94,47 +37,13 @@ class Rational:
             raise ZeroDivisionError("the denominator cannot be zero")
 ```
 
-`Rational` を作った直後に `__post_init__` が呼ばれ、表現が最低限の条件を
-満たしているか検査します。
+<p data-meta="post-init">最後の <code>if self.q == Z_ZERO</code> は、受け取った分母と整数の0を前章の方法で比べます。分母が0なら <code>raise</code> で作成を止めます。作成に成功した数はすべて「分母が0でない」という条件を守ります。このように常に守る条件を<strong>不変条件</strong>といいます。</p>
 
-<div class="meta-note" data-meta="post-init" data-reveal>
-  <strong>生成された <code>__init__</code> と、手書きの検査を接続する</strong>
-  <p>
-    <code>__post_init__</code> を利用者が直接呼ぶ必要はありません。
-    dataclassが生成した <code>__init__</code> が <code>p</code> と <code>q</code> を設定し、
-    直後にこの検査処理を呼びます。作成に成功したすべてのRationalで
-    「両方がIntegerで、分母は0でない」という不変条件が成立します。
-  </p>
-</div>
+<p class="source-reference" data-source-reference="peano/rational.py" data-test-reference="tests/test_rational.py">元のファイルを読む　<a href="/assets/source/peano/rational.py">peano/rational.py</a> ／ <a href="/assets/source/tests/test_rational.py">tests/test_rational.py</a></p>
 
-ここで `self.q == Z_ZERO` は、前章で読んだ整数の同値関係を使います。
-分母の代表元が `(2,2)` でも、それは整数0と等しいので拒否されます。
-上の数体系が下の数体系の実装を再利用している具体例です。
+<span class="lesson-layer" data-layer="implementation">比較と足し算を書く</span>
 
-`rational(1,2)` は、Python標準の整数1と2から `Integer` を二つ作り、
-`Rational` へ渡す短縮関数です。このライブラリの有理数が、
-Pythonに用意された別の数値型へ置き換わるわけではありません。
-
-```python
-def rational(numerator: int, denominator: int) -> Rational:
-    return Rational(integer(numerator), integer(denominator))
-```
-
-このライブラリは、作成時に `2/4` を `1/2` へ自動約分しません。
-また `1/−2` の分母を自動で正にしません。
-
-| 操作 | 保存される表現 | 表す値 |
-| --- | --- | --- |
-| `rational(2,4)` | `2/4` | `1/2` と等しい |
-| `rational(1,-2)` | `1/−2` | `−1/2` と等しい |
-| `rational(2,4).reduction()` | `1/2` | 元と同じ |
-
-<span class="lesson-layer" data-layer="implementation">Pythonでの実装</span>
-
-## 交差積と通分を、そのままメソッドにする
-
-Pythonの `half == two_quarters` は `Rational.__eq__` を呼びます。
-次がログ文字列を含む完全な実装です。
+## 同じ通分から二つのメソッドを作る
 
 ```python
 @log(log_level=21)
@@ -156,13 +65,7 @@ def __eq__(self, other: object) -> tuple[bool, LogMessage]:
     )
 ```
 
-| 数学 | 実装 |
-| --- | --- |
-| 左の交差積 `p×s` | `self.p * converted.q` |
-| 右の交差積 `q×r` | `self.q * converted.p` |
-| 二つの積が等しい | 整数の `__eq__` で比較 |
-
-`Rational.__add__` も加法の定義から直接、新しい分子と分母を作ります。
+`self.p * converted.q` に 1×4、`self.q * converted.p` に 2×2 を当てはめれば、紙で書いた交差積と同じです。右側の値を比較できる型に直すこと、扱えない相手に `NotImplemented` を返すこと、説明文を `lambda` に入れることは整数の章と共通です。
 
 ```python
 @log(log_level=24)
@@ -188,44 +91,11 @@ def __add__(self, other: object) -> tuple[Rational, LogMessage]:
     )
 ```
 
-この一行の中では整数の乗法と加法が動き、その内部ではさらに自然数の演算が動きます。
-自然数 → 整数 → 有理数は、説明上の順序だけでなく実際の呼び出し関係です。
+今度は 1/2＋1/3 で `result = Rational(...)` の二つの引数を読みます。最初の引数は **1×3＋2×1＝5**。二つ目は **2×3＝6**。つまり、同じ大きさに切りそろえた3切れと2切れを足す計算です。比較では交差積を比べ、足し算ではその二つを足します。
 
-約分は別の `reduction()` に分離されています。
+<span class="lesson-layer" data-layer="trace">自分の予想と比べる</span>
 
-```python
-def reduction(self) -> Rational:
-    numerator = self.p.normalize()
-    denominator = self.q.normalize()
-    if denominator < Z_ZERO:
-        numerator, denominator = -numerator, -denominator
-
-    a, b = abs(numerator), abs(denominator)
-    while b:
-        a, b = b, a % b
-    divisor = Integer(a, N_ZERO)
-    return Rational(numerator // divisor, denominator // divisor)
-```
-
-まず分子・分母を整数として正規化し、分母を正に揃え、最大公約数で割ります。
-元の `Rational` は不変なので、`reduction()` は同じ値を表す新しいオブジェクトを返します。
-
-<span class="lesson-layer" data-layer="trace">実行して確かめる</span>
-
-## 有理数の等号ログは、内部の整数計算を要約する
-
-`Rational.__eq__` のログレベルは21です。次の実験では、
-交差積を作ったという有理数層の一行だけを表示します。
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>実行前に、ログの部品を予想</strong>
-  <p>
-    上に抜粋した <code>Rational.__eq__</code> の <code>result</code> と
-    ログ文字列を参照し、<code>1/2</code> と <code>2/4</code> の
-    どの整数どうしが掛けられるかを書き、
-    最後の判定を予想してください。
-  </p>
-</div>
+<div class="learning-prompt"><strong>実行する前に</strong><p>1/2 と 2/4 を比べたあと、左だけを 2/3 に変えてみましょう。右の分数をそのままにすると、比べる二つの積はどう変わりますか。</p></div>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -251,36 +121,7 @@ print(half == two_quarters)</textarea>
   </div>
 </div>
 
-<details class="self-check" data-reveal>
-  <summary><code>Q</code> と <code>Z</code> を層として読む</summary>
-  <p>
-    <code>&lt;Q(1/2)&gt;</code> と <code>&lt;Q(2/4)&gt;</code> は比較した有理数の代表元です。
-    右側の <code>&lt;Z(1,0)&gt; * &lt;Z(4,0)&gt;</code> と
-    <code>&lt;Z(2,0)&gt; * &lt;Z(2,0)&gt;</code> は交差積を作る整数演算です。
-    <code>Q</code> は有理数、<code>Z</code> は整数という実装上の表示です。
-  </p>
-  <p>
-    ログには、等しさを判定する二つの交差積が表示されます。
-    それぞれの積4までは表示しないため、式を実装へ戻し、
-    最後の <code>True</code> と合わせて判断します。
-  </p>
-</details>
-
-`log_level=21` は21未満の整数・自然数ログを隠します。
-`log_level=15` に変えると整数乗法も見え、`log_level=4` まで下げると
-自然数加法も見えます。ただし出力量は急に増えます。ログレベルは、
-自然数や整数の途中計算まで表示するか選ぶためのフィルターで、
-通常の本文には表示されません。
-
-有理数の加法だけを見る次の実験では、設定値24を使います。
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>もう一度、実装から予想</strong>
-  <p>
-    上に抜粋した <code>Rational.__add__</code> の <code>result</code> を参照し、
-    新しい分子と分母を先に計算してください。
-  </p>
-</div>
+<details class="self-check"><summary>答えと途中の計算</summary><p>元の比較は True。変更後は 2×4＝8 と 3×2＝6 が違うので False です。表示される一行の比較の内側では、前章で作った整数の演算が働いています。</p></details>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -305,31 +146,33 @@ print(answer)</textarea>
   </div>
 </div>
 
-<span class="lesson-layer" data-layer="test">テストで確かめる</span>
+2つ目の実験で両方を 1/2 にすると、計算結果の分子は 1×2＋2×1＝4、分母は 2×2＝4 です。表示が 4/4 でも値は1です。分子・分母を簡単な形に直す手順は、次のメソッドに分けてあります。
 
-## テストは定義、不変条件、正規化を別々に確かめる
-
-加法のテストは、分子・分母を小さな範囲で動かし、定義式と照合します。
+## 約分で割る数は、どうやって見つける？
 
 ```python
-self.assertEqual(
-    rational(i, j) + rational(k, m),
-    rational(i * m + j * k, j * m),
-)
+def reduction(self) -> Rational:
+    numerator = self.p.normalize()
+    denominator = self.q.normalize()
+    if denominator < Z_ZERO:
+        numerator, denominator = -numerator, -denominator
+
+    a, b = abs(numerator), abs(denominator)
+    while b:
+        a, b = b, a % b
+    divisor = Integer(a, N_ZERO)
+    return Rational(numerator // divisor, denominator // divisor)
 ```
 
-表現が異なっても同じハッシュ値になること、約分が値を変えないことも別に検査します。
+6/−8 で追います。まず分母が負なので、分子と分母の符号を両方変えて −6/8 にします。次に絶対値の6と8から、両方を割り切る最大の数（最大公約数）を探します。
 
-```python
-self.assertEqual(hash(rational(i, j)), hash(rational(i * 2, j * 2)))
-self.assertEqual(rational(16, 9).reduction(), rational(16, 9))
-```
+`a % b` は a を b で割った余りです。8＝6×1＋2 なので、8と6を両方割り切る数は余りの2も割り切ります。逆に6と2を割り切れば8も割り切れます。このようにペアを「割る数と余り」に替えても最大公約数は同じです。ループの (a, b) は (6, 8)、(8, 6)、(6, 2)、(2, 0) と進みます。最後に残った2で −6 と8を割ると −3/4 です。
 
-ハッシュは、辞書や集合が値をすばやく探すために使う整数です。
-Pythonのデータモデルには「`a == b` なら `hash(a) == hash(b)`」という契約があります。
-そのため `Rational.__hash__` は、保存された `2/4` から直接ハッシュ値を求めず、
-`reduction()` で同じ値を同じ標準形へ揃えてから求めます。
-数学上の等値関係を `__eq__` だけでなく、コンテナの振る舞いへも反映する実装です。
+<span class="lesson-layer" data-layer="test">等しさが関わる別の場面</span>
+
+## 同じ分数を辞書のキーにしたら？
+
+Pythonの辞書は、キーを探す手がかりに**ハッシュ値**という整数を使います。1/2 をキーにして書いた値を 2/4 でも取り出すには、等しい二つのキーが同じハッシュ値を返す必要があります。
 
 ```python
 def __hash__(self) -> int:
@@ -339,35 +182,27 @@ def __hash__(self) -> int:
     return hash(("Rational", int(reduced.p), int(reduced.q)))
 ```
 
-そして、分母0は正常な値を返すのではなく、例外になることを確かめます。
+ここではまず `reduction()` を呼びます。1/2 も 2/4 も同じ組にしてからハッシュ値を作れるからです。分母が1なら整数と同じハッシュ値を返します。次のテストの一行目は、分子と分母を2倍した場合についてこの約束を確かめます。
+
+```python
+self.assertEqual(hash(rational(i, j)), hash(rational(i * 2, j * 2)))
+self.assertEqual(rational(16, 9).reduction(), rational(16, 9))
+```
 
 ```python
 with self.assertRaises(ZeroDivisionError):
     rational(1, 0)
 ```
 
-「正しい入力の演算」と「不正な入力を拒否する不変条件」は、異なる責務なので
-テストも分かれています。
+最後のテストは、分母が0の入力で決めた通りのエラーが出れば成功です。正しい結果を出せることと、作ってはいけない数を止められることの両方を試しています。
 
-<span class="lesson-layer" data-layer="boundary">次に必要になるもの</span>
+<span class="lesson-layer" data-layer="boundary">次の数が必要になる理由</span>
 
-## 有理数で表せない数が、次の実装課題になる
+## 2乗して2になる分数はあるか
 
-`x×x=2` を満たす数を `√2` と書きます。`√2` は整数どうしの比では
-表せないため、この `Rational` だけでは値を構築できません。
+もし正の分数 p/q が2乗して2になるなら、約分しきった形で p²＝2q² です。右辺が偶数なので p² は偶数。奇数の2乗は奇数だから、p も偶数です。そこで p＝2k と置いて戻すと、4k²＝2q²、つまり q²＝2k²。すると q も偶数です。分子も分母も2で割れるのは、約分しきったという出発点と矛盾します。
 
-<details class="proof-note" data-reveal>
-  <summary>発展 · √2が有理数でない理由</summary>
-  <p>
-    √2を既約分数 <code>p/q</code> と仮定すると <code>p²=2q²</code> です。
-    ここから <code>p</code> と <code>q</code> が両方とも2で割れることになり、
-    既約という仮定に反します。したがって√2は有理数ではありません。
-  </p>
-</details>
-
-この不足はライブラリの失敗ではなく、数体系を広げる動機です。次章では
-`√2` をいきなり小数として近似せず、まず `x²−2` という多項式を保存し、
-0になる場所を調べます。
+そこで次の章では、分数として保存できないこの数を「ある式を0にする数」として指定します。
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
@@ -389,4 +224,4 @@ with self.assertRaises(ZeroDivisionError):
   </fieldset>
 </form>
 
-[多項式へ進む →](polynomials.md)
+[第4章へ。式を保存し、答えがいくつあるか調べる](polynomials.md)
