@@ -117,6 +117,8 @@ def outer(func):
     return inner
 ```
 
+Read the two names on the left of result, message = func(...). The first gets the answer. The second can hold a function instead of a string. Calling message() only when a log is wanted saves building a description that nobody will read.
+
 Writing `@log(log_level=4)` above `__add__` is equivalent to assigning the
 result of the decorator back to the same name:
 

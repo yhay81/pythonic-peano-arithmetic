@@ -153,6 +153,8 @@ Rationals contain every integer but still have gaps: there is no rational whose
 square is 2. The next chapters keep rational arithmetic and use a polynomial
 plus an interval to identify such a real number.
 
+The loop for the greatest common divisor replaces (a,b) with (b,a % b). For 6 and 8 it visits (8,6), (6,2), (2,0). When b reaches zero, a is 2. Dividing both parts of 6/−8 by 2 and putting the minus sign in the numerator gives −3/4.
+
 ## From a common denominator to a square root
 
 For addition, add the two cross-products and keep the product of the denominators. For multiplication, multiply the numerators together and the denominators together. Both methods use the integer products from the last chapter.

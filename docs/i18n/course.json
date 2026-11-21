@@ -71,7 +71,8 @@
         "trace": "self.points 仍是 2，other.points 变成 4，新记录里存的是 6。点号后面的 points 读出这个数。",
         "test": "试试 `(a + b) + b`。第二次加法能运行，是因为第一次得到的也是一份得分记录。",
         "boundary": "后面会用 `@dataclass` 自动生成保存数据的方法。当两组不同的数据也能表示同一个数时，我们会自己写 `__eq__` 来判断相等。",
-        "worked": "方法就是写在类里的函数。`a.points` 中的点号表示读取字段。在库里的 `result, message = func(...)` 这一行，先看右边：调用原来的方法，再给返回的两个值分别取名。"
+        "worked": "方法就是写在类里的函数。`a.points` 中的点号表示读取字段。在库里的 `result, message = func(...)` 这一行，先看右边：调用原来的方法，再给返回的两个值分别取名。",
+        "follow_up": "在 `result, message = func(...)` 中，第一个名字接住答案。第二个名字可以接住一个生成消息的函数。只有需要记录时才调用 `message()`，这样就不用生成没人会读的文字。"
       },
       {
         "title": "不用加法，怎样定义加法？",
@@ -83,7 +84,8 @@
         "trace": "2 + 2 要等 2 + 1，后者又要等 2 + 0。答案按相反的顺序返回：2、3、4。每次返回时才记下那一步。",
         "test": "把右边改为 3，会多一次调用，最后得到 5。试几个数能检查程序；要用数学归纳法证明一般情形，还要说明起点成立，并且能从 n 推到 S(n)。",
         "boundary": "乘法也可以这样定义：3 × 0 = 0，每多一组就多 3。于是 3 × 1 = 3，3 × 2 = 6。",
-        "worked": "试着做下面两次比较。两条链同时走到头，结果是 `True`；如果只有一条走到头，一个数是零，另一个还有前一个数，结果就是 `False`。"
+        "worked": "试着做下面两次比较。两条链同时走到头，结果是 `True`；如果只有一条走到头，一个数是零，另一个还有前一个数，结果就是 `False`。",
+        "follow_up": "为什么沿着链退回去一定能到零？从零出发，不用退。假设从 n 能退到零，那么从 S(n) 先退一步到 n，再沿同样的路就行了。这是归纳证明的起点和推理步骤；程序实际逐层调用自己，叫作递归。"
       },
       {
         "title": "两个自然数怎么表示负数？",
@@ -95,7 +97,8 @@
         "trace": "第一项是 0×3+2×0 = 0，第二项是 0×0+2×3 = 6。(0,6) 表示 −6。",
         "test": "把 (0,2) 换成 (1,3)。得到的乘积是 (3,9)，表示的仍然是 −6。",
         "boundary": "`normalize()` 抵消方向相反的步数，直到一边为零。用交叉相加的方法比较，两边都不为零也能得到正确答案。",
-        "worked": "比较 (3,1) 和 (4,2)：3+2 和 1+4 都是 5。再给两组分别加上 (1,4)，得到 (4,5) 和 (5,6)。两段路的终点都在零左边一步。"
+        "worked": "比较 (3,1) 和 (4,2)：3+2 和 1+4 都是 5。再给两组分别加上 (1,4)，得到 (4,5) 和 (5,6)。两段路的终点都在零左边一步。",
+        "follow_up": "要把 (1,3) 变成它的相反数，交换两项，(3,1) 会走到相反的位置。要把它规范化，就抵消左右各一步，(0,2) 仍走到原来的位置。这两个操作中，哪一个保持数值不变？"
       },
       {
         "title": "不做除法，怎么比较分数？",
@@ -107,7 +110,8 @@
         "trace": "分子是 1×3+2×1 = 5，分母是 2×3 = 6。把两个加数都换成 1/2，同样的算法得到 4/4，值是 1。",
         "test": "给 6/8 约分：8 除以 6 余 2，6 除以 2 余 0。用最后一个非零除数 2 同除分子和分母。相等的分数还应有相同的哈希值，才能作为键找到字典中的同一条记录。",
         "boundary": "假设最简分数 p/q 的平方是 2，那么 p² = 2q²。平方是偶数，p 就是偶数。代入 p = 2k 得 q² = 2k²，所以 q 也是偶数。分子分母还能同除以 2，与“最简”矛盾。要指出 √2，需要另一种办法。",
-        "worked": "先解释下面两行输出，再做加法：1/2 和 2/4 相等吗？2/4 里面还保存着哪两个数？用 p 和 q 就能分别读出来。"
+        "worked": "先解释下面两行输出，再做加法：1/2 和 2/4 相等吗？2/4 里面还保存着哪两个数？用 p 和 q 就能分别读出来。",
+        "follow_up": "求最大公约数的循环把 (a,b) 换成 (b,`a % b`)。从 (6,8) 开始，依次经过 (8,6)、(6,2)、(2,0)。b 为零时，剩下 a = 2。给 6/−8 的分子、分母同除以 2，再把负号移到分子上，就得到 −3/4。"
       },
       {
         "title": "有几个数能让 x²−2 等于零？",
@@ -119,7 +123,8 @@
         "trace": "x²−2 的斯图姆序列是 x²−2、2x、2。在 −2 处符号为 +、−、+，变号两次；在 2 处为 +、+、+，没有变号。相减得 2。同样计算 1 和 2 之间，差是 1。",
         "test": "第二个式子是导数。x 增加 h 时，平方增加 2xh+h²；除以 h 得 2x+h，h 越接近零，它越接近 2x。接着用 x²−2 除以 2x，余数是 −2。余数反号，就得到最后一项 2。",
         "boundary": "两端都不是根时，斯图姆定理保证变号次数之差等于不同实根的个数。数变号时跳过零。`sign_at` 用精确的分数计算，以免舍入改变符号。",
-        "worked": "试试 x = 3/2。依次读入 1、0、−2，得到 1、3/2、1/4。数根时，用 x²−2、2x、2 这三个式子。代入 1 时符号为 −、+、+（变一次），代入 2 时为 +、+、+（不变）。两次计数相减，说明中间有一个根。"
+        "worked": "试试 x = 3/2。依次读入 1、0、−2，得到 1、3/2、1/4。数根时，用 x²−2、2x、2 这三个式子。代入 1 时符号为 −、+、+（变一次），代入 2 时为 +、+、+（不变）。两次计数相减，说明中间有一个根。",
+        "follow_up": "在 `sturm_sequence` 中，`sequence[-2]` 和 `sequence[-1]` 是最后两个多项式。% 求前一个除以后一个的余数。把余数反号后加到序列末尾；余数是零就结束。先去掉重复因子，是为了让同一位置的根只算一次。"
       },
       {
         "title": "不写完小数，怎样准确指出 √2？",
@@ -131,7 +136,8 @@
         "trace": "在 3/2 处，x²−3 等于 −3/4，留下 [3/2,2]。在 7/4 处等于 1/16，留下 [3/2,7/4]。两个多项式用的是同一段判断代码。",
         "test": "如果中点没有恰好碰到根，`trace(2)` 会给出起始区间和两个新区间。除了宽度，还要检查符号：选错一半也会让宽度减半。",
         "boundary": "从 [1,2] 二分七次，宽度是 1/128，中点到根的距离最多是 1/256。区间给出误差上限；原来的式子和隔离区间已经准确指定了这个数。",
-        "worked": "先看 [1,2] 上的 x²−2。中点是 3/2，平方减 2 得 1/4。左端 1 处的值为负，留下 [1,3/2]。新中点 5/4 处的值是 −7/16，留下 [5/4,3/2]。现在试着更换实验中的多项式。"
+        "worked": "先看 [1,2] 上的 x²−2。中点是 3/2，平方减 2 得 1/4。左端 1 处的值为负，留下 [1,3/2]。新中点 5/4 处的值是 −7/16，留下 [5/4,3/2]。现在试着更换实验中的多项式。",
+        "follow_up": "[1,3/2] 的宽度是 3/2−1 = 1/2。读 `interval.width` 时，带 `@property` 的函数会用两端算出宽度。把式子换成 x，区间换成 [−1,1]，第一个中点就是根。两端都变成零，循环就可以停止。"
       }
     ]
   },
@@ -207,7 +213,8 @@
         "trace": "self.points 仍是 2，other.points 變成 4，新記錄裡存的是 6。點號後面的 points 讀出這個數。",
         "test": "試試 `(a + b) + b`。第二次加法能執行，是因為第一次得到的也是一份得分記錄。",
         "boundary": "後面會用 `@dataclass` 自動生成儲存資料的方法。當兩組不同的資料也能表示同一個數時，我們會自己寫 `__eq__` 來判斷相等。",
-        "worked": "方法就是寫在類別裡的函式。`a.points` 中的點號表示讀取欄位。在庫裡的 `result, message = func(...)` 這一行，先看右邊：呼叫原來的方法，再給返回的兩個值分別取名。"
+        "worked": "方法就是寫在類別裡的函式。`a.points` 中的點號表示讀取欄位。在庫裡的 `result, message = func(...)` 這一行，先看右邊：呼叫原來的方法，再給返回的兩個值分別取名。",
+        "follow_up": "在 `result, message = func(...)` 中，第一個名字接住答案。第二個名字可以接住一個生成訊息的函式。只有需要記錄時才呼叫 `message()`，這樣就不用生成沒人會讀的文字。"
       },
       {
         "title": "不用加法，怎樣定義加法？",
@@ -219,7 +226,8 @@
         "trace": "2 + 2 要等 2 + 1，後者又要等 2 + 0。答案按相反的順序返回：2、3、4。每次返回時才記下那一步。",
         "test": "把右邊改為 3，會多一次呼叫，最後得到 5。試幾個數能檢查程式；要用數學歸納法證明一般情形，還要說明起點成立，並且能從 n 推到 S(n)。",
         "boundary": "乘法也可以這樣定義：3 × 0 = 0，每多一組就多 3。於是 3 × 1 = 3，3 × 2 = 6。",
-        "worked": "試著做下面兩次比較。兩條鏈同時走到頭，結果是 `True`；如果只有一條走到頭，一個數是零，另一個還有前一個數，結果就是 `False`。"
+        "worked": "試著做下面兩次比較。兩條鏈同時走到頭，結果是 `True`；如果只有一條走到頭，一個數是零，另一個還有前一個數，結果就是 `False`。",
+        "follow_up": "為什麼沿著鏈退回去一定能到零？從零出發，不用退。假設從 n 能退到零，那麼從 S(n) 先退一步到 n，再沿同樣的路就行了。這是歸納證明的起點和推理步驟；程式實際逐層呼叫自己，叫作遞迴。"
       },
       {
         "title": "兩個自然數怎麼表示負數？",
@@ -231,7 +239,8 @@
         "trace": "第一項是 0×3+2×0 = 0，第二項是 0×0+2×3 = 6。(0,6) 表示 −6。",
         "test": "把 (0,2) 換成 (1,3)。得到的乘積是 (3,9)，表示的仍然是 −6。",
         "boundary": "`normalize()` 抵消方向相反的步數，直到一邊為零。用交叉相加的方法比較，兩邊都不為零也能得到正確答案。",
-        "worked": "比較 (3,1) 和 (4,2)：3+2 和 1+4 都是 5。再給兩組分別加上 (1,4)，得到 (4,5) 和 (5,6)。兩段路的終點都在零左邊一步。"
+        "worked": "比較 (3,1) 和 (4,2)：3+2 和 1+4 都是 5。再給兩組分別加上 (1,4)，得到 (4,5) 和 (5,6)。兩段路的終點都在零左邊一步。",
+        "follow_up": "要把 (1,3) 變成它的相反數，交換兩項，(3,1) 會走到相反的位置。要把它規範化，就抵消左右各一步，(0,2) 仍走到原來的位置。這兩個操作中，哪一個保持數值不變？"
       },
       {
         "title": "不做除法，怎麼比較分數？",
@@ -243,7 +252,8 @@
         "trace": "分子是 1×3+2×1 = 5，分母是 2×3 = 6。把兩個加數都換成 1/2，同樣的演算法得到 4/4，值是 1。",
         "test": "給 6/8 約分：8 除以 6 餘 2，6 除以 2 餘 0。用最後一個非零除數 2 同除分子和分母。相等的分數還應有相同的雜湊值，才能作為鍵找到字典中的同一條記錄。",
         "boundary": "假設最簡分數 p/q 的平方是 2，那麼 p² = 2q²。平方是偶數，p 就是偶數。代入 p = 2k 得 q² = 2k²，所以 q 也是偶數。分子分母還能同除以 2，與“最簡”矛盾。要指出 √2，需要另一種辦法。",
-        "worked": "先解釋下面兩行輸出，再做加法：1/2 和 2/4 相等嗎？2/4 裡面還儲存著哪兩個數？用 p 和 q 就能分別讀出來。"
+        "worked": "先解釋下面兩行輸出，再做加法：1/2 和 2/4 相等嗎？2/4 裡面還儲存著哪兩個數？用 p 和 q 就能分別讀出來。",
+        "follow_up": "求最大公約數的迴圈把 (a,b) 換成 (b,`a % b`)。從 (6,8) 開始，依次經過 (8,6)、(6,2)、(2,0)。b 為零時，剩下 a = 2。給 6/−8 的分子、分母同除以 2，再把負號移到分子上，就得到 −3/4。"
       },
       {
         "title": "有幾個數能讓 x²−2 等於零？",
@@ -255,7 +265,8 @@
         "trace": "x²−2 的斯圖姆序列是 x²−2、2x、2。在 −2 處符號為 +、−、+，變號兩次；在 2 處為 +、+、+，沒有變號。相減得 2。同樣計算 1 和 2 之間，差是 1。",
         "test": "第二個式子是導數。x 增加 h 時，平方增加 2xh+h²；除以 h 得 2x+h，h 越接近零，它越接近 2x。接著用 x²−2 除以 2x，餘數是 −2。餘數反號，就得到最後一項 2。",
         "boundary": "兩端都不是根時，斯圖姆定理保證變號次數之差等於不同實根的個數。數變號時跳過零。`sign_at` 用精確的分數計算，以免舍入改變符號。",
-        "worked": "試試 x = 3/2。依次讀入 1、0、−2，得到 1、3/2、1/4。數根時，用 x²−2、2x、2 這三個式子。代入 1 時符號為 −、+、+（變一次），代入 2 時為 +、+、+（不變）。兩次計數相減，說明中間有一個根。"
+        "worked": "試試 x = 3/2。依次讀入 1、0、−2，得到 1、3/2、1/4。數根時，用 x²−2、2x、2 這三個式子。代入 1 時符號為 −、+、+（變一次），代入 2 時為 +、+、+（不變）。兩次計數相減，說明中間有一個根。",
+        "follow_up": "在 `sturm_sequence` 中，`sequence[-2]` 和 `sequence[-1]` 是最後兩個多項式。% 求前一個除以後一個的餘數。把餘數反號後加到序列末尾；餘數是零就結束。先去掉重複因子，是為了讓同一位置的根只算一次。"
       },
       {
         "title": "不寫完小數，怎樣準確指出 √2？",
@@ -267,7 +278,8 @@
         "trace": "在 3/2 處，x²−3 等於 −3/4，留下 [3/2,2]。在 7/4 處等於 1/16，留下 [3/2,7/4]。兩個多項式用的是同一段判斷程式碼。",
         "test": "如果中點沒有恰好碰到根，`trace(2)` 會給出起始區間和兩個新區間。除了寬度，還要檢查符號：選錯一半也會讓寬度減半。",
         "boundary": "從 [1,2] 二分七次，寬度是 1/128，中點到根的距離最多是 1/256。區間給出誤差上限；原來的式子和隔離區間已經準確指定了這個數。",
-        "worked": "先看 [1,2] 上的 x²−2。中點是 3/2，平方減 2 得 1/4。左端 1 處的值為負，留下 [1,3/2]。新中點 5/4 處的值是 −7/16，留下 [5/4,3/2]。現在試著更換實驗中的多項式。"
+        "worked": "先看 [1,2] 上的 x²−2。中點是 3/2，平方減 2 得 1/4。左端 1 處的值為負，留下 [1,3/2]。新中點 5/4 處的值是 −7/16，留下 [5/4,3/2]。現在試著更換實驗中的多項式。",
+        "follow_up": "[1,3/2] 的寬度是 3/2−1 = 1/2。讀 `interval.width` 時，帶 `@property` 的函式會用兩端算出寬度。把式子換成 x，區間換成 [−1,1]，第一個中點就是根。兩端都變成零，迴圈就可以停止。"
       }
     ]
   },
@@ -343,7 +355,8 @@
         "trace": "self.points vale 2 y other.points vale 4. La nueva puntuación guarda 6. El punto permite leer el campo points.",
         "test": "Prueba `(a + b) + b`. El segundo signo + funciona porque el primero devolvió otra puntuación.",
         "boundary": "Más adelante `@dataclass` escribirá por nosotros el método que guarda los datos. Definiremos `__eq__` cuando dos registros diferentes puedan representar el mismo número.",
-        "worked": "Un método es una función escrita dentro de una clase. El punto en `a.points` lee un campo. En la biblioteca, lee `result, message = func(...)` desde la derecha: llama al método original y pon un nombre a cada uno de los dos valores que devuelve."
+        "worked": "Un método es una función escrita dentro de una clase. El punto en `a.points` lee un campo. En la biblioteca, lee `result, message = func(...)` desde la derecha: llama al método original y pon un nombre a cada uno de los dos valores que devuelve.",
+        "follow_up": "En `result, message = func(...)`, el primer nombre recibe el resultado. El segundo puede guardar una función que construye el mensaje. Al llamar a `message()` solo cuando se registra el paso, evitamos construir texto que nadie leerá."
       },
       {
         "title": "¿Cómo definir la suma sin usar la suma?",
@@ -355,7 +368,8 @@
         "trace": "2 + 2 espera a 2 + 1, que espera a 2 + 0. Las respuestas vuelven en orden inverso: 2, 3, 4. El registro se escribe al volver de cada llamada.",
         "test": "Cambia el segundo sumando a 3. Hay una llamada más y el resultado es 5. Una prueba con ejemplos comprueba el código; una demostración por inducción necesita un caso inicial y un paso de n a S(n).",
         "boundary": "Para multiplicar, 3 × 0 = 0 y cada grupo nuevo añade 3. Así, 3 × 1 = 3 y 3 × 2 = 6.",
-        "worked": "Prueba las dos comparaciones. Si ambas cadenas terminan a la vez, el resultado es `True`. Si solo termina una, un número es cero y al otro le queda un paso: el resultado es `False`."
+        "worked": "Prueba las dos comparaciones. Si ambas cadenas terminan a la vez, el resultado es `True`. Si solo termina una, un número es cero y al otro le queda un paso: el resultado es `False`.",
+        "follow_up": "¿Por qué se llega siempre a cero? Desde cero no hace falta ningún paso. Si la cadena de n llega a cero, la de S(n) llega primero a n y sigue el mismo camino. Es el caso inicial y el paso de una inducción. Las llamadas que ejecuta el programa forman la recursión."
       },
       {
         "title": "¿Cómo representa un par de naturales un número negativo?",
@@ -367,7 +381,8 @@
         "trace": "La primera cantidad es 0×3+2×0 = 0; la segunda es 0×0+2×3 = 6. El par (0,6) representa −6.",
         "test": "Sustituye (0,2) por (1,3). El producto pasa a ser (3,9), que sigue representando −6.",
         "boundary": "`normalize()` cancela los pasos que se compensan y deja cero en un lado. La comparación mediante sumas cruzadas funciona incluso antes de cancelar.",
-        "worked": "Compara (3,1) y (4,2): 3+2 y 1+4 valen 5. Al sumar (1,4) a cada par obtienes (4,5) y (5,6). Ambos recorridos acaban ahora un paso a la izquierda de cero."
+        "worked": "Compara (3,1) y (4,2): 3+2 y 1+4 valen 5. Al sumar (1,4) a cada par obtienes (4,5) y (5,6). Ambos recorridos acaban ahora un paso a la izquierda de cero.",
+        "follow_up": "Para cambiar el signo de (1,3), intercambia las dos cantidades: (3,1) llega al punto opuesto. Para normalizar, cancela un paso hacia cada lado: (0,2) llega al punto original. ¿Cuál de las dos operaciones conserva la igualdad?"
       },
       {
         "title": "¿Cómo comparar fracciones sin dividir?",
@@ -379,7 +394,8 @@
         "trace": "El numerador es 1×3+2×1 = 5 y el denominador es 2×3 = 6. Si ambos sumandos son 1/2, aparece 4/4, que vale 1.",
         "test": "Para reducir 6/8, al dividir 8 entre 6 sobran 2 y al dividir 6 entre 2 sobra 0. Divide ambos términos entre el último divisor no nulo, 2. Las fracciones iguales también deben tener el mismo hash para encontrar la misma entrada de un diccionario.",
         "boundary": "Si una fracción irreducible p/q al cuadrado diera 2, tendríamos p² = 2q². Entonces p sería par. Al sustituir p = 2k sale q² = 2k², así que q también sería par. Podríamos simplificar por 2: una contradicción. Necesitamos otra forma de identificar √2.",
-        "worked": "Antes de sumar, explica cada línea que se muestra: ¿son iguales 1/2 y 2/4? ¿Qué dos números se guardan todavía en 2/4? Los nombres p y q permiten leerlos."
+        "worked": "Antes de sumar, explica cada línea que se muestra: ¿son iguales 1/2 y 2/4? ¿Qué dos números se guardan todavía en 2/4? Los nombres p y q permiten leerlos.",
+        "follow_up": "El bucle del máximo común divisor cambia (a,b) por (b,`a % b`). Desde (6,8) pasa por (8,6), (6,2) y (2,0). Al llegar b a cero queda a = 2. Dividir ambas partes de 6/−8 entre 2 y dejar el signo en el numerador da −3/4."
       },
       {
         "title": "¿Cuántos números hacen que x²−2 valga cero?",
@@ -391,7 +407,8 @@
         "trace": "La sucesión de Sturm es x²−2, 2x, 2. En −2 los signos son +,−,+ (dos cambios); en 2 son +,+,+ (ninguno). La diferencia es 2. Entre 1 y 2 la diferencia es 1.",
         "test": "La segunda expresión es la derivada: al aumentar x en h, su cuadrado aumenta en 2xh+h². Al dividir entre h queda 2x+h, que se acerca a 2x. Al dividir x²−2 entre 2x queda un resto de −2; cambiándole el signo se obtiene el último término.",
         "boundary": "El teorema de Sturm justifica restar los recuentos cuando ningún extremo es raíz. Omite los ceros al contar cambios. `sign_at` usa fracciones exactas para que un redondeo no altere el signo.",
-        "worked": "Prueba x = 3/2. Leyendo 1, 0, −2 obtienes 1, luego 3/2 y finalmente 1/4. Para contar raíces usa x²−2, 2x, 2. En 1 los signos son −,+,+ (un cambio); en 2 son +,+,+ (ninguno). La diferencia indica que hay una raíz entre ambos."
+        "worked": "Prueba x = 3/2. Leyendo 1, 0, −2 obtienes 1, luego 3/2 y finalmente 1/4. Para contar raíces usa x²−2, 2x, 2. En 1 los signos son −,+,+ (un cambio); en 2 son +,+,+ (ninguno). La diferencia indica que hay una raíz entre ambos.",
+        "follow_up": "En `sturm_sequence`, `sequence[-2]` y `sequence[-1]` son los dos últimos polinomios. El operador % halla el resto al dividir el primero por el segundo. Se añade el opuesto del resto, salvo que sea cero: entonces termina el bucle. Primero se eliminan los factores repetidos para contar cada raíz una sola vez."
       },
       {
         "title": "¿Cómo identificar √2 sin escribir todos sus decimales?",
@@ -403,7 +420,8 @@
         "trace": "En 3/2, x²−3 vale −3/4: queda [3/2,2]. En 7/4 vale 1/16: queda [3/2,7/4]. Las mismas decisiones sirven para ambos polinomios.",
         "test": "`trace(2)` incluye el intervalo inicial y los dos nuevos, salvo que el punto medio sea una raíz exacta. Comprueba los signos además de la anchura: la mitad equivocada también mide la mitad.",
         "boundary": "Tras siete pasos desde [1,2] la anchura es 1/128 y el error del punto medio es como máximo 1/256. El intervalo acota el error; el polinomio y el intervalo inicial identifican exactamente el número.",
-        "worked": "Empieza con x²−2 en [1,2]. El punto medio es 3/2 y su cuadrado menos 2 vale 1/4. En 1 el valor es negativo, así que queda [1,3/2]. En el siguiente punto medio, 5/4, el valor es −7/16: queda [5/4,3/2]. Ahora cambia el polinomio del experimento."
+        "worked": "Empieza con x²−2 en [1,2]. El punto medio es 3/2 y su cuadrado menos 2 vale 1/4. En 1 el valor es negativo, así que queda [1,3/2]. En el siguiente punto medio, 5/4, el valor es −7/16: queda [5/4,3/2]. Ahora cambia el polinomio del experimento.",
+        "follow_up": "La anchura de [1,3/2] es 3/2−1 = 1/2. Leer `interval.width` llama a una función marcada con `@property` que la calcula a partir de los extremos. Para el polinomio x en [−1,1], el primer punto medio es la raíz: ambos extremos pasan a ser cero y termina el bucle."
       }
     ]
   },
@@ -479,7 +497,8 @@
         "trace": "self.points continua valendo 2 e other.points passa a valer 4. A nova pontuação guarda 6, que o ponto permite ler no campo points.",
         "test": "Experimente `(a + b) + b`. A segunda soma funciona porque a primeira devolveu uma pontuação.",
         "boundary": "Mais adiante, `@dataclass` vai criar o método que guarda os dados. Escreveremos `__eq__` quando dados diferentes puderem representar o mesmo número.",
-        "worked": "Um método é uma função escrita dentro de uma classe. O ponto em `a.points` permite ler um campo. Na biblioteca, leia `result, message = func(...)` a partir da direita: chame o método original e dê um nome a cada um dos dois valores devolvidos."
+        "worked": "Um método é uma função escrita dentro de uma classe. O ponto em `a.points` permite ler um campo. Na biblioteca, leia `result, message = func(...)` a partir da direita: chame o método original e dê um nome a cada um dos dois valores devolvidos.",
+        "follow_up": "Em `result, message = func(...)`, o primeiro nome recebe o resultado. O segundo pode guardar uma função que prepara a mensagem. Chamar `message()` só quando há registro evita criar texto que ninguém vai ler."
       },
       {
         "title": "Como definir a soma sem usar a própria soma?",
@@ -491,7 +510,8 @@
         "trace": "2 + 2 espera por 2 + 1, que espera por 2 + 0. Os resultados voltam na ordem inversa: 2, 3, 4. O registro é feito na volta de cada chamada.",
         "test": "Troque a parcela da direita por 3. Surge mais uma chamada e o resultado é 5. Testes verificam exemplos. Uma prova por indução precisa de um caso inicial e de um passo de n para S(n).",
         "boundary": "Na multiplicação, 3 × 0 = 0 e cada novo grupo acrescenta 3. Assim, 3 × 1 = 3 e 3 × 2 = 6.",
-        "worked": "Experimente as duas comparações. Se as duas cadeias terminarem juntas, a resposta é `True`. Se só uma terminar, um número é zero e o outro ainda tem antecessor: a resposta é `False`."
+        "worked": "Experimente as duas comparações. Se as duas cadeias terminarem juntas, a resposta é `True`. Se só uma terminar, um número é zero e o outro ainda tem antecessor: a resposta é `False`.",
+        "follow_up": "Por que sempre chegamos ao zero voltando pela cadeia? Do zero não é preciso dar passo algum. Se a cadeia de n chega ao zero, a de S(n) chega primeiro a n e depois segue o mesmo caminho. Temos o início e o passo de uma prova por indução. As chamadas feitas pelo programa são a recursão."
       },
       {
         "title": "Como dois naturais representam um número negativo?",
@@ -503,7 +523,8 @@
         "trace": "A primeira contagem é 0×3+2×0 = 0 e a segunda é 0×0+2×3 = 6. O par (0,6) representa −6.",
         "test": "Troque (0,2) por (1,3). O produto passa a ser (3,9), que continua valendo −6.",
         "boundary": "`normalize()` cancela passos em direções opostas até deixar um zero de um lado. A comparação por somas cruzadas já funciona antes disso.",
-        "worked": "Compare (3,1) e (4,2): tanto 3+2 como 1+4 valem 5. Somando (1,4) a cada par, obtemos (4,5) e (5,6). Os dois trajetos agora terminam um passo à esquerda do zero."
+        "worked": "Compare (3,1) e (4,2): tanto 3+2 como 1+4 valem 5. Somando (1,4) a cada par, obtemos (4,5) e (5,6). Os dois trajetos agora terminam um passo à esquerda do zero.",
+        "follow_up": "Para trocar o sinal de (1,3), inverta os números: (3,1) chega ao ponto oposto. Para normalizar, cancele um passo em cada direção: (0,2) chega ao ponto original. Qual das operações conserva o valor?"
       },
       {
         "title": "Como comparar frações sem fazer a divisão?",
@@ -515,7 +536,8 @@
         "trace": "O numerador é 1×3+2×1 = 5; o denominador é 2×3 = 6. Trocando as duas parcelas por 1/2, a regra dá 4/4, que vale 1.",
         "test": "Para simplificar 6/8, veja os restos: 8 dividido por 6 deixa 2; 6 dividido por 2 deixa 0. Divida os dois termos pelo último divisor não nulo, 2. Frações iguais também precisam do mesmo hash para localizar a mesma entrada num dicionário.",
         "boundary": "Se uma fração irredutível p/q ao quadrado fosse 2, teríamos p² = 2q². Logo p seria par. Escrevendo p = 2k, obtemos q² = 2k², então q também seria par. Poderíamos simplificar por 2, uma contradição. Precisamos de outro jeito de indicar √2.",
-        "worked": "Antes da soma, explique as linhas exibidas: 1/2 e 2/4 são iguais? Quais números continuam guardados em 2/4? Os campos p e q permitem lê-los."
+        "worked": "Antes da soma, explique as linhas exibidas: 1/2 e 2/4 são iguais? Quais números continuam guardados em 2/4? Os campos p e q permitem lê-los.",
+        "follow_up": "O laço do máximo divisor comum troca (a,b) por (b,`a % b`). Partindo de (6,8), passa por (8,6), (6,2) e (2,0). Quando b chega a zero, resta a = 2. Dividir os dois termos de 6/−8 por 2 e passar o sinal para o numerador dá −3/4."
       },
       {
         "title": "Quantos valores fazem x²−2 valer zero?",
@@ -527,7 +549,8 @@
         "trace": "A sequência de Sturm é x²−2, 2x, 2. Em −2, os sinais são +,−,+ (duas mudanças); em 2, são +,+,+ (nenhuma). A diferença é 2. Entre 1 e 2, a diferença é 1.",
         "test": "A segunda expressão é a derivada: quando x aumenta em h, seu quadrado aumenta em 2xh+h². Dividindo por h, temos 2x+h, que se aproxima de 2x. Dividir x²−2 por 2x deixa resto −2. Trocar o sinal do resto dá o último termo, 2.",
         "boundary": "O teorema de Sturm justifica subtrair essas contagens quando nenhum extremo é raiz. Pule os zeros ao contar as mudanças de sinal. `sign_at` usa frações exatas para que o arredondamento não mude um sinal.",
-        "worked": "Experimente x = 3/2. Ao ler 1, 0, −2 obtemos 1, depois 3/2 e por fim 1/4. Para contar as raízes, use x²−2, 2x, 2. Em 1 os sinais são −,+,+ (uma mudança); em 2 são +,+,+ (nenhuma). A diferença indica uma raiz entre os dois."
+        "worked": "Experimente x = 3/2. Ao ler 1, 0, −2 obtemos 1, depois 3/2 e por fim 1/4. Para contar as raízes, use x²−2, 2x, 2. Em 1 os sinais são −,+,+ (uma mudança); em 2 são +,+,+ (nenhuma). A diferença indica uma raiz entre os dois.",
+        "follow_up": "Em `sturm_sequence`, `sequence[-2]` e `sequence[-1]` são os dois últimos polinômios. O operador % calcula o resto da divisão do penúltimo pelo último. Acrescentamos o oposto desse resto; se for zero, o laço termina. Os fatores repetidos são removidos antes para contar cada raiz uma só vez."
       },
       {
         "title": "Como identificar √2 sem escrever todas as casas decimais?",
@@ -539,7 +562,8 @@
         "trace": "Em 3/2, x²−3 vale −3/4: fica [3/2,2]. Em 7/4, vale 1/16: fica [3/2,7/4]. As mesmas decisões servem para os dois polinômios.",
         "test": "`trace(2)` inclui o intervalo inicial e os dois novos, a menos que o ponto médio seja uma raiz exata. Confira os sinais além da largura: a metade errada também teria metade da largura.",
         "boundary": "Após sete divisões de [1,2], a largura é 1/128. O ponto médio está a no máximo 1/256 da raiz. O intervalo limita o erro; o polinômio e o intervalo inicial identificam o número com exatidão.",
-        "worked": "Comece com x²−2 em [1,2]. O ponto médio é 3/2 e seu quadrado menos 2 vale 1/4. Em 1 o valor é negativo: fica [1,3/2]. No próximo ponto médio, 5/4, o valor é −7/16: fica [5/4,3/2]. Agora troque o polinômio no experimento."
+        "worked": "Comece com x²−2 em [1,2]. O ponto médio é 3/2 e seu quadrado menos 2 vale 1/4. Em 1 o valor é negativo: fica [1,3/2]. No próximo ponto médio, 5/4, o valor é −7/16: fica [5/4,3/2]. Agora troque o polinômio no experimento.",
+        "follow_up": "A largura de [1,3/2] é 3/2−1 = 1/2. Ler `interval.width` chama uma função marcada com `@property` que calcula a largura pelos extremos. Para o polinômio x em [−1,1], o primeiro ponto médio é a raiz: os dois extremos passam a valer zero e o laço termina."
       }
     ]
   },
@@ -615,7 +639,8 @@
         "trace": "self.points vaut 2 et other.points vaut 4. Le nouveau score contient 6. Le point permet de lire son champ points.",
         "test": "Essaie `(a + b) + b`. La seconde addition fonctionne parce que la première a renvoyé un score.",
         "boundary": "Plus loin, `@dataclass` écrira pour nous la méthode qui range les données. Nous écrirons `__eq__` quand deux enregistrements différents pourront avoir la même valeur.",
-        "worked": "Une méthode est une fonction écrite dans une classe. Le point dans `a.points` permet de lire un champ. Dans la bibliothèque, lis `result, message = func(...)` en partant de la droite : appelle la méthode d’origine et donne un nom à chacune de ses deux réponses."
+        "worked": "Une méthode est une fonction écrite dans une classe. Le point dans `a.points` permet de lire un champ. Dans la bibliothèque, lis `result, message = func(...)` en partant de la droite : appelle la méthode d’origine et donne un nom à chacune de ses deux réponses.",
+        "follow_up": "Dans `result, message = func(...)`, le premier nom reçoit le résultat. Le second peut contenir une fonction qui prépare le message. Appeler `message()` uniquement si on veut garder une trace évite de fabriquer du texte que personne ne lira."
       },
       {
         "title": "Comment définir l’addition sans utiliser l’addition ?",
@@ -627,7 +652,8 @@
         "trace": "2 + 2 attend 2 + 1, qui attend 2 + 0. Les réponses reviennent dans l’ordre inverse : 2, 3, 4. Chaque étape est enregistrée au retour de l’appel.",
         "test": "Remplace le second terme par 3 : il y a un appel de plus et le résultat vaut 5. Ces essais vérifient des exemples. Une preuve par récurrence établit un cas initial puis le passage de n à S(n).",
         "boundary": "Pour multiplier, 3 × 0 = 0 et chaque groupe supplémentaire ajoute 3. Ainsi 3 × 1 = 3 et 3 × 2 = 6.",
-        "worked": "Essaie les deux comparaisons. Si les deux chaînes se terminent ensemble, le résultat est `True`. Si une seule se termine, un nombre vaut zéro et l’autre a encore un prédécesseur : le résultat est `False`."
+        "worked": "Essaie les deux comparaisons. Si les deux chaînes se terminent ensemble, le résultat est `True`. Si une seule se termine, un nombre vaut zéro et l’autre a encore un prédécesseur : le résultat est `False`.",
+        "follow_up": "Pourquoi finit-on toujours par atteindre zéro ? Depuis zéro, aucun pas n’est nécessaire. Si la chaîne de n atteint zéro, celle de S(n) passe d’abord par n puis suit le même chemin. Voilà le cas initial et le pas d’une preuve par récurrence. Les appels effectués par le programme, eux, sont récursifs."
       },
       {
         "title": "Comment deux entiers naturels peuvent-ils représenter un nombre négatif ?",
@@ -639,7 +665,8 @@
         "trace": "Le premier nombre vaut 0×3+2×0 = 0 et le second 0×0+2×3 = 6. Le couple (0,6) représente −6.",
         "test": "Remplace (0,2) par (1,3). Le produit devient (3,9), qui représente toujours −6.",
         "boundary": "`normalize()` annule les pas qui se compensent et laisse zéro d’un côté. Les sommes croisées permettent déjà de comparer les couples avant cette opération.",
-        "worked": "Compare (3,1) et (4,2) : 3+2 et 1+4 valent tous deux 5. En ajoutant (1,4) à chaque couple, on obtient (4,5) et (5,6). Les deux trajets finissent maintenant un pas à gauche de zéro."
+        "worked": "Compare (3,1) et (4,2) : 3+2 et 1+4 valent tous deux 5. En ajoutant (1,4) à chaque couple, on obtient (4,5) et (5,6). Les deux trajets finissent maintenant un pas à gauche de zéro.",
+        "follow_up": "Pour prendre l’opposé de (1,3), échange les deux nombres : (3,1) arrive au point opposé. Pour normaliser, annule un pas dans chaque sens : (0,2) arrive au point de départ du raisonnement, celui que représentait (1,3). Laquelle des opérations conserve l’égalité ?"
       },
       {
         "title": "Comment comparer deux fractions sans effectuer la division ?",
@@ -651,7 +678,8 @@
         "trace": "En haut, 1×3+2×1 = 5. En bas, 2×3 = 6. Avec deux fois 1/2, la même règle donne 4/4, égal à 1.",
         "test": "Pour réduire 6/8, divise 8 par 6 : il reste 2. En divisant 6 par 2, il reste 0. Divise les deux termes par le dernier diviseur non nul, 2. Des fractions égales doivent aussi avoir le même hachage pour retrouver la même entrée d’un dictionnaire.",
         "boundary": "Supposons qu’une fraction irréductible p/q ait pour carré 2. Alors p² = 2q². Son carré est pair, donc p est pair. Poser p = 2k donne q² = 2k², donc q aussi est pair. On pourrait simplifier par 2, ce qui est impossible. Il faut un autre moyen de désigner √2.",
-        "worked": "Avant l’addition, explique les lignes affichées : 1/2 et 2/4 sont-ils égaux ? Quels nombres restent enregistrés dans 2/4 ? Les champs p et q permettent de les lire."
+        "worked": "Avant l’addition, explique les lignes affichées : 1/2 et 2/4 sont-ils égaux ? Quels nombres restent enregistrés dans 2/4 ? Les champs p et q permettent de les lire.",
+        "follow_up": "La boucle du plus grand commun diviseur remplace (a,b) par (b,`a % b`). À partir de (6,8), elle passe par (8,6), (6,2) et (2,0). Quand b vaut zéro, il reste a = 2. En divisant les deux termes de 6/−8 par 2 et en plaçant le signe au numérateur, on obtient −3/4."
       },
       {
         "title": "Combien de valeurs annulent x²−2 ?",
@@ -663,7 +691,8 @@
         "trace": "La suite de Sturm est x²−2, 2x, 2. En −2, les signes sont +,−,+ (deux changements) ; en 2, +,+,+ (aucun). La différence vaut 2. Entre 1 et 2, elle vaut 1.",
         "test": "La deuxième expression est la dérivée : si x augmente de h, son carré augmente de 2xh+h². En divisant par h on obtient 2x+h, qui tend vers 2x. Le reste de la division de x²−2 par 2x est −2. Son opposé donne le dernier terme, 2.",
         "boundary": "Le théorème de Sturm justifie cette différence de comptages si aucune borne n’est une racine. On saute les zéros en comptant les changements de signe. `sign_at` travaille avec des fractions exactes pour éviter un changement de signe dû à un arrondi.",
-        "worked": "Essaie x = 3/2. En lisant 1, 0, −2, on obtient 1, puis 3/2 et enfin 1/4. Pour compter les racines, utilise x²−2, 2x, 2. En 1, les signes sont −,+,+ (un changement) ; en 2, +,+,+ (aucun). La différence indique une racine entre les deux."
+        "worked": "Essaie x = 3/2. En lisant 1, 0, −2, on obtient 1, puis 3/2 et enfin 1/4. Pour compter les racines, utilise x²−2, 2x, 2. En 1, les signes sont −,+,+ (un changement) ; en 2, +,+,+ (aucun). La différence indique une racine entre les deux.",
+        "follow_up": "Dans `sturm_sequence`, `sequence[-2]` et `sequence[-1]` sont les deux derniers polynômes. L’opérateur % calcule le reste de la division du premier par le second. On ajoute son opposé, sauf si le reste est nul : la boucle se termine alors. Les facteurs répétés sont éliminés au départ pour compter chaque racine une seule fois."
       },
       {
         "title": "Comment désigner √2 sans écrire toutes ses décimales ?",
@@ -675,7 +704,8 @@
         "trace": "En 3/2, x²−3 vaut −3/4 : garde [3/2,2]. En 7/4, il vaut 1/16 : garde [3/2,7/4]. Le même code convient aux deux polynômes.",
         "test": "`trace(2)` contient l’intervalle initial et les deux suivants, sauf si le milieu est exactement la racine. Vérifie les signes en plus de la largeur : garder la mauvaise moitié diviserait aussi la largeur par deux.",
         "boundary": "Après sept étapes depuis [1,2], la largeur est 1/128. L’écart entre le milieu et la racine est donc au plus 1/256. L’intervalle borne l’erreur ; le polynôme et l’intervalle isolant désignent exactement le nombre.",
-        "worked": "Commence avec x²−2 sur [1,2]. Le milieu vaut 3/2 ; son carré moins 2 vaut 1/4. La valeur en 1 est négative : garde [1,3/2]. Au milieu suivant, 5/4, la valeur est −7/16 : garde [5/4,3/2]. Change maintenant le polynôme de l’expérience."
+        "worked": "Commence avec x²−2 sur [1,2]. Le milieu vaut 3/2 ; son carré moins 2 vaut 1/4. La valeur en 1 est négative : garde [1,3/2]. Au milieu suivant, 5/4, la valeur est −7/16 : garde [5/4,3/2]. Change maintenant le polynôme de l’expérience.",
+        "follow_up": "La largeur de [1,3/2] vaut 3/2−1 = 1/2. Lire `interval.width` appelle une fonction marquée `@property` qui la calcule à partir des bornes. Pour le polynôme x sur [−1,1], le premier milieu est la racine : les deux bornes deviennent zéro et la boucle s’arrête."
       }
     ]
   },
@@ -751,7 +781,8 @@
         "trace": "self.points bleibt 2, other.points ist jetzt 4. Im neuen Punktestand steht 6. Mit .points liest du diesen Wert aus.",
         "test": "Probiere `(a + b) + b`. Das zweite Plus funktioniert, weil das erste wieder einen Punktestand geliefert hat.",
         "boundary": "Später erzeugt `@dataclass` die Methode zum Speichern der Daten. `__eq__` schreiben wir selbst, wenn verschieden gespeicherte Daten denselben Wert haben können.",
-        "worked": "Eine Methode ist eine Funktion innerhalb einer Klasse. Der Punkt in `a.points` liest ein Feld aus. Lies `result, message = func(...)` von rechts: Erst wird die ursprüngliche Methode aufgerufen, dann bekommen ihre beiden Rückgabewerte eigene Namen."
+        "worked": "Eine Methode ist eine Funktion innerhalb einer Klasse. Der Punkt in `a.points` liest ein Feld aus. Lies `result, message = func(...)` von rechts: Erst wird die ursprüngliche Methode aufgerufen, dann bekommen ihre beiden Rückgabewerte eigene Namen.",
+        "follow_up": "In `result, message = func(...)` erhält der erste Name das Ergebnis. Hinter dem zweiten kann eine Funktion stehen, die die Meldung erst erstellt. Wird `message()` nur bei eingeschaltetem Protokoll aufgerufen, entsteht kein Text, den niemand lesen wird."
       },
       {
         "title": "Wie definiert man Addition ohne Addition?",
@@ -763,7 +794,8 @@
         "trace": "2 + 2 wartet auf 2 + 1 und diese Summe auf 2 + 0. Die Ergebnisse kommen rückwärts zurück: 2, 3, 4. Erst beim Zurückkehren wird der jeweilige Schritt protokolliert.",
         "test": "Setze rechts eine 3 ein. Ein Aufruf kommt hinzu und das Ergebnis ist 5. Tests prüfen einzelne Fälle. Ein Induktionsbeweis braucht einen Anfang und einen Schritt von n zu S(n).",
         "boundary": "Bei der Multiplikation ist 3 × 0 = 0. Jede weitere Dreiergruppe erhöht das Ergebnis um 3. So folgen 3 × 1 = 3 und 3 × 2 = 6.",
-        "worked": "Probiere beide Vergleiche. Enden die Ketten zugleich, lautet das Ergebnis `True`. Endet nur eine, ist eine Zahl null und die andere hat noch einen Vorgänger: Das Ergebnis ist `False`."
+        "worked": "Probiere beide Vergleiche. Enden die Ketten zugleich, lautet das Ergebnis `True`. Endet nur eine, ist eine Zahl null und die andere hat noch einen Vorgänger: Das Ergebnis ist `False`.",
+        "follow_up": "Warum kommt man rückwärts immer bei null an? Von null sind keine Schritte nötig. Führt die Kette für n zu null, führt die für S(n) zuerst zu n und dann denselben Weg weiter. Das sind Anfang und Schritt eines Induktionsbeweises. Die tatsächlichen Funktionsaufrufe im Programm nennt man Rekursion."
       },
       {
         "title": "Wie stellen zwei natürliche Zahlen eine negative Zahl dar?",
@@ -775,7 +807,8 @@
         "trace": "Der erste Eintrag ist 0×3+2×0 = 0, der zweite 0×0+2×3 = 6. Das Paar (0,6) steht für −6.",
         "test": "Ersetze (0,2) durch (1,3). Das Produkt ist jetzt (3,9), also immer noch −6.",
         "boundary": "`normalize()` streicht gegenläufige Schritte paarweise, bis eine Seite null ist. Der Vergleich über die beiden Summen funktioniert schon vorher.",
-        "worked": "Vergleiche (3,1) mit (4,2): 3+2 und 1+4 ergeben beide 5. Addierst du zu jedem Paar (1,4), entstehen (4,5) und (5,6). Beide Wege enden nun einen Schritt links von null."
+        "worked": "Vergleiche (3,1) mit (4,2): 3+2 und 1+4 ergeben beide 5. Addierst du zu jedem Paar (1,4), entstehen (4,5) und (5,6). Beide Wege enden nun einen Schritt links von null.",
+        "follow_up": "Um bei (1,3) das Vorzeichen zu wechseln, vertausche die Einträge: (3,1) endet am gegenüberliegenden Punkt. Beim Normalisieren streichst du einen Schritt in jeder Richtung: (0,2) endet am ursprünglichen Punkt. Welche Operation erhält den Wert?"
       },
       {
         "title": "Wie vergleicht man Brüche ohne Division?",
@@ -787,7 +820,8 @@
         "trace": "Oben steht 1×3+2×1 = 5, unten 2×3 = 6. Setzt du zweimal 1/2 ein, ergibt dieselbe Regel 4/4, also 1.",
         "test": "Beim Kürzen von 6/8 hilft der Rest: 8 geteilt durch 6 lässt 2, und 6 geteilt durch 2 lässt 0. Teile beide Zahlen durch den letzten Teiler, die 2. Gleiche Brüche brauchen auch denselben Hashwert, damit sie denselben Eintrag in einem Python-Wörterbuch finden.",
         "boundary": "Angenommen, ein vollständig gekürzter Bruch p/q hätte das Quadrat 2. Dann ist p² = 2q² gerade, also auch p. Mit p = 2k folgt q² = 2k², also ist auch q gerade. Man könnte doch durch 2 kürzen: ein Widerspruch. Für √2 brauchen wir eine andere Darstellung.",
-        "worked": "Erkläre vor der Addition die Ausgaben: Sind 1/2 und 2/4 gleich? Welche beiden Zahlen sind weiterhin in 2/4 gespeichert? Über p und q kannst du sie auslesen."
+        "worked": "Erkläre vor der Addition die Ausgaben: Sind 1/2 und 2/4 gleich? Welche beiden Zahlen sind weiterhin in 2/4 gespeichert? Über p und q kannst du sie auslesen.",
+        "follow_up": "Die Schleife für den größten gemeinsamen Teiler ersetzt (a,b) durch (b,`a % b`). Aus (6,8) werden (8,6), (6,2) und (2,0). Sobald b null ist, bleibt a = 2. Teile bei 6/−8 beide Zahlen durch 2 und verschiebe das Minus in den Zähler: −3/4."
       },
       {
         "title": "Wie viele Zahlen machen x²−2 zu null?",
@@ -799,7 +833,8 @@
         "trace": "Die Sturm-Folge lautet x²−2, 2x, 2. Bei −2 sind die Vorzeichen +,−,+ (zwei Wechsel), bei 2 sind sie +,+,+ (kein Wechsel). Die Differenz ist 2. Zwischen 1 und 2 beträgt sie 1.",
         "test": "Der zweite Ausdruck ist die Ableitung: Steigt x um h, wächst das Quadrat um 2xh+h². Durch h geteilt ergibt das 2x+h, was sich für kleines h dem Wert 2x nähert. Die Division von x²−2 durch 2x lässt den Rest −2. Sein Gegenwert ist das letzte Glied, 2.",
         "boundary": "Der Satz von Sturm begründet die Differenz der Wechselzahlen, wenn die Grenzen keine Nullstellen sind. Beim Zählen überspringt man Nullen. `sign_at` rechnet mit exakten Brüchen, sodass kein Rundungsfehler das Vorzeichen verfälscht.",
-        "worked": "Setze x = 3/2 ein. Beim Lesen von 1, 0, −2 entstehen 1, dann 3/2 und schließlich 1/4. Für die Nullstellen betrachte x²−2, 2x, 2. Bei 1 sind die Vorzeichen −,+,+ (ein Wechsel), bei 2 sind sie +,+,+ (kein Wechsel). Die Differenz ergibt eine Nullstelle dazwischen."
+        "worked": "Setze x = 3/2 ein. Beim Lesen von 1, 0, −2 entstehen 1, dann 3/2 und schließlich 1/4. Für die Nullstellen betrachte x²−2, 2x, 2. Bei 1 sind die Vorzeichen −,+,+ (ein Wechsel), bei 2 sind sie +,+,+ (kein Wechsel). Die Differenz ergibt eine Nullstelle dazwischen.",
+        "follow_up": "In `sturm_sequence` sind `sequence[-2]` und `sequence[-1]` die letzten beiden Polynome. % bildet den Rest bei der Division des vorletzten durch das letzte. Hänge den Rest mit umgekehrtem Vorzeichen an. Ist er null, endet die Schleife. Wiederholte Faktoren werden vorher entfernt, damit jede Nullstelle nur einmal zählt."
       },
       {
         "title": "Wie lässt sich √2 exakt benennen, ohne alle Ziffern zu kennen?",
@@ -811,7 +846,8 @@
         "trace": "Bei 3/2 ergibt x²−3 den Wert −3/4: Behalte [3/2,2]. Bei 7/4 ergibt sich 1/16: Behalte [3/2,7/4]. Der Code trifft für beide Polynome dieselbe Art von Entscheidung.",
         "test": "`trace(2)` enthält das Startintervall und beide neuen Intervalle, sofern die Mitte keine exakte Nullstelle ist. Prüfe außer der Breite die Vorzeichen: Auch die falsche Hälfte wäre halb so breit.",
         "boundary": "Nach sieben Halbierungen von [1,2] beträgt die Breite 1/128. Die Mitte liegt höchstens 1/256 von der Nullstelle entfernt. Das Intervall begrenzt den Fehler; Polynom und Startintervall bestimmen die Zahl exakt.",
-        "worked": "Beginne mit x²−2 auf [1,2]. Die Mitte ist 3/2, ihr Quadrat minus 2 ergibt 1/4. Bei 1 ist der Wert negativ: Behalte [1,3/2]. In der nächsten Mitte 5/4 ist der Wert −7/16: Behalte [5/4,3/2]. Ändere nun das Polynom im Versuch."
+        "worked": "Beginne mit x²−2 auf [1,2]. Die Mitte ist 3/2, ihr Quadrat minus 2 ergibt 1/4. Bei 1 ist der Wert negativ: Behalte [1,3/2]. In der nächsten Mitte 5/4 ist der Wert −7/16: Behalte [5/4,3/2]. Ändere nun das Polynom im Versuch.",
+        "follow_up": "Die Breite von [1,3/2] ist 3/2−1 = 1/2. Beim Lesen von `interval.width` berechnet eine mit `@property` markierte Funktion die Breite aus den Grenzen. Beim Polynom x auf [−1,1] trifft schon die erste Mitte die Nullstelle. Beide Grenzen werden null und die Schleife endet."
       }
     ]
   },
@@ -887,7 +923,8 @@
         "trace": "self.points는 2이고 other.points는 4가 됩니다. 새 점수에 저장된 값은 6입니다. 점 뒤의 points로 이 값을 읽습니다.",
         "test": "`(a + b) + b`도 해 보세요. 첫 번째 덧셈의 결과가 다시 점수이므로 두 번째 덧셈도 됩니다.",
         "boundary": "뒤에서는 `@dataclass`가 데이터를 저장하는 메서드를 만들어 줍니다. 서로 다른 기록이 같은 수를 나타낼 때는 `__eq__`를 직접 작성합니다.",
-        "worked": "메서드는 클래스 안에 쓴 함수입니다. `a.points`의 점은 필드를 읽는 표시입니다. 라이브러리의 `result, message = func(...)`는 오른쪽부터 읽으세요. 원래 메서드를 부른 다음 돌려받은 두 값에 각각 이름을 붙입니다."
+        "worked": "메서드는 클래스 안에 쓴 함수입니다. `a.points`의 점은 필드를 읽는 표시입니다. 라이브러리의 `result, message = func(...)`는 오른쪽부터 읽으세요. 원래 메서드를 부른 다음 돌려받은 두 값에 각각 이름을 붙입니다.",
+        "follow_up": "`result, message = func(...)`에서 첫 번째 이름은 답을 받습니다. 두 번째 이름에는 설명을 만드는 함수가 올 수 있습니다. 기록이 필요할 때만 `message()`를 부르면 아무도 읽지 않을 문장을 만들 필요가 없습니다."
       },
       {
         "title": "덧셈을 쓰지 않고 덧셈을 정의하려면?",
@@ -899,7 +936,8 @@
         "trace": "2 + 2는 2 + 1을, 2 + 1은 2 + 0을 기다립니다. 답은 반대 순서로 2, 3, 4가 돌아옵니다. 각 단계의 기록은 답이 돌아올 때 남습니다.",
         "test": "오른쪽을 3으로 바꾸면 호출이 한 번 늘고 답은 5입니다. 테스트는 개별 예를 확인합니다. 수학적 귀납법으로 증명하려면 출발점과 n에서 S(n)으로 넘어가는 단계를 모두 보여야 합니다.",
         "boundary": "곱셈에서도 3 × 0 = 0이고 세 개짜리 묶음이 하나 늘 때마다 3을 더합니다. 그래서 3 × 1 = 3, 3 × 2 = 6입니다.",
-        "worked": "아래 두 비교를 해 보세요. 두 연결이 동시에 끝나면 True입니다. 하나만 끝나면 한 수는 0이고 다른 수에는 이전 수가 남아 있으므로 False입니다."
+        "worked": "아래 두 비교를 해 보세요. 두 연결이 동시에 끝나면 True입니다. 하나만 끝나면 한 수는 0이고 다른 수에는 이전 수가 남아 있으므로 False입니다.",
+        "follow_up": "거슬러 가면 왜 항상 0에 도착할까요? 0에서는 한 걸음도 필요 없습니다. n에서 0에 갈 수 있다면 S(n)에서는 먼저 n으로 한 번 간 뒤 같은 길을 따르면 됩니다. 이것이 귀납법의 출발점과 다음 단계입니다. 프로그램이 실제로 자신을 다시 부르는 과정은 재귀입니다."
       },
       {
         "title": "자연수 두 개로 음수를 어떻게 나타낼까요?",
@@ -911,7 +949,8 @@
         "trace": "첫 값은 0×3+2×0 = 0, 둘째 값은 0×0+2×3 = 6입니다. (0,6)은 −6을 나타냅니다.",
         "test": "(0,2)를 (1,3)으로 바꿔 보세요. 곱은 (3,9)가 되지만 여전히 −6입니다.",
         "boundary": "`normalize()`는 반대 방향의 걸음을 짝지어 지워 한쪽에 0을 남깁니다. 교차해서 더하는 비교는 걸음을 지우기 전에도 쓸 수 있습니다.",
-        "worked": "(3,1)과 (4,2)를 비교하면 3+2와 1+4가 모두 5입니다. 각 쌍에 (1,4)를 더하면 (4,5)와 (5,6)이 됩니다. 두 이동 모두 이제 0에서 왼쪽으로 한 칸 간 곳에서 끝납니다."
+        "worked": "(3,1)과 (4,2)를 비교하면 3+2와 1+4가 모두 5입니다. 각 쌍에 (1,4)를 더하면 (4,5)와 (5,6)이 됩니다. 두 이동 모두 이제 0에서 왼쪽으로 한 칸 간 곳에서 끝납니다.",
+        "follow_up": "(1,3)의 부호를 바꾸려면 두 칸을 맞바꿉니다. (3,1)은 반대쪽에 도착합니다. 정규화할 때는 양쪽에서 한 걸음씩 지웁니다. (0,2)는 원래 위치에 도착합니다. 어느 쪽이 값을 보존할까요?"
       },
       {
         "title": "나눗셈 없이 두 분수가 같은지 어떻게 알까요?",
@@ -923,7 +962,8 @@
         "trace": "분자는 1×3+2×1 = 5, 분모는 2×3 = 6입니다. 둘 다 1/2로 바꾸면 같은 규칙으로 4/4가 나오고 그 값은 1입니다.",
         "test": "6/8을 약분하려고 나머지를 구합니다. 8을 6으로 나누면 2, 6을 2로 나누면 0이 남습니다. 마지막으로 나눈 수 2로 분자와 분모를 나눕니다. 같은 분수는 해시값도 같아야 딕셔너리의 같은 항목을 찾습니다.",
         "boundary": "기약분수 p/q의 제곱이 2라면 p² = 2q²입니다. 제곱이 짝수이므로 p도 짝수입니다. p = 2k를 넣으면 q² = 2k²이므로 q도 짝수입니다. 둘 다 2로 나눌 수 있어 기약분수라는 가정에 어긋납니다. √2를 가리킬 다른 방법이 필요합니다.",
-        "worked": "더하기 전에 두 출력의 뜻을 생각해 보세요. 1/2과 2/4는 같을까요? 2/4 안에는 아직 어떤 두 수가 들어 있을까요? p와 q로 각각 읽을 수 있습니다."
+        "worked": "더하기 전에 두 출력의 뜻을 생각해 보세요. 1/2과 2/4는 같을까요? 2/4 안에는 아직 어떤 두 수가 들어 있을까요? p와 q로 각각 읽을 수 있습니다.",
+        "follow_up": "최대공약수를 찾는 반복문은 (a,b)를 (b,`a % b`)로 바꿉니다. (6,8)에서 시작해 (8,6), (6,2), (2,0)을 거칩니다. b가 0이 되면 a = 2가 남습니다. 6/−8의 분자와 분모를 2로 나누고 음수 부호를 분자로 옮기면 −3/4입니다."
       },
       {
         "title": "x²−2를 0으로 만드는 수는 몇 개일까요?",
@@ -935,7 +975,8 @@
         "trace": "슈투름 수열은 x²−2, 2x, 2입니다. −2에서 부호는 +,−,+로 두 번 바뀌고, 2에서는 +,+,+로 한 번도 바뀌지 않습니다. 차이는 2입니다. 1과 2 사이에서는 차이가 1입니다.",
         "test": "둘째 식은 도함수입니다. x가 h만큼 늘면 제곱은 2xh+h²만큼 늘어납니다. h로 나누면 2x+h이고 h가 0에 가까워질수록 2x에 가까워집니다. x²−2를 2x로 나눈 나머지는 −2입니다. 부호를 뒤집으면 마지막 항 2입니다.",
         "boundary": "양 끝점이 근이 아니면 슈투름 정리에 따라 부호 변화 횟수의 차이가 서로 다른 실근의 개수입니다. 부호를 셀 때 0은 건너뜁니다. sign_at는 정확한 분수를 써서 반올림으로 부호가 달라지지 않습니다.",
-        "worked": "x = 3/2를 넣어 보세요. 1, 0, −2를 읽으면 중간값은 1, 3/2, 1/4입니다. 근을 셀 때는 x²−2, 2x, 2를 씁니다. 1에서는 −,+,+로 한 번 바뀌고 2에서는 +,+,+로 그대로입니다. 차이가 1이므로 사이에 근이 하나 있습니다."
+        "worked": "x = 3/2를 넣어 보세요. 1, 0, −2를 읽으면 중간값은 1, 3/2, 1/4입니다. 근을 셀 때는 x²−2, 2x, 2를 씁니다. 1에서는 −,+,+로 한 번 바뀌고 2에서는 +,+,+로 그대로입니다. 차이가 1이므로 사이에 근이 하나 있습니다.",
+        "follow_up": "`sturm_sequence`에서 `sequence[-2]`와 `sequence[-1]`은 마지막 두 다항식입니다. %는 앞의 식을 뒤의 식으로 나눈 나머지를 구합니다. 나머지의 부호를 뒤집어 끝에 붙이고, 나머지가 0이면 반복을 끝냅니다. 먼저 중복된 인수를 한 번씩만 남겨 같은 위치의 근을 한 번만 셉니다."
       },
       {
         "title": "소수를 끝까지 쓰지 않고 √2를 정확히 가리키려면?",
@@ -947,7 +988,8 @@
         "trace": "3/2에서 x²−3은 −3/4이므로 [3/2,2]를 남깁니다. 7/4에서는 1/16이므로 [3/2,7/4]를 남깁니다. 두 식 모두 같은 코드로 판단합니다.",
         "test": "중점이 정확한 근이 아니면 `trace(2)`는 처음 구간과 새 구간 둘을 돌려줍니다. 폭과 함께 부호도 확인하세요. 잘못된 쪽을 남겨도 폭은 절반이 됩니다.",
         "boundary": "[1,2]를 일곱 번 나누면 폭은 1/128, 중점과 근의 거리는 최대 1/256입니다. 구간으로 오차를 알 수 있고, 원래 식과 분리 구간은 처음부터 그 수를 정확히 가리킵니다.",
-        "worked": "먼저 [1,2]에서 x²−2를 보세요. 중점 3/2의 제곱에서 2를 빼면 1/4입니다. 왼쪽 끝 1에서 값이 음수이므로 [1,3/2]를 남깁니다. 다음 중점 5/4에서는 값이 −7/16이므로 [5/4,3/2]가 남습니다. 이제 실험의 다항식을 바꿔 보세요."
+        "worked": "먼저 [1,2]에서 x²−2를 보세요. 중점 3/2의 제곱에서 2를 빼면 1/4입니다. 왼쪽 끝 1에서 값이 음수이므로 [1,3/2]를 남깁니다. 다음 중점 5/4에서는 값이 −7/16이므로 [5/4,3/2]가 남습니다. 이제 실험의 다항식을 바꿔 보세요.",
+        "follow_up": "[1,3/2]의 폭은 3/2−1 = 1/2입니다. `interval.width`를 읽으면 `@property`가 붙은 함수가 양 끝으로 폭을 계산합니다. 식이 x이고 범위가 [−1,1]이라면 첫 중점이 바로 근입니다. 양 끝이 모두 0이 되고 반복을 멈출 수 있습니다."
       }
     ]
   },
@@ -1023,7 +1065,8 @@
         "trace": "В self.points осталось 2, а в other.points теперь 4. В новом объекте хранится 6. Запись .points позволяет прочитать это поле.",
         "test": "Попробуй `(a + b) + b`. Второй плюс работает, потому что результат первого сложения тоже имеет тип `Score`.",
         "boundary": "Позже `@dataclass` создаст за нас метод для записи полей. Метод `__eq__` мы напишем сами там, где разные записи могут обозначать одно число.",
-        "worked": "Метод — это функция, записанная внутри класса. Точка в `a.points` позволяет прочитать поле. Строку `result, message = func(...)` читай справа: сначала вызывается исходный метод, затем каждое из двух возвращённых значений получает своё имя."
+        "worked": "Метод — это функция, записанная внутри класса. Точка в `a.points` позволяет прочитать поле. Строку `result, message = func(...)` читай справа: сначала вызывается исходный метод, затем каждое из двух возвращённых значений получает своё имя.",
+        "follow_up": "В строке `result, message = func(...)` первое имя получает ответ. За вторым может стоять функция, составляющая сообщение. Если вызывать `message()` лишь при включённой записи, не придётся создавать текст, который никто не прочтёт."
       },
       {
         "title": "Как определить сложение без самого сложения?",
@@ -1035,7 +1078,8 @@
         "trace": "2 + 2 ждёт 2 + 1, а та ждёт 2 + 0. Ответы возвращаются в обратном порядке: 2, 3, 4. Запись о каждом шаге появляется при возврате.",
         "test": "Замени правое слагаемое на 3. Появится ещё один вызов, ответ будет 5. Тесты проверяют отдельные примеры. Для доказательства по индукции нужны начальный случай и переход от n к S(n).",
         "boundary": "Умножение строится похожим образом: 3 × 0 = 0, а каждая новая тройка добавляет 3. Получаем 3 × 1 = 3 и 3 × 2 = 6.",
-        "worked": "Попробуй оба сравнения. Если цепочки заканчиваются одновременно, ответ `True`. Если закончилась только одна, одно число равно нулю, а у другого ещё есть предыдущее: ответ `False`."
+        "worked": "Попробуй оба сравнения. Если цепочки заканчиваются одновременно, ответ `True`. Если закончилась только одна, одно число равно нулю, а у другого ещё есть предыдущее: ответ `False`.",
+        "follow_up": "Почему цепочка всегда приводит к нулю? От нуля не нужно делать ни шага. Если от n можно дойти до нуля, то от S(n) сначала переходим к n и следуем тем же путём. Это база и шаг индукции. Сами повторные вызовы функции в программе — рекурсия."
       },
       {
         "title": "Как пара натуральных чисел обозначает отрицательное число?",
@@ -1047,7 +1091,8 @@
         "trace": "Первая величина равна 0×3+2×0 = 0, вторая — 0×0+2×3 = 6. Пара (0,6) обозначает −6.",
         "test": "Замени (0,2) на (1,3). Получится пара (3,9), которая по-прежнему обозначает −6.",
         "boundary": "`normalize()` удаляет пары противоположных шагов, пока с одной стороны не останется ноль. Сравнение перекрёстных сумм работает и до этого.",
-        "worked": "Сравни (3,1) и (4,2): суммы 3+2 и 1+4 равны 5. Прибавь к каждой паре (1,4), и получатся (4,5) и (5,6). Оба пути теперь заканчиваются на шаг левее нуля."
+        "worked": "Сравни (3,1) и (4,2): суммы 3+2 и 1+4 равны 5. Прибавь к каждой паре (1,4), и получатся (4,5) и (5,6). Оба пути теперь заканчиваются на шаг левее нуля.",
+        "follow_up": "Чтобы сменить знак у (1,3), поменяй числа местами: (3,1) приводит в противоположную точку. При нормализации убери один шаг в каждую сторону: (0,2) приводит в прежнюю точку. Какая операция сохраняет значение?"
       },
       {
         "title": "Как сравнить дроби без деления?",
@@ -1059,7 +1104,8 @@
         "trace": "Числитель равен 1×3+2×1 = 5, знаменатель равен 2×3 = 6. Если оба слагаемых заменить на 1/2, правило даст 4/4, то есть 1.",
         "test": "Чтобы сократить 6/8, найди остатки: от деления 8 на 6 остаётся 2, от деления 6 на 2 остаётся 0. Раздели обе части дроби на последний ненулевой делитель, 2. Равным дробям нужен и одинаковый хеш, чтобы находить одну и ту же запись словаря.",
         "boundary": "Допустим, квадрат несократимой дроби p/q равен 2. Тогда p² = 2q². Квадрат чётен, значит, p чётно. Подставив p = 2k, получим q² = 2k², так что q тоже чётно. Дробь можно сократить на 2 — противоречие. Чтобы задать √2, нужен другой способ.",
-        "worked": "Перед сложением объясни две строки вывода: равны ли 1/2 и 2/4? Какие числа по-прежнему хранятся в дроби 2/4? Их можно прочитать через поля p и q."
+        "worked": "Перед сложением объясни две строки вывода: равны ли 1/2 и 2/4? Какие числа по-прежнему хранятся в дроби 2/4? Их можно прочитать через поля p и q.",
+        "follow_up": "Цикл для наибольшего общего делителя заменяет (a,b) на (b,`a % b`). После (6,8) идут (8,6), (6,2), (2,0). Когда b равен нулю, остаётся a = 2. Разделив обе части дроби 6/−8 на 2 и перенеся минус в числитель, получим −3/4."
       },
       {
         "title": "Сколько чисел обращают x²−2 в ноль?",
@@ -1071,7 +1117,8 @@
         "trace": "Последовательность Штурма имеет вид x²−2, 2x, 2. При −2 знаки +,−,+ меняются дважды, при 2 знаки +,+,+ не меняются. Разность равна 2. Между 1 и 2 разность равна 1.",
         "test": "Второе выражение — производная: при увеличении x на h квадрат увеличивается на 2xh+h². После деления на h остаётся 2x+h, что приближается к 2x при малых h. Деление x²−2 на 2x даёт остаток −2. Меняем его знак и получаем последнее выражение, 2.",
         "boundary": "Теорема Штурма обосновывает вычитание числа перемен знака, если границы не являются корнями. При подсчёте пропускай нули. `sign_at` использует точные дроби, чтобы округление не изменило знак.",
-        "worked": "Подставь x = 3/2. Читая 1, 0, −2, получаем 1, затем 3/2 и 1/4. Чтобы сосчитать корни, возьми x²−2, 2x, 2. При 1 знаки −,+,+ меняются один раз; при 2 знаки +,+,+ не меняются. Разность даёт один корень между этими точками."
+        "worked": "Подставь x = 3/2. Читая 1, 0, −2, получаем 1, затем 3/2 и 1/4. Чтобы сосчитать корни, возьми x²−2, 2x, 2. При 1 знаки −,+,+ меняются один раз; при 2 знаки +,+,+ не меняются. Разность даёт один корень между этими точками.",
+        "follow_up": "В `sturm_sequence` имена `sequence[-2]` и `sequence[-1]` обозначают последние два многочлена. Оператор % находит остаток от деления предпоследнего на последний. Его добавляют с противоположным знаком; если остаток нулевой, цикл заканчивается. Повторяющиеся множители заранее убирают, чтобы один корень не считался дважды."
       },
       {
         "title": "Как точно задать √2, не выписывая все цифры?",
@@ -1083,7 +1130,8 @@
         "trace": "При 3/2 значение x²−3 равно −3/4: оставляем [3/2,2]. При 7/4 оно равно 1/16: оставляем [3/2,7/4]. Обоим многочленам подходят те же ветви программы.",
         "test": "`trace(2)` выдаёт исходный и два новых отрезка, если середина не оказалась точным корнем. Проверяй знаки вместе с длиной: ошибочно выбранная половина тоже вдвое короче.",
         "boundary": "После семи делений [1,2] длина равна 1/128. Середина отличается от корня не более чем на 1/256. Отрезок ограничивает ошибку, а многочлен и исходный изолирующий отрезок точно задают число.",
-        "worked": "Начни с x²−2 на [1,2]. Середина равна 3/2, её квадрат минус 2 равен 1/4. При 1 значение отрицательное: оставь [1,3/2]. В новой середине 5/4 значение равно −7/16: оставь [5/4,3/2]. Теперь замени многочлен в опыте."
+        "worked": "Начни с x²−2 на [1,2]. Середина равна 3/2, её квадрат минус 2 равен 1/4. При 1 значение отрицательное: оставь [1,3/2]. В новой середине 5/4 значение равно −7/16: оставь [5/4,3/2]. Теперь замени многочлен в опыте.",
+        "follow_up": "Длина [1,3/2] равна 3/2−1 = 1/2. При чтении `interval.width` функция с пометкой `@property` вычисляет длину по концам. Для многочлена x на [−1,1] первая же середина оказывается корнем. Обе границы становятся нулевыми, и цикл заканчивается."
       }
     ]
   },
@@ -1159,7 +1207,8 @@
         "trace": "تبقى قيمة ⁦self.points⁩ تساوي ⁦2⁩ وتصبح قيمة ⁦other.points⁩ تساوي ⁦4⁩. يخزّن السجل الجديد ⁦6⁩، ونقرأه من الحقل ⁦points⁩ بعد النقطة.",
         "test": "جرّب ⁦`(a + b) + b`⁩. تنجح عملية الجمع الثانية لأن الأولى أعادت سجل نقاط.",
         "boundary": "سنستعمل ⁦`@dataclass`⁩ لاحقًا لإنشاء دالة تخزين الحقول. وسنكتب ⁦`__eq__`⁩ بأنفسنا حين يمكن لسجلّين مختلفين أن يمثّلا العدد نفسه.",
-        "worked": "الطريقة دالة تُكتب داخل الصنف. تسمح النقطة في ⁦`a.points`⁩ بقراءة حقل. وفي السطر ⁦`result, message = func(...)`⁩ ابدأ باستدعاء الدالة الأصلية في الطرف الأيمن، ثم أعطِ كل قيمة من القيمتين المعادتين اسمًا."
+        "worked": "الطريقة دالة تُكتب داخل الصنف. تسمح النقطة في ⁦`a.points`⁩ بقراءة حقل. وفي السطر ⁦`result, message = func(...)`⁩ ابدأ باستدعاء الدالة الأصلية في الطرف الأيمن، ثم أعطِ كل قيمة من القيمتين المعادتين اسمًا.",
+        "follow_up": "في السطر ⁦`result, message = func(...)`⁩ يتلقى الاسم الأول الجواب. وقد يتلقى الثاني دالة تُنشئ الرسالة. عندما نستدعي ⁦`message()`⁩ فقط إذا أردنا التسجيل، لا ننشئ نصًا لن يقرأه أحد."
       },
       {
         "title": "كيف نعرّف الجمع من غير أن نفترض أننا نعرف الجمع؟",
@@ -1171,7 +1220,8 @@
         "trace": "تنتظر ⁦2 + 2⁩ نتيجة ⁦2 + 1⁩، وهذه تنتظر ⁦2 + 0⁩. تعود الأجوبة بالترتيب المعاكس: ⁦2⁩ ثم ⁦3⁩ ثم ⁦4⁩. تُكتب كل خطوة عند عودة الجواب.",
         "test": "غيّر العدد الأيمن إلى ⁦3⁩. يزداد عدد الاستدعاءات بواحد ويصبح الجواب ⁦5⁩. تختبر الأمثلة حالات محددة، أما البرهان بالاستقراء فيحتاج إلى حالة بداية وخطوة تنقل الحكم من ⁦n⁩ إلى ⁦S(n)⁩.",
         "boundary": "ينطبق الأسلوب على الضرب: ⁦3 × 0 = 0⁩، وكل مجموعة جديدة تضيف ⁦3⁩. فنحصل على ⁦3 × 1 = 3⁩ ثم ⁦3 × 2 = 6⁩.",
-        "worked": "جرّب المقارنتين أدناه. إذا انتهت السلسلتان معًا فالجواب ⁦`True`⁩. وإذا انتهت إحداهما وحدها فأحد العددين صفر وللآخر عدد سابق، لذا يكون الجواب ⁦`False`⁩."
+        "worked": "جرّب المقارنتين أدناه. إذا انتهت السلسلتان معًا فالجواب ⁦`True`⁩. وإذا انتهت إحداهما وحدها فأحد العددين صفر وللآخر عدد سابق، لذا يكون الجواب ⁦`False`⁩.",
+        "follow_up": "لماذا نصل دائمًا إلى الصفر عند الرجوع؟ لا نحتاج إلى خطوة إذا بدأنا من الصفر. وإذا كان مسار ⁦n⁩ يصل إلى الصفر، فإن مسار ⁦S(n)⁩ يمر أولًا عبر ⁦n⁩ ثم يسلك الطريق نفسه. هذه حالة البداية وخطوة البرهان بالاستقراء؛ أما استدعاء الدالة لنفسها في البرنامج فهو الاستدعاء الذاتي."
       },
       {
         "title": "كيف يمثّل عددان طبيعيان عددًا سالبًا؟",
@@ -1183,7 +1233,8 @@
         "trace": "الخانة الأولى تساوي ⁦0×3+2×0 = 0⁩، والثانية تساوي ⁦0×0+2×3 = 6⁩. إذن يمثّل الزوج ⁦(0,6)⁩ العدد ⁦−6⁩.",
         "test": "استبدل ⁦(1,3)⁩ بالزوج ⁦(0,2)⁩ بوصفه تمثيلًا آخر للعدد ⁦−2⁩. يصبح حاصل الضرب ⁦(3,9)⁩، وما زالت قيمته ⁦−6⁩.",
         "boundary": "تلغي ⁦`normalize()`⁩ الخطوات المتعاكسة حتى يبقى صفر في إحدى الخانتين. وتنجح المقارنة بالجمع المتقاطع حتى قبل الإلغاء.",
-        "worked": "قارن ⁦(3,1)⁩ و⁦(4,2)⁩: كلا المجموعين ⁦3+2⁩ و⁦1+4⁩ يساوي ⁦5⁩. إذا أضفت ⁦(1,4)⁩ إلى كل زوج تحصل على ⁦(4,5)⁩ و⁦(5,6)⁩. وينتهي كلا المسارين الآن على بُعد خطوة يسار الصفر."
+        "worked": "قارن ⁦(3,1)⁩ و⁦(4,2)⁩: كلا المجموعين ⁦3+2⁩ و⁦1+4⁩ يساوي ⁦5⁩. إذا أضفت ⁦(1,4)⁩ إلى كل زوج تحصل على ⁦(4,5)⁩ و⁦(5,6)⁩. وينتهي كلا المسارين الآن على بُعد خطوة يسار الصفر.",
+        "follow_up": "لعكس إشارة ⁦(1,3)⁩ بدّل الخانتين: يصل ⁦(3,1)⁩ إلى النقطة المقابلة. ولتبسيط التمثيل ألغِ خطوة في كل اتجاه: يصل ⁦(0,2)⁩ إلى النقطة الأصلية. أي العمليتين تحفظ القيمة؟"
       },
       {
         "title": "كيف نقارن كسرين من غير قسمة؟",
@@ -1195,7 +1246,8 @@
         "trace": "البسط يساوي ⁦1×3+2×1 = 5⁩ والمقام يساوي ⁦2×3 = 6⁩. وإذا كان كلا الكسرين ⁦1/2⁩ تعطي القاعدة نفسها ⁦4/4⁩ وهو يساوي ⁦1⁩.",
         "test": "لاختزال ⁦6/8⁩، اقسم ⁦8⁩ على ⁦6⁩ فيبقى ⁦2⁩، ثم اقسم ⁦6⁩ على ⁦2⁩ فيبقى صفر. اقسم البسط والمقام على آخر مقسوم عليه غير صفري وهو ⁦2⁩. ويجب أن يكون للكسرين المتساويين رمز التجزئة نفسه كي يصلا إلى المدخل نفسه في قاموس بايثون.",
         "boundary": "لنفترض أن مربع كسر مبسّط ⁦p/q⁩ يساوي ⁦2⁩. عندئذ ⁦p² = 2q²⁩، ومن ثم ⁦p⁩ زوجي لأن مربعه زوجي. بالتعويض عن ⁦p⁩ بالقيمة ⁦2k⁩ نحصل على ⁦q² = 2k²⁩، فيكون ⁦q⁩ زوجيًا أيضًا. نستطيع إذن الاختزال على ⁦2⁩، وهذا يناقض الافتراض. نحتاج إلى طريقة أخرى لتحديد ⁦√2⁩.",
-        "worked": "قبل الجمع فسّر سطري الناتج: هل ⁦1/2⁩ و⁦2/4⁩ متساويان؟ وما العددان اللذان لا يزال الكسر ⁦2/4⁩ يحتفظ بهما؟ يمكن قراءتهما من الحقلين ⁦p⁩ و⁦q⁩."
+        "worked": "قبل الجمع فسّر سطري الناتج: هل ⁦1/2⁩ و⁦2/4⁩ متساويان؟ وما العددان اللذان لا يزال الكسر ⁦2/4⁩ يحتفظ بهما؟ يمكن قراءتهما من الحقلين ⁦p⁩ و⁦q⁩.",
+        "follow_up": "تستبدل حلقة القاسم المشترك الأكبر الزوج ⁦(a,b)⁩ بالزوج ⁦(b⁩,⁦`a % b`⁩). من ⁦(6,8)⁩ تمر عبر ⁦(8,6)⁩ ثم ⁦(6,2)⁩ ثم ⁦(2,0)⁩. عندما يصبح ⁦b⁩ صفرًا يبقى ⁦a = 2⁩. اقسم بسط ⁦6/−8⁩ ومقامه على ⁦2⁩ وانقل الإشارة إلى البسط فتحصل على ⁦−3/4⁩."
       },
       {
         "title": "كم عددًا يجعل ⁦x²−2⁩ يساوي صفرًا؟",
@@ -1207,7 +1259,8 @@
         "trace": "متتالية شتورم هنا هي ⁦x²−2⁩ ثم ⁦2x⁩ ثم ⁦2⁩. عند ⁦−2⁩ تكون الإشارات موجب، سالب، موجب، فتتغير مرتين. وعند ⁦2⁩ تكون كلها موجبة فلا تتغير. الفرق ⁦2⁩. أما بين ⁦1⁩ و⁦2⁩ فالفرق ⁦1⁩.",
         "test": "العبارة الثانية هي المشتقة: إذا زادت ⁦x⁩ بمقدار ⁦h⁩ زاد مربعها بمقدار ⁦2xh+h²⁩. بالقسمة على ⁦h⁩ نحصل على ⁦2x+h⁩، الذي يقترب من ⁦2x⁩ باقتراب ⁦h⁩ من الصفر. وبقسمة ⁦x²−2⁩ على ⁦2x⁩ يبقى ⁦−2⁩. نعكس إشارة الباقي فنحصل على الحد الأخير ⁦2⁩.",
         "boundary": "تبرهن مبرهنة شتورم أن فرق عدد التغيرات يعطي عدد الجذور المختلفة إذا لم يكن أي من الطرفين جذرًا. نتجاوز القيم الصفرية عند عدّ تغيرات الإشارة. وتستعمل ⁦`sign_at`⁩ كسورًا دقيقة حتى لا يقلب التقريب الإشارة.",
-        "worked": "جرّب ⁦x = 3/2⁩. عند قراءة المعاملات ⁦1⁩ ثم ⁦0⁩ ثم ⁦−2⁩ نحصل على ⁦1⁩ ثم ⁦3/2⁩ ثم ⁦1/4⁩. ولعدّ الجذور نستعمل ⁦x²−2⁩ ثم ⁦2x⁩ ثم ⁦2⁩. عند ⁦1⁩ تكون الإشارات سالب، موجب، موجب (تغيّر واحد)؛ وعند ⁦2⁩ تكون كلها موجبة (لا تغيّر). الفرق يعني أن بينهما جذرًا واحدًا."
+        "worked": "جرّب ⁦x = 3/2⁩. عند قراءة المعاملات ⁦1⁩ ثم ⁦0⁩ ثم ⁦−2⁩ نحصل على ⁦1⁩ ثم ⁦3/2⁩ ثم ⁦1/4⁩. ولعدّ الجذور نستعمل ⁦x²−2⁩ ثم ⁦2x⁩ ثم ⁦2⁩. عند ⁦1⁩ تكون الإشارات سالب، موجب، موجب (تغيّر واحد)؛ وعند ⁦2⁩ تكون كلها موجبة (لا تغيّر). الفرق يعني أن بينهما جذرًا واحدًا.",
+        "follow_up": "في ⁦`sturm_sequence`⁩ يشير ⁦`sequence[-2]`⁩ و⁦`sequence[-1]`⁩ إلى آخر كثيرتي حدود. يحسب % باقي قسمة الأولى على الثانية. نضيف الباقي بعكس إشارته، وإذا كان صفرًا تتوقف الحلقة. تزال العوامل المكررة أولًا حتى لا نعدّ الجذر في الموضع نفسه مرتين."
       },
       {
         "title": "كيف نحدّد ⁦√2⁩ بدقة من غير كتابة كل أرقامه؟",
@@ -1219,7 +1272,8 @@
         "trace": "عند ⁦3/2⁩ تكون قيمة ⁦x²−3⁩ هي ⁦−3/4⁩ فتبقى ⁦[3/2,2]⁩. وعند ⁦7/4⁩ تكون ⁦1/16⁩ فتبقى ⁦[3/2,7/4]⁩. يعمل القرار نفسه مع كثيرتي الحدود.",
         "test": "تعيد ⁦`trace(2)`⁩ الفترة الأولى والفترتين الجديدتين ما لم يكن المنتصف جذرًا دقيقًا. تحقّق من الإشارتين إضافة إلى الطول؛ فاختيار النصف الخطأ أيضًا ينصّف الطول.",
         "boundary": "بعد تنصيف ⁦[1,2]⁩ سبع مرات يصبح طول الفترة ⁦1/128⁩. لذا لا تتجاوز المسافة من المنتصف إلى الجذر ⁦1/256⁩. تعطينا الفترة حدًا للخطأ، وتحدد كثيرة الحدود والفترة العازلة الأصلية العدد بدقة.",
-        "worked": "ابدأ بالتعبير ⁦x²−2⁩ في ⁦[1,2]⁩. المنتصف هو ⁦3/2⁩ ومربعه ناقص ⁦2⁩ يساوي ⁦1/4⁩. القيمة عند ⁦1⁩ سالبة فنحتفظ بالفترة ⁦[1,3/2]⁩. وعند المنتصف التالي ⁦5/4⁩ تكون القيمة ⁦−7/16⁩ فنحتفظ بالفترة ⁦[5/4,3/2]⁩. غيّر الآن كثيرة الحدود في التجربة."
+        "worked": "ابدأ بالتعبير ⁦x²−2⁩ في ⁦[1,2]⁩. المنتصف هو ⁦3/2⁩ ومربعه ناقص ⁦2⁩ يساوي ⁦1/4⁩. القيمة عند ⁦1⁩ سالبة فنحتفظ بالفترة ⁦[1,3/2]⁩. وعند المنتصف التالي ⁦5/4⁩ تكون القيمة ⁦−7/16⁩ فنحتفظ بالفترة ⁦[5/4,3/2]⁩. غيّر الآن كثيرة الحدود في التجربة.",
+        "follow_up": "طول ⁦[1,3/2]⁩ يساوي ⁦3/2−1 = 1/2⁩. عند قراءة ⁦`interval.width`⁩ تحسب دالة تحمل العلامة ⁦`@property`⁩ الطول من الطرفين. إذا كانت كثيرة الحدود ⁦x⁩ والفترة ⁦[−1,1]⁩ فإن أول منتصف هو الجذر. يصبح الطرفان صفرًا وتنتهي الحلقة."
       }
     ]
   },
@@ -1295,7 +1349,8 @@
         "trace": "self.points अभी भी 2 है और other.points अब 4 है। नए स्कोर में 6 रखा है। बिंदु के बाद points लिखकर यही मान पढ़ते हैं।",
         "test": "`(a + b) + b` आज़माएँ। दूसरा जोड़ इसलिए चलता है क्योंकि पहले जोड़ ने भी एक स्कोर लौटाया था।",
         "boundary": "आगे `@dataclass` डेटा रखने वाला मेथड बना देगा। जब अलग-अलग रिकॉर्ड एक ही संख्या दिखा सकते हैं, तब बराबरी जाँचने का `__eq__` हम ख़ुद लिखेंगे।",
-        "worked": "मेथड क्लास के अंदर लिखा फ़ंक्शन है। `a.points` में बिंदु के बाद फ़ील्ड का नाम है। लाइब्रेरी की पंक्ति `result, message = func(...)` दाईं ओर से पढ़ें: पहले मूल मेथड को बुलाएँ, फिर लौटे हुए दोनों मानों को अलग नाम दें।"
+        "worked": "मेथड क्लास के अंदर लिखा फ़ंक्शन है। `a.points` में बिंदु के बाद फ़ील्ड का नाम है। लाइब्रेरी की पंक्ति `result, message = func(...)` दाईं ओर से पढ़ें: पहले मूल मेथड को बुलाएँ, फिर लौटे हुए दोनों मानों को अलग नाम दें।",
+        "follow_up": "`result, message = func(...)` में पहला नाम उत्तर लेता है। दूसरा नाम संदेश बनाने वाला फ़ंक्शन भी रख सकता है। सिर्फ़ रिकॉर्ड की ज़रूरत पर `message()` बुलाने से ऐसा पाठ नहीं बनाना पड़ता जिसे कोई नहीं पढ़ेगा।"
       },
       {
         "title": "जोड़ का इस्तेमाल किए बिना जोड़ कैसे बनाएँ?",
@@ -1307,7 +1362,8 @@
         "trace": "2 + 2 को 2 + 1 का इंतज़ार है और उसे 2 + 0 का। जवाब उलटे क्रम में लौटते हैं: 2, 3, 4। हर कदम का संदेश जवाब लौटते समय लिखा जाता है।",
         "test": "दाईं संख्या 3 करें। फ़ंक्शन एक बार और चलेगा और जवाब 5 होगा। परीक्षण कुछ उदाहरण जाँचते हैं। गणितीय आगमन से प्रमाण के लिए शुरुआती मामला और n से S(n) तक जाने का तर्क चाहिए।",
         "boundary": "गुणा में भी 3 × 0 = 0 है। तीन का हर नया समूह जोड़ने से उत्तर 3 बढ़ता है। इसलिए 3 × 1 = 3 और 3 × 2 = 6।",
-        "worked": "नीचे दी गई दोनों तुलनाएँ चलाएँ। दोनों कड़ियाँ साथ खत्म हों तो उत्तर `True` है। सिर्फ़ एक खत्म हो तो एक संख्या शून्य है और दूसरी की पिछली संख्या अभी बाकी है। उत्तर `False` है।"
+        "worked": "नीचे दी गई दोनों तुलनाएँ चलाएँ। दोनों कड़ियाँ साथ खत्म हों तो उत्तर `True` है। सिर्फ़ एक खत्म हो तो एक संख्या शून्य है और दूसरी की पिछली संख्या अभी बाकी है। उत्तर `False` है।",
+        "follow_up": "पीछे चलते हुए शून्य तक क्यों पहुँचेंगे? शुरुआत शून्य पर हो तो कोई कदम नहीं चाहिए। अगर n से शून्य तक पहुँच सकते हैं तो S(n) से पहले n पर आएँ, फिर वही रास्ता लें। यह आगमन का शुरुआती मामला और अगला कदम है। प्रोग्राम में फ़ंक्शन का ख़ुद को बुलाना पुनरावर्तन है।"
       },
       {
         "title": "दो प्राकृतिक संख्याएँ एक ऋणात्मक संख्या कैसे दिखा सकती हैं?",
@@ -1319,7 +1375,8 @@
         "trace": "पहली गिनती 0×3+2×0 = 0 और दूसरी 0×0+2×3 = 6 है। जोड़ी (0,6) का मान −6 है।",
         "test": "(0,2) की जगह (1,3) रखें। अब गुणनफल (3,9) है, फिर भी उसका मान −6 है।",
         "boundary": "`normalize()` विपरीत दिशाओं के बराबर कदम काटकर एक तरफ़ शून्य छोड़ता है। आड़ी जोड़ियों के योग से तुलना करने के लिए पहले कदम काटना ज़रूरी नहीं है।",
-        "worked": "(3,1) और (4,2) की तुलना करें: 3+2 और 1+4 दोनों 5 हैं। दोनों जोड़ियों में (1,4) जोड़ें तो (4,5) और (5,6) मिलते हैं। अब दोनों यात्राएँ शून्य से एक कदम बाईं ओर खत्म होती हैं।"
+        "worked": "(3,1) और (4,2) की तुलना करें: 3+2 और 1+4 दोनों 5 हैं। दोनों जोड़ियों में (1,4) जोड़ें तो (4,5) और (5,6) मिलते हैं। अब दोनों यात्राएँ शून्य से एक कदम बाईं ओर खत्म होती हैं।",
+        "follow_up": "(1,3) का चिह्न बदलने के लिए दोनों संख्याएँ उलटें: (3,1) उलटे बिंदु पर पहुँचता है। रूप सरल करने के लिए दोनों दिशाओं का एक-एक कदम काटें: (0,2) मूल बिंदु पर पहुँचता है। किस क्रिया ने मान बचाए रखा?"
       },
       {
         "title": "बिना भाग दिए भिन्नों की तुलना कैसे करें?",
@@ -1331,7 +1388,8 @@
         "trace": "अंश 1×3+2×1 = 5 और हर 2×3 = 6 है। दोनों भिन्नों को 1/2 करने पर इसी नियम से 4/4 मिलता है, जिसका मान 1 है।",
         "test": "6/8 को सरल करें: 8 को 6 से भाग देने पर शेष 2 है और 6 को 2 से भाग देने पर शेष 0। अंतिम गैर-शून्य भाजक 2 से अंश और हर दोनों को भाग दें। बराबर भिन्नों का हैश भी बराबर होना चाहिए ताकि पाइथन की डिक्शनरी में एक ही प्रविष्टि मिले।",
         "boundary": "मान लें कि सरलतम भिन्न p/q का वर्ग 2 है। तब p² = 2q² है। वर्ग सम है, इसलिए p सम है। p = 2k रखने पर q² = 2k² मिलता है, इसलिए q भी सम है। दोनों को 2 से काट सकते हैं, जो सरलतम होने के विरुद्ध है। √2 को बताने का दूसरा तरीका चाहिए।",
-        "worked": "जोड़ने से पहले आउटपुट की दो पंक्तियाँ समझाएँ: क्या 1/2 और 2/4 बराबर हैं? 2/4 में अब भी कौन-सी दो संख्याएँ रखी हैं? उन्हें p और q से पढ़ सकते हैं।"
+        "worked": "जोड़ने से पहले आउटपुट की दो पंक्तियाँ समझाएँ: क्या 1/2 और 2/4 बराबर हैं? 2/4 में अब भी कौन-सी दो संख्याएँ रखी हैं? उन्हें p और q से पढ़ सकते हैं।",
+        "follow_up": "महत्तम समापवर्तक निकालने वाला लूप (a,b) को (b,`a % b`) से बदलता है। (6,8) से (8,6), (6,2) और (2,0) मिलते हैं। b शून्य होने पर a = 2 बचता है। 6/−8 के अंश और हर को 2 से भाग देकर ऋण चिह्न अंश में रखें तो −3/4 मिलता है।"
       },
       {
         "title": "कितनी संख्याओं के लिए x²−2 शून्य है?",
@@ -1343,7 +1401,8 @@
         "trace": "यहाँ स्टर्म अनुक्रम x²−2, 2x, 2 है। −2 पर चिह्न +,−,+ हैं, यानी दो बदलाव। 2 पर +,+,+ हैं, यानी कोई बदलाव नहीं। अंतर 2 है। इसी तरह 1 और 2 के बीच अंतर 1 है।",
         "test": "दूसरा व्यंजक अवकलज है। x को h बढ़ाने पर उसका वर्ग 2xh+h² बढ़ता है। h से भाग देने पर 2x+h मिलता है, जो h के शून्य के पास जाने पर 2x के पास जाता है। x²−2 को 2x से भाग देने पर शेष −2 है। इसका चिह्न बदलने से अंतिम पद 2 मिलता है।",
         "boundary": "अगर दोनों सिरे मूल न हों तो स्टर्म प्रमेय के अनुसार बदलावों की गिनती का अंतर अलग-अलग वास्तविक मूलों की संख्या देता है। चिह्न गिनते समय शून्य छोड़ दें। `sign_at` ठीक-ठीक भिन्नों से गणना करता है ताकि सन्निकटन से चिह्न न बदल जाए।",
-        "worked": "x = 3/2 रखें। गुणांक 1, 0, −2 पढ़ने पर क्रम से 1, 3/2, 1/4 मिलता है। मूल गिनने के लिए x²−2, 2x, 2 लें। 1 पर चिह्न −,+,+ हैं (एक बदलाव), 2 पर +,+,+ हैं (कोई बदलाव नहीं)। अंतर बताता है कि बीच में एक मूल है।"
+        "worked": "x = 3/2 रखें। गुणांक 1, 0, −2 पढ़ने पर क्रम से 1, 3/2, 1/4 मिलता है। मूल गिनने के लिए x²−2, 2x, 2 लें। 1 पर चिह्न −,+,+ हैं (एक बदलाव), 2 पर +,+,+ हैं (कोई बदलाव नहीं)। अंतर बताता है कि बीच में एक मूल है।",
+        "follow_up": "`sturm_sequence` में `sequence[-2]` और `sequence[-1]` आखिरी दो बहुपद हैं। % पहले को दूसरे से भाग देने का शेष निकालता है। शेष का चिह्न उलटकर उसे अंत में जोड़ें। शेष शून्य हो तो लूप रुकता है। दोहराए गए गुणनखंड पहले हटाते हैं ताकि एक ही स्थान का मूल एक बार गिना जाए।"
       },
       {
         "title": "सभी दशमलव अंक लिखे बिना √2 को ठीक-ठीक कैसे पहचानें?",
@@ -1355,7 +1414,8 @@
         "trace": "3/2 पर x²−3 का मान −3/4 है, इसलिए [3/2,2] रखें। 7/4 पर मान 1/16 है, इसलिए [3/2,7/4] रखें। दोनों बहुपदों के लिए एक ही कोड चलता है।",
         "test": "अगर मध्यबिंदु ही मूल न निकल आए, तो `trace(2)` शुरुआती अंतराल और दो नए अंतराल देता है। चौड़ाई के साथ चिह्न भी जाँचें: ग़लत आधा चुनने पर भी चौड़ाई आधी होगी।",
         "boundary": "[1,2] को सात बार आधा करने पर चौड़ाई 1/128 है। मध्यबिंदु की मूल से दूरी अधिक से अधिक 1/256 है। अंतराल से त्रुटि की सीमा मिलती है; मूल बहुपद और शुरुआती पृथक्कारी अंतराल संख्या को ठीक-ठीक तय करते हैं।",
-        "worked": "पहले [1,2] में x²−2 लें। मध्यबिंदु 3/2 है और उसके वर्ग से 2 घटाने पर 1/4 मिलता है। 1 पर मान ऋणात्मक है, इसलिए [1,3/2] रखें। अगले मध्यबिंदु 5/4 पर मान −7/16 है, इसलिए [5/4,3/2] रखें। अब प्रयोग के बहुपद को बदलें।"
+        "worked": "पहले [1,2] में x²−2 लें। मध्यबिंदु 3/2 है और उसके वर्ग से 2 घटाने पर 1/4 मिलता है। 1 पर मान ऋणात्मक है, इसलिए [1,3/2] रखें। अगले मध्यबिंदु 5/4 पर मान −7/16 है, इसलिए [5/4,3/2] रखें। अब प्रयोग के बहुपद को बदलें।",
+        "follow_up": "[1,3/2] की चौड़ाई 3/2−1 = 1/2 है। `interval.width` पढ़ने पर `@property` वाला फ़ंक्शन सिरों से चौड़ाई निकालता है। अगर बहुपद x हो और अंतराल [−1,1], तो पहला मध्यबिंदु ही मूल है। दोनों सिरे शून्य हो जाते हैं और लूप रुक जाता है।"
       }
     ]
   }

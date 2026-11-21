@@ -187,6 +187,8 @@ algebraic number type. It does not define arithmetic between roots or general
 mathematical equality. The course stops after exposing why rational endpoints
 can approach a non-rational value without ever becoming that value.
 
+The width of [1,3/2] is 3/2−1 = 1/2. Reading interval.width calls a little function marked @property, so we do not have to save a separate width each time. If the polynomial is x on [−1,1], the very first midpoint is its root: both endpoints become zero and the loop can stop.
+
 ## Find the square root of three
 
 `_bisect` tests the sign of the polynomial at the midpoint. A zero gives a single-point interval. Otherwise keep the half whose endpoint signs differ. The initial check means the root in that half must be the same root.

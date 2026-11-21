@@ -195,6 +195,8 @@ Unary predecessor chains make the structure visible and arithmetic slow. Large
 numbers are intentionally outside the useful range. Python's built-in `int`
 appears only at input and display boundaries.
 
+Why does stepping backwards always finish? For zero, no step is needed. If the chain for n reaches zero, the chain for S(n) first reaches n and then follows the same path. This gives the starting case and the step of an induction proof; the actual calls in the program are recursion.
+
 ## Use addition to build multiplication
 
 Start at zero groups and add one group at a time.

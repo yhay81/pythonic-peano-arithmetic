@@ -172,6 +172,8 @@ ratios for performance. No floating-point approximation is introduced. The
 mapping is a documented implementation boundary that avoids enormous unary
 intermediates during interval refinement.
 
+In sturm_sequence, sequence[-2] and sequence[-1] are the last two polynomials. The % operator finds the remainder of dividing the former by the latter. Append its negative; a zero remainder ends the loop. Repeated factors are removed first so a root at the same point counts only once.
+
 ## Count roots on both sides of zero
 
 evaluate reads the list backwards, multiplying the running value by x and then adding the next coefficient. For x = 3/2 the values are 1, 3/2, then 9/4−2 = 1/4. This is Horner's method.

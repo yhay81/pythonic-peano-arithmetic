@@ -164,6 +164,8 @@ representatives cannot change an operation's equivalence class.
 values. Construction does not call it automatically. Keeping both `(3,1)` and
 `(4,2)` intact is an educational choice, not a mathematical requirement.
 
+The two fields play different roles. To negate (1,3), swap the fields: (3,1) reaches the opposite point. To normalize (1,3), cancel a right step against a left step: (0,2) reaches the original point. You can predict which operation preserves equality before running it.
+
 ## Multiply the pairs
 
 To multiply (a−b)(c−d), expand and regroup: (ac+bd)−(ad+bc). The two arguments to Integer in the code below are those two groups. Every product inside is a natural-number product.

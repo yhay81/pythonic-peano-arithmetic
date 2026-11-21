@@ -159,6 +159,40 @@ for interval in root.trace(2):
     print(interval)""",
 }
 
+FOLLOW_UP_EXCERPTS = {
+    "python-basics": """def add_with_note(a, b):
+    return a + b, lambda: f"{a} + {b}"
+
+
+result, message = add_with_note(2, 1)
+print(message())
+print(result + 1)""",
+    "natural-numbers": """two = natural_number(2)
+print(two.structural_str())
+print(two.pre.structural_str())
+print(two.pre.pre.structural_str())""",
+    "integers": """def normalize(self) -> Integer:
+    if self.a >= self.b:
+        return Integer(self.a - self.b, N_ZERO)
+    return Integer(N_ZERO, self.b - self.a)""",
+    "rationals": """a, b = abs(numerator), abs(denominator)
+while b:
+    a, b = b, a % b
+divisor = Integer(a, N_ZERO)
+return Rational(numerator // divisor, denominator // divisor)""",
+    "polynomials": """square_free = value.square_free()
+sequence = [square_free, square_free.derivative()]
+while sequence[-1]:
+    remainder = sequence[-2] % sequence[-1]
+    if not remainder:
+        break
+    sequence.append(-remainder)""",
+    "algebraic-roots": """@property
+def width(self) -> Rational:
+    return _from_fraction(_as_fraction(self.upper) - _as_fraction(self.lower))""",
+}
+
+
 # These short experiments establish facts used by the next calculation.
 WARMUP_SOURCES = {
     "natural-numbers": """from peano import natural_number
@@ -385,7 +419,7 @@ def render_lesson(
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
-    <legend>{text(common, "check")}</legend>
+    <legend>{question}</legend>
     {choices}
   </fieldset>
   <button type="submit">{text(common, "check")}</button>
@@ -397,6 +431,12 @@ def render_lesson(
 <h2 data-layer="test">{text(common, "test")}</h2>
 
 {text(lesson, "test")}
+
+{text(lesson, "follow_up")}
+
+```python
+{FOLLOW_UP_EXCERPTS[slug]}
+```
 
 <h2 data-layer="boundary">{text(common, "boundary")}</h2>
 
