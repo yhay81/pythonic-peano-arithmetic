@@ -1,33 +1,21 @@
 <span class="lesson-number">第1章 · 自然数</span>
 
-# 公理から実装を読み、ログを検証する
+# 「次へ」を3回押すと、2はいくつになる？
 
-<p class="lesson-lead">
-  <code>0, 1, 2, …</code> を使うだけでなく、何を出発点として認め、
-  ライブラリがそれをどう保存し、<code>+</code> をどう実行するかまで読みます。
-  ログは、実装を理解したあとに妥当性を確かめる材料です。
-</p>
+<p class="lesson-lead">2から始めて、数直線を右へ一目盛りずつ進んでみましょう。</p>
 
-<div class="lesson-context" data-reveal>
-  <div>
-    <strong>ここまでに分かったこと</strong>
-    <p>演算子と特殊メソッド、dataclassのコード生成、デコレータ適用前後の違い。</p>
-  </div>
-  <div>
-    <strong>この章で学ぶこと</strong>
-    <p>ペアノの公理、データ表現、メソッド、再帰、呼び出しと戻りの順番です。</p>
-  </div>
-</div>
+1回目で3、2回目で4、3回目で5に着きます。これが「2に3を足す」という計算です。では、2に0を足したら？　一度も動かないので、答えは出発点の2です。
+
+この教材では0も自然数に含めます。0から「次へ」を1回押した数が1、もう1回押した数が2です。どの自然数にも次の数があります。数学ではその「次の数」を<strong>後者</strong>と呼びます。
 
 <div class="lesson-goals" data-reveal>
-  <strong>この章を終えると</strong>
-  <ul>
-    <li>ペアノの公理と、このライブラリの表現上の選択を区別できる</li>
-    <li>0と後者の区別、後者の単射性を <code>__eq__</code> の分岐へ対応付けられる</li>
-    <li>加法の再帰的定義と <code>NaturalNumber.__add__</code> を対応付けられる</li>
-    <li>なぜ <code>2+0</code> のログが最初に出るのか、実装から説明できる</li>
-  </ul>
+  <strong>4から「次へ」を2回押すと？</strong>
+  <details><summary>答えを確かめる</summary><p>5、6と進むので、4＋2＝6です。</p></details>
 </div>
+
+[整数の話へ](integers.md)
+
+## Pythonのコードで確かめる
 
 <div class="implementation-bridge" data-reveal aria-label="自然数の数学・表現・実装">
   <div>

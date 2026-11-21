@@ -1,50 +1,11 @@
 <span class="lesson-number">自由実験</span>
 
-# 実装を確かめる実験室
+# 数字を変えて、足し算を試そう
 
-<p class="lesson-lead">
-  ここは、数だけを変えて答えを眺める場所ではありません。
-  定義と実装からログを予想し、実行結果との差を説明するための実験室です。
-  小さな変更一つを、根拠のある問いへ変えます。
-</p>
+<p class="lesson-lead">下の「実行」を押すと、Pythonが 2＋1 を計算します。「出力」のいちばん下に、答えの3が出るか見てみましょう。</p>
 
-!!! note "先に準備章を読んでください"
-    基本的なPython構文は前提にしますが、演算子・dataclass・デコレータの役割は
-    [00 Pythonの仕組み](learn/python-basics.md)で、このライブラリに沿って説明します。
-    このページは第1章以降で説明した用語を使います。
-
-各課題では、対応する章に掲載されたコード抜粋を横に置いてください。
-完全なファイルとテストは[実装リファレンス](reference/implementation.md)から開けます。
-
-## 実行前に、七つの欄を埋める
-
-紙、メモアプリ、コード欄のコメントのどれでもかまいません。
-次の七つへ一文ずつ答えてから実行します。
-
-| 欄 | 書くこと | 自然数 `2+1` の例 |
-| --- | --- | --- |
-| 定義 | 今回使う数学上の規則 | `n+S(m)=S(n+m)` |
-| 表現 | 値を保存する属性と不変条件 | `pre` の鎖、作成後は変更不可 |
-| 実装 | 呼ばれるメソッドと分岐 | `NaturalNumber.__add__` の再帰ケース |
-| Pythonの仕組み | 介在する生成・委譲・ラッパー | `+` が`__add__`へ委譲され、`@log`が戻り値を包む |
-| 予想 | ログの最初・最後と最終値 | 基底ケースから戻り、最後は3 |
-| 観察 | 実際に出た行 | `加法・基底`と`加法・再帰`、そのあと3 |
-| 差の説明 | 予想と違った理由 | 呼び出し時でなく戻り時に記録された |
-
-「当たった／外れた」で終わらず、違いを実装の行へ戻して説明することが重要です。
-
-## まず一つ、実装と結果を照らし合わせる
-
-まずそのまま実行し、次に `right` だけを1から2へ変えます。
-右辺の後者が一段増えるので、再帰ケースとログが何行増えるかを予想してください。
-
-<div class="learning-prompt" data-kind="prediction" data-reveal>
-  <strong>変更前の予想</strong>
-  <p>
-    <code>2+1</code> では、基底ケースと再帰ケースが何回ずつ通るでしょう。
-    最後の <code>print</code> が表示する値も書いてください。
-  </p>
-</div>
+もう一度、今度は `right = natural_number(1)` の `1` を `3` に変えて実行します。
+2から3歩進むと、最後に出る数字はいくつでしょう？
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -67,7 +28,7 @@ print(answer)</textarea>
   </div>
   <div class="peano-runner__output-wrap">
     <span class="peano-runner__output-label">出力</span>
-    <pre class="peano-runner__output" data-role="output" aria-live="polite">二つの規則名と、最後のprintを分けて読みます。</pre>
+    <pre class="peano-runner__output" data-role="output" aria-live="polite">実行すると、ここに計算の途中経過と答えが出ます。</pre>
   </div>
 </div>
 

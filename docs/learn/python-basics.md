@@ -1,33 +1,21 @@
 <span class="lesson-number">第0章 · Pythonの仕組み</span>
 
-# 演算子とデコレータの裏側を読む
+# Pythonで「ねこ」＋「ねこ」を計算したら？
 
-<p class="lesson-lead">
-  この教材では、基本的なPython構文は知っているものとします。
-  ここで準備するのは構文ではなく、ライブラリがPythonの記号へ
-  独自の意味を与える仕組みです。
-</p>
+<p class="lesson-lead">Pythonで 2 + 3 を計算すると5です。では、文字を引用符で囲んで "ねこ" + "ねこ" と書くとどうなるでしょう。</p>
 
-<div class="lesson-context" data-reveal>
-  <div>
-    <strong>ここまでに必要なもの</strong>
-    <p>関数、クラス、属性、条件分岐、ループ、コレクション、例外、型注釈を読めること。</p>
-  </div>
-  <div>
-    <strong>この章で学ぶこと</strong>
-    <p>特殊メソッド、デコレータ、<code>dataclass</code>、<code>property</code>がコードを組み替える仕組みです。</p>
-  </div>
-</div>
+答えは「ねこねこ」。同じ + でも、数どうしなら足し算、文字どうしなら前後につなぐ操作になります。記号の意味は、そこに置いたものの種類で決まります。
+
+自分で新しい種類の数を作ったときも、+ を使えます。その種類の数を足す手順に <code>__add__</code> という名前を付けておけば、Pythonが + を読んだときにその手順を呼び出してくれます。
 
 <div class="lesson-goals" data-reveal>
-  <strong>この章を終えると</strong>
-  <ul>
-    <li><code>a + b</code> から、型が実装した特殊メソッドを探せる</li>
-    <li>デコレータ適用前の関数と、適用後の公開関数を区別できる</li>
-    <li><code>dataclass</code> が生成する処理と、手書きする処理を区別できる</li>
-    <li>テストコードの <code>self</code> と演算メソッドの <code>self</code> を区別できる</li>
-  </ul>
+  <strong>"2" + "3" の答えは？</strong>
+  <details><summary>答えを確かめる</summary><p>引用符が付いているので、どちらも文字です。順番につないだ結果は "23" です。</p></details>
 </div>
+
+[自然数の話へ](natural-numbers.md)
+
+## Pythonのコードで確かめる
 
 <div class="implementation-bridge" data-reveal aria-label="Pythonの構文・データモデル・ライブラリ実装">
   <div>

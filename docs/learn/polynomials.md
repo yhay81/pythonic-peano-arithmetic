@@ -1,33 +1,21 @@
 <span class="lesson-number">第4章 · 多項式</span>
 
-# 式をデータにして、根の個数を調べる
+# 面積が2の正方形、一辺はどれくらい？
 
-<p class="lesson-lead">
-  <code>√2</code> は有理数として作れませんが、
-  <code>x²−2=0</code> を満たす数として指定できます。
-  この章では式を係数列として保存し、代入とスツルム列（Sturm列）の実装から、
-  根が1と2の間に一つだけあることを確かめます。
-</p>
+<p class="lesson-lead">一辺が1なら面積は1、一辺が2なら面積は4。面積が2になる一辺の長さは、1と2の間にありそうです。</p>
 
-<div class="lesson-context" data-reveal>
-  <div>
-    <strong>前章から使うもの</strong>
-    <p>有理数の表現と演算、約分、作成時の不変条件、ログの表示範囲。</p>
-  </div>
-  <div>
-    <strong>この章で学ぶこと</strong>
-    <p>変数、係数列、ホーナー法（Horner法）、根、符号変化、スツルム列、高速化のための選択。</p>
-  </div>
-</div>
+一辺の長さを x と書くと、面積は x × x、短く書けば x² です。そこで x²−2 を計算してみます。答えが負なら面積が足りず、正なら大きすぎます。ちょうど0になる長さが探している答えです。
+
+x²−2 のように、数や x や x² などに数を掛けて足し合わせた式を<strong>多項式</strong>といいます。式の値を0にする x が、その式の<strong>根</strong>です。ここで探しているのは長さなので、正の根に注目します。
 
 <div class="lesson-goals" data-reveal>
-  <strong>この章を終えると</strong>
-  <ul>
-    <li><code>x²−2</code> と係数列 <code>(−2,0,1)</code> を対応付けられる</li>
-    <li><code>Polynomial.__init__</code> と <code>evaluate</code> の処理を追える</li>
-    <li>根の存在と一意性を、別の根拠で説明できる</li>
-  </ul>
+  <strong>一辺が1.5だと、面積は足りる？</strong>
+  <details><summary>答えを確かめる</summary><p>1.5 × 1.5＝2.25。面積が少し大きいので、探している長さは1.5より短いと分かります。</p></details>
 </div>
+
+[代数的実根の話へ](algebraic-roots.md)
+
+## Pythonのコードで確かめる
 
 <div class="implementation-bridge" data-reveal aria-label="多項式の数学・表現・実装">
   <div>

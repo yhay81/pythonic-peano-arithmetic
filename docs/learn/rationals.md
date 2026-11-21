@@ -1,32 +1,21 @@
 <span class="lesson-number">第3章 · 有理数</span>
 
-# 整数の比から、有理数を実装する
+# ピザの半分は、4切れのうち何切れ？
 
-<p class="lesson-lead">
-  整数まで広げても <code>1÷2</code> の答えは作れません。
-  分子と分母に整数を保存し、異なる分数表現を同じ値として扱う規則を、
-  コンストラクタ・等号・約分の実装へ接続します。
-</p>
+<p class="lesson-lead">丸いピザを半分に切り、片方をお皿に取ります。そのあと両方の半円をもう半分に切ったら、お皿の上の量は増えるでしょうか。</p>
 
-<div class="lesson-context" data-reveal>
-  <div>
-    <strong>前章から使うもの</strong>
-    <p>整数の代表元、同値関係、整数の乗法と等号、ログの表示範囲。</p>
-  </div>
-  <div>
-    <strong>この章で学ぶこと</strong>
-    <p>整数の比、分母の不変条件、交差積、約分を必要なときだけ行う設計。</p>
-  </div>
-</div>
+お皿には同じ大きさの4切れのうち2切れがあります。切り方を変えても、食べられる量は同じです。だから 1/2＝2/4 です。
+
+分数を比べるときも、切れの大きさをそろえれば比べられます。たとえば 2/3 と 3/4 は、12等分で数えると8切れと9切れ。大きいのは 3/4 です。整数を整数で割った形で表せる数を<strong>有理数</strong>と呼びます。分母には0を使えません。
 
 <div class="lesson-goals" data-reveal>
-  <strong>この章を終えると</strong>
-  <ul>
-    <li><code>Rational.p</code> と <code>Rational.q</code> が何を保存するか説明できる</li>
-    <li>交差積の定義を <code>__eq__</code> と実行ログへ対応付けられる</li>
-    <li>表現を保存すること、値が等しいこと、約分することを区別できる</li>
-  </ul>
+  <strong>2/3 と 4/6 は同じ量？</strong>
+  <details><summary>答えを確かめる</summary><p>3等分した一切れをさらに半分にすると、2切れが4切れになります。どちらも6切れのうち4切れです。</p></details>
 </div>
+
+[多項式の話へ](polynomials.md)
+
+## Pythonのコードで確かめる
 
 <div class="implementation-bridge" data-reveal aria-label="有理数の数学・表現・実装">
   <div>

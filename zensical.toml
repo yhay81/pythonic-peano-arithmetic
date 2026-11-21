@@ -2,7 +2,7 @@
 docs_dir = "docs"
 site_dir = "site"
 site_name = "Peano Arithmetic"
-site_description = "Pythonのデータモデルを読み、Peano公理から代数的実根まで構成する教材"
+site_description = "0から始めて、足し算、負の数、分数を作ってみよう。身近な例で考えたら、Pythonでも試せます。"
 site_url = "https://peano.yhay81.com/"
 repo_url = "https://github.com/yhay81/pythonic-peano-arithmetic"
 edit_uri = "edit/main/docs/"

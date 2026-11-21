@@ -1,32 +1,21 @@
 <span class="lesson-number">第2章 · 整数</span>
 
-# 同じ差をまとめて、整数を実装する
+# 右へ1歩、左へ3歩。どこに着く？
 
-<p class="lesson-lead">
-  自然数だけでは <code>1−2</code> の答えを表せません。
-  二つの自然数を「差の代表」として保存し、見た目が違っても同じ差なら
-  等しいと判定する実装を読みます。
-</p>
+<p class="lesson-lead">数直線の0に立って、右へ1歩、左へ3歩動くと、0の左隣を通って−2に着きます。</p>
 
-<div class="lesson-context" data-reveal>
-  <div>
-    <strong>前章から使うもの</strong>
-    <p>自然数の表現、自然数の加法、演算子がメソッドを呼ぶこと、戻り時に出るログ。</p>
-  </div>
-  <div>
-    <strong>この章で学ぶこと</strong>
-    <p>代表元、同値関係、演算が代表元の選び方に依存しないこと、ログの表示範囲。</p>
-  </div>
-</div>
+コンピューターには歩いた回数を順番に (1, 3) と記録しておきます。右へ2歩、左へ4歩なら記録は (2, 4)。行き帰りが1歩ずつ増えただけなので、着く場所はやはり−2です。
+
+こうして「右へ何歩、左へ何歩」という二つの自然数で、0より小さい数も表せます。0から左右に丸ごと一歩ずつ動いて着ける数が<strong>整数</strong>です。
 
 <div class="lesson-goals" data-reveal>
-  <strong>この章を終えると</strong>
-  <ul>
-    <li><code>Integer(a, b)</code> が何を保存し、どの整数を表すか説明できる</li>
-    <li>整数の等号を、数学の定義・<code>__eq__</code>・実行ログへ対応付けられる</li>
-    <li>正規化しない設計と、値が等しいことを区別できる</li>
-  </ul>
+  <strong>(3, 1) と (4, 2) の着く場所は同じ？</strong>
+  <details><summary>答えを確かめる</summary><p>どちらも出発点の右に2歩の場所です。記録の数字が違っても、表す整数は同じです。</p></details>
 </div>
+
+[有理数の話へ](rationals.md)
+
+## Pythonのコードで確かめる
 
 <div class="implementation-bridge" data-reveal aria-label="整数の数学・表現・実装">
   <div>
