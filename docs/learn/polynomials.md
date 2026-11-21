@@ -10,7 +10,7 @@
 
 ## 「一つはある」と「一つだけある」
 
-式に入れると値が0になる数を、その式の**根**と呼びます。x²−2 に1を入れると−1、2を入れると2です。この式のグラフは途中で途切れないので、負の高さから正の高さへ行く途中、どこかで高さ0を通ります。これは**中間値の定理**を使った考え方です。
+式に入れると値が0になる数を、その式の**根**と呼びます。x²−2 に1を入れると−1、2を入れると2です。この式のグラフは途中で途切れないので、負の高さから正の高さへ行く途中、どこかで高さ0を通ります。そのときの x は数直線上のどこかにあります。分数で書ける数も、√2 のように分数で書けない数も含め、数直線上の数を**実数**と呼びます。途中で高さ0を取るという説明に使ったのは、**中間値の定理**です。
 
 今回は正の数が大きくなるほど2乗も大きくなるので、1から2の間で0を通るのは一度だけです。でも、一般の式ではグラフが何度も上下するかもしれません。そこで「少なくとも一つ」と「ちょうど一つ」を別々に調べます。
 
@@ -18,7 +18,7 @@
 
 ## x の項がないのに、なぜ0を入れる？
 
-<div class="implementation-bridge"><p>x²−2 を次数の低い順に書くと −2＋0x＋1x² です。各項に掛かっている数を<strong>係数</strong>と呼びます。係数を (−2, 0, 1) と並べれば、位置が定数、x、x² のどれかを表します。</p></div>
+<div class="implementation-bridge"><p>定数の項、x の項、x² の項という順に並べます。このときの指数（定数の項なら0）をその項の<strong>次数</strong>といいます。x²−2 を書き直すと −2＋0x＋1x² です。各項で x の累乗に掛かっている数を<strong>係数</strong>と呼びます。係数を (−2, 0, 1) と並べれば、位置が定数、x、x² のどれかを表します。</p></div>
 
 ```python
 @total_ordering
@@ -70,7 +70,7 @@ def evaluate(self, value: object) -> tuple[Rational, LogMessage]:
 
 <span class="lesson-layer" data-layer="trace">手計算と比べる</span>
 
-<div class="learning-prompt"><strong>実行する前に</strong><p>実験では同じ式に1と2を入れます。手で符号を予想してから実行し、片方の入力を 3/2 に変えて表の最後の値も確かめてください。</p></div>
+<div class="learning-prompt"><strong>実行する前に</strong><p>実験では同じ式に1と2を入れます。<code>p = polynomial(...)</code> の最初の組 <code>(-2, 1)</code> は係数 −2/1 です。残りも分子・分母の順に読み、0/1、1/1 を並べると式が決まります。二つの入力で符号を予想して実行したら、<code>right = rational(2, 1)</code> を <code>right = rational(3, 2)</code> に変えましょう。表で求めた 1/4 が出ますか。</p></div>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -82,11 +82,11 @@ def evaluate(self, value: object) -> tuple[Rational, LogMessage]:
 config_log(log_level=31, max_lines=200, locale="ja")
 
 p = polynomial((-2, 1), (0, 1), (1, 1))
-value_at_1 = p.evaluate(rational(1, 1))
-value_at_2 = p.evaluate(rational(2, 1))
+left = rational(1, 1)
+right = rational(2, 1)
 
-print("x = 1:", value_at_1)
-print("x = 2:", value_at_2)</textarea>
+print("x =", left, "のとき", p.evaluate(left))
+print("x =", right, "のとき", p.evaluate(right))</textarea>
   <div class="peano-runner__controls">
     <button class="peano-runner__button peano-runner__button--run" data-action="run">▶ 実行</button>
     <button class="peano-runner__button" data-action="reset">環境をリセット</button>
@@ -130,7 +130,7 @@ def sturm_sequence(value: Polynomial) -> tuple[Polynomial, ...]:
     return tuple(sequence)
 ```
 
-`square_free()` は、同じ根が重なる因子を一つずつに整理します。今回の x²−2 はそのままです。`derivative()` は、式からその変化のしかたを表す別の式（導関数）を作ります。たとえば x が h だけ増えると、2乗の増え方は (x＋h)²−x²＝2xh＋h²。これを h で割ると 2x＋h で、h を0に近づけると 2x に近づきます。これが x² の導関数が 2x になる理由です。定数 −2 は x が動いても変わらないので導関数は0です。初めの二つの式がこれで決まりました。
+`square_free()` は、重なった因子を一つずつに整理します。たとえば (x−1)(x−1) が0になる場所は1だけです。同じ場所を二度数えずに済むよう、これを x−1 にします。今回の x²−2 はそのままです。`derivative()` は、式からその変化のしかたを表す別の式（導関数）を作ります。たとえば x が h だけ増えると、2乗の増え方は (x＋h)²−x²＝2xh＋h²。これを h で割ると 2x＋h で、h を0に近づけると 2x に近づきます。これが x² の導関数が 2x になる理由です。定数 −2 は x が動いても変わらないので導関数は0です。初めの二つの式がこれで決まりました。
 
 次の `%` は式の割り算の余りです。x²−2＝(x/2)×(2x)−2 なので、最初の式を次の式で割った余りは−2。`append(-remainder)` で符号を反転して2を追加します。次に2xを2で割ると余りが0なので終了です。この作り方で得られる並びを**スツルム列**と呼びます。なぜこれであらゆる多項式の根を数えられるかという証明は、この章では定理として使っています。
 
@@ -165,7 +165,7 @@ def count_real_roots(
     return sign_variations(sequence, lower) - sign_variations(sequence, upper)
 ```
 
-最初の関数では、0を飛ばし、各値が「負かどうか」を並べます。`zip(signs, signs[1:])` は一つずらして隣同士を組にする書き方です。左と右が違う組だけを数えれば、表の最後の列になります。二つ目の関数の最後の一行が、左端での回数から右端での回数を引いています。
+最初の関数では、0を飛ばし、各値が「負かどうか」を並べます。`zip(signs, signs[1:])` は一つずらして隣同士を組にする書き方です。左と右が違う組だけを数えれば、表の最後の列になります。1を入れた表の行なら、負かどうかの並びは `[True, False, False]` です。隣同士は「違う」「同じ」の二組。`sum` が違う組を1、同じ組を0として足すので、変化は1回です。二つ目の関数の最後の一行が、左端での回数から右端での回数を引いています。
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -181,14 +181,14 @@ def count_real_roots(
 )
 
 p = polynomial((-2, 1), (0, 1), (1, 1))
-one = rational(1, 1)
-two = rational(2, 1)
+left = rational(1, 1)
+right = rational(2, 1)
 sequence = sturm_sequence(p)
 
 print("スツルム列:", [str(item) for item in sequence])
-print("1 での符号変化:", sign_variations(sequence, one))
-print("2 での符号変化:", sign_variations(sequence, two))
-print("根の個数:", count_real_roots(p, one, two))</textarea>
+print(left, "での符号変化:", sign_variations(sequence, left))
+print(right, "での符号変化:", sign_variations(sequence, right))
+print("根の個数:", count_real_roots(p, left, right))</textarea>
   <div class="peano-runner__controls">
     <button class="peano-runner__button peano-runner__button--run" data-action="run">▶ 実行</button>
     <button class="peano-runner__button" data-action="reset">環境をリセット</button>

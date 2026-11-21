@@ -19,13 +19,15 @@ class Score:
         return Score(self.points + other.points)
 ```
 
-`a = Score(2)` と書くと、新しく作る点数が `self`、受け取った2が `points` になります。`self.points = points` が、その2を点数の中に保存する行です。
+`a = Score(2)` と書くと、Pythonは新しい点数を用意し、その点数の `__init__` を呼びます。このとき新しく作った点数が `self`、受け取った2が `points` になります。`self.points = points` が、その2を点数の中に保存する行です。
 
 <p data-meta="operator-protocol">次に <code>b = Score(1)</code> として <code>a + b</code> を計算します。ここではPythonが左の点数の <code>__add__</code> を呼ぶので、<code>self</code> は <code>a</code>、<code>other</code> は <code>b</code> です。中身の整数を足し、3を持つ新しい点数を返します。</p>
 
 <div class="implementation-bridge"><p>これから使う自然数のクラスも、同じ名前のメソッドを持っています。記号から手順を見つけるしくみは同じです。中でどんな足し算をするかは、次章で変わります。</p></div>
 
 <p class="source-reference" data-source-reference="peano/utils.py" data-test-reference="tests/test_utils.py">元のファイルを読む　<a href="/assets/source/peano/utils.py">peano/utils.py</a> ／ <a href="/assets/source/tests/test_utils.py">tests/test_utils.py</a></p>
+
+下の `from peano import natural_number` は、教材に用意してある関数を使えるようにする行です。`two = natural_number(2)` は、その関数で作った自然数に名前を付けています。`=` は名前を付ける記号、最後の `==` は左右の値が等しいかを尋ねる記号です。
 
 <div class="learning-prompt"><strong>実行する前に</strong><p>下の two と one は、この教材の自然数です。記号で足した答えと、メソッドを直接呼んだ答えを比べると、何が表示されるでしょう。</p></div>
 
@@ -63,6 +65,21 @@ print(via_operator == via_method)</textarea>
 
 <p data-meta="decorator">関数を受け取り、その前後に仕事を加えた関数を用意するしくみが<strong>デコレータ</strong>です。関数の上に書く <code>@log(...)</code> は、「以後、この名前で呼ぶときは記録係を通してね」という指定です。</p>
 
+まず、整数の足し算で答えと説明文を別々に受け取ってみます。
+
+```python
+def add_with_note(a, b):
+    return a + b, "二つの整数を足した"
+
+answer, note = add_with_note(2, 1)
+print(note)
+print(answer + 1)
+```
+
+二つの値を順に並べた組をタプルと呼びます。呼ぶ側で名前を二つ並べると、答えの3が `answer`、説明文が `note` に入ります。最後の行は4です。この受け取りと記録を毎回書かずに済むよう、一度だけ書いたのが次の `inner` です。
+
+下は `log` の中から抜き出したコードです。メソッドに `@log(log_level=4)` を付けると、`log` が用意した `outer` に、元のメソッドが `func` として渡ります。
+
 ```python
 def outer(func: Callable[P, tuple[T, LogMessage]]) -> Callable[P, T]:
     @wraps(func)
@@ -72,7 +89,7 @@ def outer(func: Callable[P, tuple[T, LogMessage]]) -> Callable[P, T]:
             logger.log(log_level, message if isinstance(message, str) else message())
         return result
 
-    # このあと、公開する戻り型とシグネチャも更新する。
+    # このあと、関数の引数や戻り値の型を調べたときの表示も整える。
     ...
     return inner
 ```
@@ -99,7 +116,7 @@ class Integer:
 
 <p data-meta="dataclass">ここで <code>a</code> と <code>b</code> は整数の材料になる二つの自然数です。<code>@dataclass</code> は、この二つを受け取って保存する <code>__init__</code> を用意します。先ほどの Score で手書きした仕事です。</p>
 
-`frozen=True` は作った数の中身をあとから書き換えないための指定、`slots=True` は使う属性名をあらかじめ定める指定です。`eq=False` と `repr=False` は等しさの判定と表示を自分で書くために付けます。たとえば分数は分子と分母が違っても同じ値になるので、二つの欄をそのまま比べるだけでは困ります。
+`frozen=True` は作った数の中身をあとから書き換えないための指定、`slots=True` は使う欄の名前をあらかじめ定める指定です。`eq=False` と `repr=False` は等しさの判定と表示を自分で書くために付けます。たとえば分数は分子と分母が違っても同じ値になるので、二つの欄をそのまま比べるだけでは困ります。
 
 `@total_ordering` は、等しいか、小さいかの判定から残りの大小比較を補います。作った直後に分母の確認などが必要なクラスは、`__post_init__` にその手順を書きます。
 
@@ -115,7 +132,7 @@ def coefficients(self) -> tuple[Rational, ...]:
 
 ## テストの一行を日本語で読む
 
-<p data-meta="test-api"><code>self.assertEqual(two + one, three)</code> は、「二つの値を計算し、等しいかを確認する」と読みます。この行の <code>self</code> は検査を行う側です。足し算の中の <code>self</code> がどの数を指すかは、左辺の <code>two</code> で決まります。</p>
+<p data-meta="test-api"><code>three = natural_number(3)</code> と用意したとします。<code>self.assertEqual(two + one, three)</code> は、「二つの値を計算し、等しいかを確認する」と読みます。この行の <code>self</code> は検査を行う側です。足し算の中の <code>self</code> がどの数を指すかは、左辺の <code>two</code> で決まります。</p>
 
 もし記録係が `return result, message` と書いてあったら、利用者に届くのは二つの値の組です。途中経過が正しく表示されても、上のテストは通りません。最後の問いでは、画面に出る説明と、計算の答えがどこへ行くかを追ってみてください。
 

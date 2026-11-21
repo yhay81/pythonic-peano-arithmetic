@@ -31,7 +31,7 @@ def width(self) -> Rational:
     return _from_fraction(_as_fraction(self.upper) - _as_fraction(self.lower))
 ```
 
-<p data-meta="property">二つ目の抜粋は区間のクラスにある <code>width</code> です。<code>@property</code> が付いているので <code>interval.width</code> と読むと、その場で上端から下端を引きます。幅も中点も分数で計算できます。√2そのものを小数に直す必要はありません。</p>
+<p data-meta="property">式を持つクラスと区間を持つクラスを読み分けましょう。上の <code>root.interval</code> が区間で、その両端は <code>root.interval.lower</code> と <code>root.interval.upper</code> です。二つ目の抜粋は区間のクラスにある <code>width</code> です。<code>@property</code> が付いているので <code>interval.width</code> と読むと、その場で上端から下端を引きます。<code>_as_fraction</code> は前章の <code>Fraction</code> に直して計算しやすくし、<code>_from_fraction</code> が結果を教材の分数に戻します。√2そのものを小数に直す必要はありません。</p>
 
 <p class="source-reference" data-source-reference="peano/algebraic_root.py" data-test-reference="tests/test_algebraic_root.py">元のファイルを読む　<a href="/assets/source/peano/algebraic_root.py">peano/algebraic_root.py</a> ／ <a href="/assets/source/tests/test_algebraic_root.py">tests/test_algebraic_root.py</a></p>
 
@@ -86,6 +86,8 @@ def __post_init__(self) -> None:
 <span class="lesson-layer" data-layer="implementation">半分を選ぶ</span>
 
 ## 真ん中で一度計算すると、なぜ半分を消せる？
+
+中点は両端の平均です。コードの `midpoint = interval.midpoint` で、最初は (1＋2)/2＝3/2 が得られます。次の `sign_at(midpoint)` が尋ねるのは、中点が正かではなく、**中点を式に入れた結果**が正かどうかです。たとえば5/4は正でも、(5/4)²−2 は負になります。
 
 x²−2 の値は、左端1では−1、右端2では2。真ん中の 3/2 では 9/4−2＝1/4 で正です。左端と真ん中の間で負から正に変わったので、ここに根が一つはあります。元の区間に根が一つしかないことはもう確かめたので、右半分を捨ててもその根を失いません。これが**二分法**の一歩です。
 
@@ -205,11 +207,13 @@ self.assertEqual(len(root.trace(3)), 4)
 
 √2の例では、k 回二分すると幅は 1/2ᵏ です。幅を 1/100 より小さくしたければ、2⁶＝64、2⁷＝128 なので7回で足ります。答えを小数で言う前に、「どこからどこまで」と精度を示せます。何回計算しても両端は有理数なので、両端のどちらも √2 にはなりません。
 
+区間の幅が小さいことと、根を含むことは別々に確かめてきました。したがって、たとえば7回後の区間の中点を答えに選べば、√2 とのずれは幅の半分、1/256 以下です。
+
 最初に保存した**式と分離区間**は、初めから正確に一つの根を指しています。一方、二分して得た**区間**は、その根がどこにあるかを知るための有限回の計算結果です。区間を際限なく狭めた先にも実数が存在するという議論には、実数に隙間がないという性質（完備性）を使います。プログラムが無限回の処理を終えるわけではありません。
 
 <form class="knowledge-check" data-reveal>
   <fieldset>
-    <legend>確認問題 · <code>trace(4)</code> を実行して直接得られるものは何ですか。</legend>
+    <legend>確認問題 · √2 の実験で <code>trace(4)</code> を実行して直接得られるものは何ですか。</legend>
     <label>
       <input type="radio" name="root-check" data-feedback="端点は最後まで有理数で、√2そのものにはなりません。">
       √2と厳密に等しい有理数

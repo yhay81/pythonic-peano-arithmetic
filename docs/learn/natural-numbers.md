@@ -12,7 +12,7 @@
 
 この章では0も自然数に含めます。ある数 n の次の数を **後者** と呼び、`S(n)` と書きます。1は `S(0)`、2は `S(S(0))` の略だと思ってください。
 
-最初に認める規則を**公理**といいます。0は自然数で、どの自然数にも後者があります。0はどの数の後者にもならず、違う数が同じ後者を持つこともありません。こうして0から始めた列が途中で輪になったり、別の数と合流したりすることを防ぎます。すべての自然数について考えるときには、後で使う数学的帰納法の規則もあります。
+このように0と後者から自然数を考えるのが、ペアノ算術の出発点です。最初に認める規則を**公理**といいます。0は自然数で、どの自然数にも後者があります。0はどの数の後者にもならず、違う数が同じ後者を持つこともありません。こうして0から始めた列が途中で輪になったり、別の数と合流したりすることを防ぎます。すべての自然数について考えるときには、後で使う数学的帰納法の規則もあります。
 
 <span class="lesson-layer" data-layer="representation">数を保存する</span>
 
@@ -54,6 +54,8 @@ def natural_number(value: int) -> NaturalNumber:
         result = successor(result)
     return result
 ```
+
+`N_ZERO` は最初に作った0です。`successor(result)` は今の数を一つ前の数として持つ、新しい数を作ります。`for _ in range(value)` はこれを `value` 回繰り返す行です。
 
 `natural_number(2)` の `result` を追うと、ループの前は0、1周目は0を中に持つ数、2周目はその数を中に持つ数です。こうしてできた2の `pre` を2回読むと0に戻れます。
 
@@ -109,9 +111,9 @@ def __eq__(self, other: object) -> tuple[bool, LogMessage]:
     )
 ```
 
-長い `lambda` は、比較の途中を文章にする部分です。答えを決めるのはその手前です。片方の `pre` が `None` ならその数は0。もう片方も0のときだけ `True` を返します。両方に前の数があれば、最後の `left_predecessor == right_predecessor` で一段短い比較を始めます。
+第0章で `+` が `__add__` を呼んだのと同じように、二つの自然数を `==` で比べると `__eq__` が呼ばれます。`return result, lambda: ...` は、答えと「あとで説明文を作る関数」の組を返す書き方です。記録係が必要なときにこの関数を呼びます。答えを決めるのはその手前です。片方の `pre` が `None` ならその数は0。もう片方も0のときだけ `True` を返します。両方に前の数があれば、最後の `left_predecessor == right_predecessor` で一段短い比較を始めます。
 
-<div class="learning-prompt"><strong>実行する前に</strong><p>2と1を比べたとき、どちらが先に0になりますか。続いて右側も2に変えたら、最後に比較する二つの数は何でしょう。</p></div>
+<div class="learning-prompt"><strong>実行する前に</strong><p>下の <code>config_log</code> は記録の設定です。<code>locale="ja"</code> は日本語表示、<code>max_lines</code> は表示する行数の上限です。入力の数は <code>left</code> と <code>right</code> で決めます。2と1を比べたとき、どちらが先に0になりますか。続いて右側も2に変えたら、最後に比較する二つの数は何でしょう。</p></div>
 
 <div class="peano-runner" data-state="idle" data-reveal>
   <div class="peano-runner__header">
@@ -155,7 +157,7 @@ print(answer)</textarea>
 | 0 | n＋0＝n |
 | S(m) | n＋S(m)＝S(n＋m) |
 
-この二行を `NaturalNumber.__add__` の中で探しましょう。`self` が左の数、`other` が右の数です。まず記録用の処理を外して読むと、計算部分は次の形です。
+この二行を `NaturalNumber.__add__` の中で探しましょう。`self` が左の数、`other` が右の数です。まず、自然数どうしの計算に使う行だけを取り出します。
 
 ```python
 predecessor = other.pre
@@ -163,6 +165,8 @@ if predecessor is None:
     return self
 return successor(self + predecessor)
 ```
+
+最後の行のかっこの内側が、表の n＋m です。右の数から `pre` を一つ取ったので、元の問題より右辺が小さくなりました。その答えを待って外側の `successor` が一つ先へ進めます。実際のメソッドでは、この二つの答えにそれぞれ記録用の関数を添えます。
 
 ```python
 @log(log_level=4)
@@ -207,7 +211,7 @@ def __add__(self, other: object) -> tuple[NaturalNumber, LogMessage]:
 | 2＋1 | 2＋0の答えを待つ |
 | 2＋0 | 2をすぐ返せる |
 
-ここから表を下から読んでください。2＋0が2を返すと、待っていた2＋1は `successor(2)`、つまり3を返せます。それを待っていた2＋2が4を返して計算終了です。
+ここから表を下から読んでください。2＋0が2を返すと、待っていた2＋1は、返ってきた自然数2を `successor` に渡して3を返せます。それを待っていた2＋2が4を返して計算終了です。
 
 <div class="learning-prompt"><strong>実行する前に</strong><p>最初に答えが決まる行には「加法・基底」、小さい計算から戻る行には「加法・再帰」と出ます。2＋2ではそれぞれ何行出るでしょう。</p></div>
 
