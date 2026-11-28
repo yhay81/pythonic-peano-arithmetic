@@ -32,10 +32,18 @@ jobs:
           --ExecutePreprocessor.timeout=60 --stdout examples.ipynb > /dev/null
       - name: Build distributions
         run: make build
-      - name: Install browser for accessibility checks
-        run: npx --yes browser-driver-manager@2.0.1 install chrome
-      - name: Audit documentation accessibility
-        run: make docs-a11y
+      - name: Share the verified documentation
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verified-site
+          path: site/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+  accessibility:
+    needs: quality
+    uses: ./.github/workflows/audit-docs.yml
 
   test:
     timeout-minutes: 1
