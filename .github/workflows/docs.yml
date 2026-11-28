@@ -14,16 +14,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    name: Build and deploy
-    environment:
-      name: production
-      url: https://peano.yhay81.com/
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 1
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install uv
@@ -36,10 +29,37 @@ jobs:
         run: uv sync --locked
       - name: Build documentation
         run: make docs
-      - name: Install browser for accessibility checks
-        run: npx --yes browser-driver-manager@2.0.1 install chrome
-      - name: Audit documentation accessibility
-        run: make docs-a11y
+      - name: Share the verified documentation
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verified-site
+          path: site/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+  accessibility:
+    needs: build
+    uses: ./.github/workflows/audit-docs.yml
+
+  deploy:
+    name: Deploy the audited documentation
+    needs: accessibility
+    environment:
+      name: production
+      url: https://peano.yhay81.com/
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Download the verified documentation
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: verified-site
+          path: site
 
       - name: Deploy to Cloudflare Workers
         if: >-

@@ -1,0 +1,31 @@
+name: Audit documentation accessibility
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    timeout-minutes: 1
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Download the verified documentation
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: verified-site
+          path: site
+      - name: Install browser for accessibility checks
+        run: npx --yes browser-driver-manager@2.0.1 install chrome
+      - name: Audit assigned pages
+        env:
+          A11Y_SHARD: ${{ matrix.shard }}
+          A11Y_SHARDS: ${{ strategy.job-total }}
+          A11Y_WORKERS: "3"
+        run: bash scripts/check_docs_accessibility.sh
