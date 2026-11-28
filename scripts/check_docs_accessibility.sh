@@ -38,7 +38,7 @@ if [[ -z "${chrome_test_path}" || -z "${chromedriver_test_path}" ]]; then
   exit 1
 fi
 
-uv run --locked python -m http.server "${A11Y_PORT}" --directory site \
+python3 -m http.server "${A11Y_PORT}" --directory site \
   >"${a11y_temp_dir}/server.log" 2>&1 &
 a11y_server_pid="$!"
 
@@ -92,11 +92,35 @@ for route in "${course_routes[@]}"; do
   done
 done
 
-npx --yes "@axe-core/cli@${AXE_VERSION}" \
-  "${a11y_urls[@]}" \
-  --tags wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa,best-practice \
-  --exit \
-  --load-delay 1500 \
-  --chrome-options='--headless=new' \
-  --chrome-path="${chrome_test_path}" \
-  --chromedriver-path="${chromedriver_test_path}"
+shard=${A11Y_SHARD:-0}
+shards=${A11Y_SHARDS:-1}
+workers=${A11Y_WORKERS:-1}
+if ! [[ ${shard} =~ ^(0|[1-9][0-9]*)$ && ${shards} =~ ^[1-9][0-9]*$ && ${workers} =~ ^[1-9][0-9]*$ ]] ||
+  ((shard >= shards)); then
+  echo "Invalid accessibility shard or worker count" >&2
+  exit 2
+fi
+
+# Resolve once before starting independent Chrome processes.
+axe_bin=$(npx --yes --package "@axe-core/cli@${AXE_VERSION}" -c 'command -v axe')
+pids=()
+for ((worker = 0; worker < workers; worker++)); do
+  urls=()
+  for ((page = shard * workers + worker; page < ${#a11y_urls[@]}; page += shards * workers)); do
+    urls+=("${a11y_urls[page]}")
+  done
+  if ((${#urls[@]} == 0)); then continue; fi
+  "${axe_bin}" "${urls[@]}" \
+    --tags wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa,best-practice \
+    --exit \
+    --load-delay 1500 \
+    --chrome-options='--headless=new' \
+    --chrome-path="${chrome_test_path}" \
+    --chromedriver-path="${chromedriver_test_path}" &
+  pids+=("$!")
+done
+status=0
+for pid in "${pids[@]}"; do
+  wait "${pid}" || status=1
+done
+exit "${status}"
